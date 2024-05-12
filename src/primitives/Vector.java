@@ -1,11 +1,11 @@
 package primitives;
 
 /**
- * Represents a Vector in a 3-Dimensional space
+ * Represents a Vector in a 3-Dimensional space.
  * Various methods are available for basic vector operations
  * @author Pini Goldfraind
  */
-public class Vector extends Point{
+public final class Vector extends Point{
 
     /**
      * Constructor that receives x,y,z coordinates to represent the vector's
@@ -29,7 +29,7 @@ public class Vector extends Point{
      * @param coordinates Double3 object containing the coordinates in a 3D space
      * @exception IllegalArgumentException thrown if the vector is a zero-vector
      */
-    Vector(Double3 coordinates){
+    public Vector(Double3 coordinates){
         super(coordinates);
         if(this.xyz.equals(Double3.ZERO))
             throw new IllegalArgumentException("Zero Vector");
@@ -69,10 +69,9 @@ public class Vector extends Point{
      * @return a new vector that is orthogonal(perpendicular) to the two given vectors
      */
     public final Vector crossProduct(Vector vec2){
-        return new Vector(this.xyz.d2 * vec2.xyz.d3 + this.xyz.d3 * vec2.xyz.d2,
-                            this.xyz.d1 * vec2.xyz.d3 + this.xyz.d3 * vec2.xyz.d1,
-                            this.xyz.d1 * vec2.xyz.d2 + this.xyz.d2 * vec2.xyz.d1);
-    }
+        return new Vector(this.xyz.d2 * vec2.xyz.d3 - this.xyz.d3 * vec2.xyz.d2,
+                            this.xyz.d3 * vec2.xyz.d1 - this.xyz.d1 * vec2.xyz.d3,
+                            this.xyz.d1 * vec2.xyz.d2 - this.xyz.d2 * vec2.xyz.d1);}
 
     /**
      * Gives the squared length of this vector object
