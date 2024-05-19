@@ -12,6 +12,8 @@ public abstract class RadialGeometry implements Geometry {
      */
     protected final double radius;
 
+    protected final double radiusSquared;
+
     /**
      * Constructor that and initializes the geometry with the given radius
      *
@@ -19,5 +21,6 @@ public abstract class RadialGeometry implements Geometry {
      */
     public RadialGeometry(double radius) {
         this.radius = radius;
+        this.radiusSquared = radius * radius;
     }
 }
