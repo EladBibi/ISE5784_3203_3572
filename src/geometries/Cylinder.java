@@ -6,14 +6,15 @@ import primitives.Vector;
 
 /**
  * A cylinder in a three-dimensional space, represented by a Tube and height
+ *
  * @author Pini Goldfraind
  */
-public class Cylinder extends Tube{
+public class Cylinder extends Tube {
 
     private final double height;
 
-    public Cylinder(Ray axis, double radius, double height){
-        super(axis,radius);
+    public Cylinder(Ray axis, double radius, double height) {
+        super(axis, radius);
         this.height = height;
     }
 
