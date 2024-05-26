@@ -6,7 +6,7 @@ import primitives.Vector;
 /**
  * A sphere in a three-dimensional space, represented with a center point and radius
  *
- * @author Pini Goldfraind
+ * @author Elad Bibi
  */
 public class Sphere extends RadialGeometry {
 
@@ -25,6 +25,6 @@ public class Sphere extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        return null;
+        return point.subtract(center).normalize();
     }
 }
