@@ -11,12 +11,12 @@ public class Ray {
     /**
      * The ray's starting position in the 3D space
      */
-    private final Point head;
+    public final Point head;
 
     /**
      * The ray's direction vector normalized
      */
-    private final Vector direction;
+    public final Vector direction;
 
     /**
      * Constructor that accepts a head point and direction vector.
@@ -43,6 +43,6 @@ public class Ray {
 
     @Override
     public final String toString() {
-        return this.head + "->" + this.direction;
+        return "h" + this.head + " " + this.direction;
     }
 }
