@@ -2,8 +2,9 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
-import primitives.Util;
 import primitives.Vector;
+
+import static primitives.Util.isZero;
 
 /**
  * A Tube in a three-dimensional space, represented with a center axis-ray and a radius.
@@ -30,12 +31,13 @@ public class Tube extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        double distance = axis.direction.dotProduct(point.subtract(axis.head));
+        Vector v = axis.getDirection();
+        Point h = axis.getHead();
+        double distance = v.dotProduct(point.subtract(h));
 
         //handling the case where the point is on the same level as the tube's head-point
-        if(Util.isZero(distance))
-            return point.subtract(axis.head).normalize();
+        Point pnt = isZero(distance) ? h : h.add(v.scale(distance));
 
-        return point.subtract(axis.head.add(axis.direction.scale(distance))).normalize();
+        return point.subtract(pnt).normalize();
     }
 }

@@ -2,8 +2,9 @@ package primitives;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static primitives.Util.isZero;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static primitives.Util.alignZero;
 
 /**
  * Tests for point-class methods
@@ -11,6 +12,12 @@ import static primitives.Util.isZero;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 class PointTest {
+
+    /**
+     * Delta value for accuracy when comparing the numbers of type 'double' in
+     * assertEquals
+     */
+    private final double DELTA = 0.000001;
 
     /**
      * Test method for {@link primitives.Point#subtract(Point)}.
@@ -34,19 +41,12 @@ class PointTest {
 
         // TC02: Vector & Point subtraction with itself
         //vector - itself:
-        assertThrows(Exception.class, () -> v1.subtract(v1),
+        assertThrows(IllegalArgumentException.class, () -> v1.subtract(v1),
                 "No exception was thrown");
-        assertThrowsExactly(IllegalArgumentException.class, () -> v1.subtract(v1),
-                "Wrong exception was thrown. 'IllegalArgumentException' is expected");
         //point - itself:
-        assertThrows(Exception.class, () -> {
-                    p1.subtract(p1);
-                },
+        assertThrows(IllegalArgumentException.class, () -> p1.subtract(p1),
                 "point - itself does not throw an exception");
-        assertThrowsExactly(IllegalArgumentException.class, () -> {
-                    p1.subtract(p1);
-                },
-                "point - itself throws the wrong exception");
+
     }
 
     /**
@@ -67,7 +67,6 @@ class PointTest {
                 "point + vector operation does not return the correct point");
         assertEquals(Point.ZERO, p1.add(v1Opposite),
                 "point + vector operation should have returned zero-vector(center of coordinates)");
-
     }
 
     /**
@@ -80,15 +79,15 @@ class PointTest {
         Point p3 = new Point(2, 4, 5);
 
         // TC01: Standard distance computation
-        assertTrue(isZero(p1.distance(p3) - 3),
+        assertEquals(0d, alignZero(p1.distance(p3) - 3),
                 "distance computation not working properly");
-        assertTrue(isZero(p3.distance(p1) - 3),
+        assertEquals(0d, alignZero(p3.distance(p1) - 3),
                 "distance computation not working properly");
 
         // =============== Boundary Values Tests ==================
 
         // TC02: Distance between identical points
-        assertTrue(isZero(p1.distance(p1)),
+        assertEquals(0d, alignZero(p1.distance(p1)),
                 "point distance to itself is not zero");
     }
 
@@ -103,14 +102,14 @@ class PointTest {
         Point p3 = new Point(2, 4, 5);
 
         // TC01: Standard distance computation
-        assertTrue(isZero(p1.distanceSquared(p3) - 9),
+        assertEquals(0d, alignZero(p1.distanceSquared(p3) - 9),
                 "squared distance computation not working properly");
-        assertTrue(isZero(p3.distanceSquared(p1) - 9),
+        assertEquals(0d, alignZero(p3.distanceSquared(p1) - 9),
                 "squared distance computation not working properly");
 
         // =============== Boundary Values Tests ==================
         // TC02: Distance between identical points
-        assertTrue(isZero(p1.distanceSquared(p1)),
+        assertEquals(0d, alignZero(p1.distanceSquared(p1)),
                 "point squared distance to itself is not zero");
     }
 }

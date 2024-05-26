@@ -1,6 +1,7 @@
 package geometries;
 
-import primitives.*;
+import primitives.Point;
+import primitives.Vector;
 
 /**
  * Interface that represents a geometry object in a three-dimensional space

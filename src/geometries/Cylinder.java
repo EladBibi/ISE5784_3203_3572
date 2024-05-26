@@ -2,8 +2,10 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
-import primitives.Util;
 import primitives.Vector;
+
+import static primitives.Util.compare;
+import static primitives.Util.isZero;
 
 /**
  * A cylinder in a three-dimensional space, represented by a Tube and height
@@ -29,21 +31,23 @@ public class Cylinder extends Tube {
     @Override
     public Vector getNormal(Point point) {
 
+        Vector v = axis.getDirection();
+        Point h = axis.getHead();
         double distance;
-        try{
-            distance = axis.direction.dotProduct(point.subtract(axis.head));
-        }catch (Exception ex){ //will get here if a zero-vector exception was thrown
+        try {
+            distance = v.dotProduct(point.subtract(h));
+        } catch (Exception ex) { //will get here if a zero-vector exception was thrown
             //handling the case where the point is in the middle of the cylinder's base
-            return axis.direction.scale(-1d);
+            return v.scale(-1d);
         }
 
         //handling the case where the point is on the cylinder's base
-        if(Util.isZero(distance))
-            return axis.direction.scale(-1d);
-        //handling the case where the point is on the cylinder's ceiling
-        if(distance == this.height)
-            return axis.direction;
+        if (isZero(distance))
+            return v.scale(-1d);
+            //handling the case where the point is on the cylinder's ceiling
+        else if (compare(distance, this.height))
+            return v;
 
-        return point.subtract(axis.head.add(axis.direction.scale(distance))).normalize();
+        return point.subtract(h.add(v.scale(distance))).normalize();
     }
 }

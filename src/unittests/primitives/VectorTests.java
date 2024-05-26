@@ -3,8 +3,7 @@ package primitives;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static primitives.Util.isZero;
+import static primitives.Util.alignZero;
 
 
 /**
@@ -38,10 +37,8 @@ class VectorTests {
         // =============== Boundary Values Tests ==================
 
         // TC02: Vector addition with the opposite
-        assertThrows(Exception.class, () -> v1.add(v1Opposite),
+        assertThrows(IllegalArgumentException.class, () -> v1.add(v1Opposite),
                 "ERROR: Vector + -itself does not throw an exception");
-        assertThrowsExactly(IllegalArgumentException.class, () -> v1.add(v1Opposite),
-                "ERROR: Vector + -itself throws the wrong exception");
     }
 
     /**
@@ -74,13 +71,13 @@ class VectorTests {
         Vector v3 = new Vector(0, 3, -2);
 
         // TC01: Standard DotProduct operation
-        assertTrue(isZero(v1.dotProduct(v2) + 28),
+        assertEquals(0d, alignZero(v1.dotProduct(v2) + 28),
                 "DotProduct operation not working properly");
 
         // =============== Boundary Values Tests ==================
 
         // TC02: Dot product operation on orthogonal vectors
-        assertTrue(isZero(v1.dotProduct(v3)),
+        assertEquals(0d, alignZero(v1.dotProduct(v3)),
                 "DotProduct operation on orthogonal vectors is not zero");
 
         // TC03: One operand is a unit-vector
@@ -99,11 +96,13 @@ class VectorTests {
         Vector vr = v1.crossProduct(v3);
 
         // TC01: Verifying orthogonality to the operands
-        assertTrue(isZero(vr.dotProduct(v1)) && isZero(vr.dotProduct(v3)),
+        assertEquals(0d, alignZero(vr.dotProduct(v1)),
+                "crossProduct() result is not orthogonal to its operands");
+        assertEquals(0d, alignZero(vr.dotProduct(v3)),
                 "crossProduct() result is not orthogonal to its operands");
 
         // TC02: Different length vectors
-        assertTrue(isZero(vr.length() - v1.length() * v3.length()),
+        assertEquals(0d, alignZero(vr.length() - v1.length() * v3.length()),
                 "crossProduct() wrong result length");
 
         // =============== Boundary Values Tests ==================
@@ -122,7 +121,7 @@ class VectorTests {
         Vector v4 = new Vector(1, 2, 2);
 
         // TC01: Standard squared-length computation
-        assertTrue(isZero(v4.lengthSquared() - 9),
+        assertEquals(0d, alignZero(v4.lengthSquared() - 9),
                 "vector lengthSquared gave the wrong value");
     }
 
@@ -135,7 +134,7 @@ class VectorTests {
         Vector v4 = new Vector(1, 2, 2);
 
         // TC01: Standard Vector length computation
-        assertTrue(isZero(v4.length() - 3),
+        assertEquals(0d, alignZero(v4.length() - 3),
                 "vector length gave the wrong value");
     }
 
@@ -149,7 +148,7 @@ class VectorTests {
         Vector u = v.normalize();
 
         // TC01: Standard Vector normalization
-        assertTrue(isZero(u.length() - 1),
+        assertEquals(0d, alignZero(u.length() - 1),
                 "the normalized vector is not a unit vector");
         assertFalse(v.dotProduct(u) < 0,
                 "the normalized vector is opposite to the original one");
