@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
 /**
@@ -11,6 +12,9 @@ import primitives.Vector;
  */
 public class Tube extends RadialGeometry {
 
+    /**
+     * The center ray at the heart of the tube
+     */
     protected final Ray axis;
 
     /**
@@ -26,6 +30,12 @@ public class Tube extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        return null;
+        double distance = axis.direction.dotProduct(point.subtract(axis.head));
+
+        //handling the case where the point is on the same level as the tube's head-point
+        if(Util.isZero(distance))
+            return point.subtract(axis.head).normalize();
+
+        return point.subtract(axis.head.add(axis.direction.scale(distance))).normalize();
     }
 }
