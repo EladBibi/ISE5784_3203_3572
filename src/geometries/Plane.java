@@ -1,6 +1,8 @@
 package geometries;
 
-import primitives.*;
+import primitives.Point;
+import primitives.Util;
+import primitives.Vector;
 
 /**
  * Represents a Plane in a three-dimensional space
@@ -14,11 +16,12 @@ public class Plane implements Geometry {
 
     /**
      * Constructor that initializes the plane from the three given unique points
-     * @exception IllegalArgumentException if the three given points are not unique OR
-     * if the given points are linearly dependent
+     *
      * @param p1 point NO 1 on the plane
      * @param p2 point NO 2 on the plane
      * @param p3 point NO 3 on the plane
+     * @throws IllegalArgumentException if the three given points are not unique OR
+     *                                  if the given points are linearly dependent
      */
     public Plane(Point p1, Point p2, Point p3) {
 
@@ -40,7 +43,7 @@ public class Plane implements Geometry {
      */
     public Plane(Point q, Vector normal) {
         this.q = q;
-        this.normal = normal.length() == 1f ? normal : normal.normalize();
+        this.normal = Util.compare(normal.length(), 1d) ? normal : normal.normalize();
     }
 
     /**

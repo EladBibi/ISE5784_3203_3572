@@ -5,7 +5,7 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for Cylinder geometry(finite) in a 3D space
@@ -41,11 +41,21 @@ class CylinderTests {
 
         // =============== Boundary Values Tests ==================
 
-        // TC04: The Point is the cylinder's head-point(middle of the base)
+        // TC04: The Point is on the edge of the cylinder's base
+        Point edgePoint = new Point(0.5, 1, 1);
+        assertEquals(rayDir.scale(-1d), cylinder.getNormal(edgePoint),
+                "Issue when computing normal for a point that's on the base's edge");
+
+        // TC05: The Point is on the edge of the cylinder's ceiling
+        Point edgePointTop = new Point(0.5, 6, 1);
+        assertEquals(rayDir, cylinder.getNormal(edgePointTop),
+                "Issue when computing normal for a point that's on the ceiling edge of the cylinder");
+
+        // TC06: The Point is the cylinder's head-point(middle of the base)
         assertEquals(rayDir.scale(-1d), cylinder.getNormal(rayHead),
                 "Issue when computing normal for the cylinder's head point");
 
-        // TC05: The Point is the cylinder's head-point projected on the ceiling(middle of the ceiling)
+        // TC07: The Point is the cylinder's head-point projected on the ceiling(middle of the ceiling)
         Point headTop = new Point(2, 6, 1);
         assertEquals(rayDir, cylinder.getNormal(headTop),
                 "Issue when computing normal for the center point on the cylinder's top");

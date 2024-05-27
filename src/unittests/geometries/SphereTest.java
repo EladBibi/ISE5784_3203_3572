@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Vector;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for sphere geometry
  *
- * @author Elad Bibi
+ * @author Pini Goldfraind &amp; Elad Bibi
  */
 class SphereTest {
 
