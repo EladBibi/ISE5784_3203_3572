@@ -82,6 +82,7 @@ class VectorTests {
 
         // TC03: One operand is a unit-vector
         assertEquals(-3.741d, v1.dotProduct(v2.normalize()), DELTA);
+
     }
 
     /**

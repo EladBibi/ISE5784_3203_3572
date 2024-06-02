@@ -6,9 +6,9 @@ import primitives.Vector;
 /**
  * Interface that represents a geometry object in a three-dimensional space
  *
- * @author Pini Goldfraind &amp'; Elad Bibi
+ * @author Pini Goldfraind &amp; Elad Bibi
  */
-public interface Geometry {
+public interface Geometry extends Intersectable {
 
     /**
      * Function that returns a normal vector(orthogonal vector) to the given point
