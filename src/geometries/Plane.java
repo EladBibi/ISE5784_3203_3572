@@ -7,7 +7,8 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static primitives.Util.*;
+import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 /**
  * Represents a Plane in a three-dimensional space
@@ -76,6 +77,6 @@ public class Plane implements Geometry {
 
         Vector vhq = q.subtract(h);
         double t = alignZero(normal.dotProduct(vhq) / nv);
-        return t <= 0 ?  null : List.of(ray.getPoint(t));
+        return t <= 0 ? null : List.of(ray.getPoint(t));
     }
 }
