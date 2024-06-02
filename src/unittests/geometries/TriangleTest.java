@@ -36,6 +36,7 @@ class TriangleTest {
         Triangle triangle = new Triangle(p1, p2, p3);
         Vector n = new Vector(3, 16, 2.5).normalize();
 
+        //TODO
         assertTrue(n.equals(triangle.getNormal(new Point(4, -2, 8))) ||
                         n.scale(-1d).equals(triangle.getNormal(new Point(4, -2, 8))),
                 "Normal computation for triangle not working properly");

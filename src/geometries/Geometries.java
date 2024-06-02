@@ -3,7 +3,7 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,18 +13,16 @@ import java.util.List;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class Geometries implements Intersectable {
-
-    private List<Intersectable> geometries = new LinkedList<Intersectable>();
+    private final List<Intersectable> geometries = new LinkedList<>();
 
     /**
      * Empty default constructor for creating an empty geometries container
      */
     public Geometries() {
-
     }
 
     /**
-     * Constructor that initializews the geometries container with the given, one or more geometries
+     * Constructor that initializes the geometries container with the given collection of geometries
      *
      * @param geometries one or more geometries objects to be put inside the new geometries container
      */
@@ -38,23 +36,22 @@ public class Geometries implements Intersectable {
      * @param geometries one or more geometries objects to be added to the container
      */
     public void add(Intersectable... geometries) {
-        for (Intersectable geometry : geometries)
-            this.geometries.add(geometry);
+        this.geometries.addAll(Arrays.asList(geometries));
     }
 
     @Override
     public List<Point> findIntersections(Ray ray) {
         List<Point> list = null;
+
         for (Intersectable geometry : geometries) {
             List<Point> intersections = geometry.findIntersections(ray);
-            if (list == null && intersections != null) {
-                list = new LinkedList<Point>(intersections);
-            } else if (intersections != null) {
-                list.addAll(intersections);
+            if (intersections != null) {
+                if (list == null)
+                    list = new LinkedList<>(intersections);
+                else
+                    list.addAll(intersections);
             }
         }
-        return list != null
-                ? list.stream().sorted(Comparator.comparingDouble((p) -> p.distance(ray.getHead()))).toList()
-                : list;
+        return list;
     }
 }

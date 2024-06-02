@@ -57,11 +57,10 @@ class PlaneTests {
         Point p3 = new Point(4, 1, 2);
         Vector n = new Vector(3, 16, 2.5).normalize();
         Plane plane = new Plane(p1, p2, p3);
-
+        //TODO
         assertTrue(plane.getNormal().equals(n) || plane.getNormal().equals(n.scale(-1d)),
                 "Plane normal computation not working properly");
-        assertTrue(plane.getNormal().equals(plane.getNormal(new Point(-4.5, -1.5, 15))),
-                "Plane normal computation not working properly");
+        assertEquals(plane.getNormal(), plane.getNormal(new Point(-4.5, -1.5, 15)), "Plane normal computation not working properly");
         //verifying the length is 1
         assertEquals(1d, plane.getNormal().length(), DELTA,
                 "Normal is not a unit-vector");

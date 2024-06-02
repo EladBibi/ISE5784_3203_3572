@@ -11,7 +11,7 @@ import static primitives.Util.isZero;
 /**
  * A Tube in a three-dimensional space, represented with a center axis-ray and a radius.
  *
- * @author Elad Bibi
+ * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class Tube extends RadialGeometry {
 

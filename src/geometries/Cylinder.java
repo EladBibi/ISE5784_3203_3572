@@ -12,7 +12,7 @@ import static primitives.Util.isZero;
 /**
  * A cylinder in a three-dimensional space, represented by a Tube and height
  *
- * @author Pini Goldfraind
+ * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class Cylinder extends Tube {
 

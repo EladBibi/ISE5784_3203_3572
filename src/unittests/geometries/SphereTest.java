@@ -7,6 +7,7 @@ import primitives.Vector;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -17,10 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 class SphereTest {
-
-    private final Point p001 = new Point(0, 0, 1);
     private final Point p100 = new Point(1, 0, 0);
-    private final Vector v001 = new Vector(0, 0, 1);
 
     /**
      * Test method for {@link geometries.Sphere#getNormal(Point)}.
@@ -52,8 +50,8 @@ class SphereTest {
         final Vector v110 = new Vector(1, 1, 0);
         final Point p01 = new Point(-1, 0, 0);
 
-        Point point = null;
-        Vector vector = null;
+        Point point;
+        Vector vector;
         // ============ Equivalence Partitions Tests ==============
 
         // TC01: Ray's line is outside the sphere (0 points)
@@ -99,9 +97,8 @@ class SphereTest {
         point = new Point(1, 2, 0);
         vector = new Vector(0, -1, 0);
         final Ray ray1 = new Ray(point, vector);
-        expected = List.of(new Point(1, -1, 0),
-                        new Point(1, 1, 0))
-                .stream().sorted(Comparator.comparingDouble(p -> p.distance(ray1.getHead()))).toList();
+        expected = Stream.of(new Point(1, -1, 0), new Point(1, 1, 0))
+                .sorted(Comparator.comparingDouble(p -> p.distance(ray1.getHead()))).toList();
         assertEquals(2, sphere.findIntersections(new Ray(point, vector)).size(),
                 "Ray starts outside, goes through center. 2 points");
         assertEquals(expected, sphere.findIntersections(new Ray(point, vector)),

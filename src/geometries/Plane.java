@@ -12,7 +12,7 @@ import static primitives.Util.*;
 /**
  * Represents a Plane in a three-dimensional space
  *
- * @author Elad Bibi
+ * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class Plane implements Geometry {
 
@@ -75,15 +75,7 @@ public class Plane implements Geometry {
             return null;
 
         Vector vhq = q.subtract(h);
-        // handling the case where the ray is orthogonal to the plane
-        if (compare(Math.abs(nv), 1d)) {
-            if (alignZero(vhq.dotProduct(v)) <= 0)
-                return null;
-        }
-
         double t = alignZero(normal.dotProduct(vhq) / nv);
-        if (t <= 0)
-            return null;
-        return List.of(ray.getPoint(t));
+        return t <= 0 ?  null : List.of(ray.getPoint(t));
     }
 }
