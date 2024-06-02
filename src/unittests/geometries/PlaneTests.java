@@ -2,7 +2,10 @@ package geometries;
 
 import org.junit.jupiter.api.Test;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,5 +65,75 @@ class PlaneTests {
         //verifying the length is 1
         assertEquals(1d, plane.getNormal().length(), DELTA,
                 "Normal is not a unit-vector");
+    }
+
+    /**
+     * Test method for {@link Plane#findIntersections(Ray)}.
+     */
+    @Test
+    void testFindIntersections() {
+        Point point = new Point(2, 1, -2);
+        Vector vector = new Vector(1, 1, 0);
+        Plane plane = new Plane(new Point(0, 2, 1), new Point(0, 2, 3), new Point(10, 2, 0));
+
+
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Standard intersection (1 point)
+        List<Point> expected = List.of(new Point(3, 2, -2));
+        assertEquals(1, plane.findIntersections(new Ray(point, vector)).size(),
+                "Intersection with the plane gives the wrong intersection-count");
+        assertEquals(expected, plane.findIntersections(new Ray(point, vector)),
+                "Intersection with the plane gives the wrong point");
+        // =============== Boundary Values Tests ==================
+
+        // TC02: Ray is parallel to the plane(0 points)
+        point = new Point(2, 1, -2);
+        vector = new Vector(1, 0, 0);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "Ray is parallel to the plane");
+
+        // TC03: Ray is included in the plane(0 points)
+        point = new Point(2, 2, -2);
+        vector = new Vector(1, 0, 0);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "Ray is included in the plane");
+
+        // TC04: Ray's head is NOT on the plane(0 points)
+        point = new Point(1.4, 3, -2);
+        vector = new Vector(1, 1, 1);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "No intersection with the plane");
+
+        // TC05: Ray is orthogonal to the plane, head point is ON the plane(0 points)
+        point = new Point(2, 2, -2);
+        vector = new Vector(0, -1, 0);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "Ray is orthogonal to the plane, starts ON the plane");
+
+        // TC06: Ray is orthogonal to the plane, head point is ABOVE the plane(0 points)
+        point = new Point(2, 3, -2);
+        vector = new Vector(0, 1, 0);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "Ray is orthogonal to the plane, starts ABOVE the plane");
+
+        // TC07: Ray is orthogonal to the plane, head point is UNDER the plane (0 points)
+        point = new Point(2, 1, -2);
+        vector = new Vector(0, -1, 0);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "Ray is orthogonal to the plane, starts UNDER the plane");
+
+        // TC08: The ray begins on the plane(0 points)
+        point = new Point(2, 2, -2);
+        vector = new Vector(1, 1, 0);
+        assertNull(plane.findIntersections(new Ray(point, vector)),
+                "Ray is orthogonal to the plane, starts UNDER the plane");
+
+        // TC09: The ray begins at the point saved as reference by the plane aka 'q point'(0 points)
+        point = new Point(2, 2, -2);
+        vector = new Vector(1, 1, 0);
+        Plane planeAltCtor = new Plane(new Point(2, 2, -2), new Vector(0, 1, 0));
+        assertNull(planeAltCtor.findIntersections(new Ray(point, vector)),
+                "The ray begins at the point saved by the plane(the point provided to the constructor - q)");
     }
 }
