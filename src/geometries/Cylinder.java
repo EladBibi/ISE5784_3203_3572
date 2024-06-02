@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
+
 import static primitives.Util.compare;
 import static primitives.Util.isZero;
 
@@ -48,6 +50,11 @@ public class Cylinder extends Tube {
         else if (compare(distance, this.height))
             return v;
 
-        return point.subtract(h.add(v.scale(distance))).normalize();
+        return point.subtract(axis.getPoint(distance)).normalize();
+    }
+
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        return null;
     }
 }

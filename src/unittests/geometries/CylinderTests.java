@@ -15,6 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CylinderTests {
 
     /**
+     * Test method for {@link geometries.Cylinder#findIntersections(Ray)}.
+     */
+    @Test
+    void testFindIntersections() {
+    }
+
+    /**
      * Test method for {@link geometries.Cylinder#getNormal(Point)}.
      */
     @Test
@@ -60,4 +67,5 @@ class CylinderTests {
         assertEquals(rayDir, cylinder.getNormal(headTop),
                 "Issue when computing normal for the center point on the cylinder's top");
     }
+
 }

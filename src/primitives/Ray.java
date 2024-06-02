@@ -1,5 +1,7 @@
 package primitives;
 
+import static primitives.Util.isZero;
+
 /**
  * Represents a Ray in a 3-Dimensional space.
  * contains head-point for the ray's starting position and a normalized direction vector
@@ -11,12 +13,12 @@ public class Ray {
     /**
      * The ray's starting position in the 3D space
      */
-    public final Point head;
+    private final Point head;
 
     /**
      * The ray's direction vector normalized
      */
-    public final Vector direction;
+    private final Vector direction;
 
     /**
      * Constructor that accepts a head point and direction vector.
@@ -62,5 +64,15 @@ public class Ray {
      */
     public Vector getDirection() {
         return this.direction;
+    }
+
+    /**
+     * Gives a point on the ray
+     *
+     * @param t scalar for scaling the direction vector
+     * @return head point + t * direction vector
+     */
+    public Point getPoint(double t) {
+        return isZero(t) ? head : head.add(direction.scale(t));
     }
 }

@@ -38,4 +38,11 @@ class TubeTest {
                 "Normal computation issue when the point-to-center vector is orthogonal(perpendicular) " +
                         "to the center-ray's direction vector");
     }
+
+    /**
+     * Test method for {@link geometries.Tube#findIntersections(Ray)}.
+     */
+    @Test
+    void testFindIntersections() {
+    }
 }
