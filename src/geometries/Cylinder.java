@@ -16,6 +16,9 @@ import static primitives.Util.isZero;
  */
 public class Cylinder extends Tube {
 
+    /**
+     * The cylinder's height
+     */
     private final double height;
 
     /**

@@ -13,6 +13,10 @@ import java.util.List;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class Geometries implements Intersectable {
+
+    /**
+     * Geometries container list
+     */
     private final List<Intersectable> geometries = new LinkedList<>();
 
     /**

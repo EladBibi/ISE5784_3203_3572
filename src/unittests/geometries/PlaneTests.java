@@ -58,8 +58,7 @@ class PlaneTests {
         Vector n = new Vector(3, 16, 2.5).normalize();
         Plane plane = new Plane(p1, p2, p3);
 
-        assertTrue(plane.getNormal().equals(n) || plane.getNormal().equals(n.scale(-1d)),
-                "Plane normal computation not working properly");
+        assertEquals(n, plane.getNormal(), "Plane normal computation not working properly");
         assertEquals(plane.getNormal(), plane.getNormal(new Point(-4.5, -1.5, 15)),
                 "Plane normal computation not working properly");
         //verifying the length is 1

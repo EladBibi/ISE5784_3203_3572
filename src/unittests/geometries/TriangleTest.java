@@ -7,7 +7,8 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for triangle geometry
@@ -36,8 +37,7 @@ class TriangleTest {
         Triangle triangle = new Triangle(p1, p2, p3);
         Vector n = new Vector(3, 16, 2.5).normalize();
 
-        assertTrue(n.equals(triangle.getNormal(new Point(4, -2, 8))) ||
-                        n.scale(-1d).equals(triangle.getNormal(new Point(4, -2, 8))),
+        assertEquals(n, triangle.getNormal(new Point(4, -2, 8)),
                 "Normal computation for triangle not working properly");
         //verifying the length is 1
         assertEquals(1d, triangle.getNormal((new Point(4, -2, 8))).length(), DELTA,

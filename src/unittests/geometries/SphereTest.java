@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 class SphereTest {
+
     private final Point p100 = new Point(1, 0, 0);
 
     /**

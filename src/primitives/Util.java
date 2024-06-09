@@ -61,7 +61,7 @@ public final class Util {
      *
      * @param num1 first operand in the comparison
      * @param num2 second operand in the comparison
-     * @return boolean result of num1 == num2
+     * @return true if num1 = num2 <br> otherwise, false
      */
     public static boolean compare(double num1, double num2) {
         return isZero(num1 - num2);
