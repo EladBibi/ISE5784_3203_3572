@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<presets>
+	<preset name = "scene1">
+		<camera-position p0 = "0 0 0"/>	
+		<image-writer nx="1000" ny="1000"/>	
+		<background-color color="75 127 90" />
+		<ambient-light color="255 191 191" scalar ="1 1 1"/>
+		<geometries>
+			<sphere center="0 0 -100" radius="50" />
+			<triangle p0="-100 0 -100" p1="0 100 -100" p2="-100 100 -100" />
+			<triangle p0="-100 0 -100" p1="0 -100 -100" p2="-100 -100 -100" />
+			<triangle p0="100 0 -100" p1="0 -100 -100" p2="100 -100 -100" />
+		</geometries>
+	</preset>
+	<preset name = "testScene">
+		<camera-position p0 = "2 5 40"/>
+		<image-writer nx="2000" ny="1000"/>		
+		<background-color color="75 127 90" />
+		<ambient-light color="255 191 191" scalar ="2 2 2"/>
+		<geometries>
+			<sphere center="0 0 -100" radius="50" />
+			<triangle p0="-100 0 -100" p1="0 100 -100" p2="-100 100 -100" />
+			<triangle p0="-100 0 -100" p1="0 -100 -100" p2="-100 -100 -100" />
+			<triangle p0="100 0 -100" p1="0 -100 -100" p2="100 -100 -100" />
+		</geometries>
+	</preset>
+</presets>

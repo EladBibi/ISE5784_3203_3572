@@ -1,14 +1,17 @@
 package renderer;
 
 
+import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import scene.Scene;
 
 import java.util.MissingResourceException;
 
 import static primitives.Util.compare;
 import static primitives.Util.isZero;
+import static xml.XmlParser.*;
 
 /**
  * Camera class that contains positioning in the plane and view plane size
@@ -46,6 +49,15 @@ public class Camera implements Cloneable {
      * The view-plane's height
      */
     private double vpHeight = 0;
+
+    /**
+     * the camera's image-writer
+     */
+    private ImageWriter imageWriter;
+    /**
+     * the camera's ray-tracer
+     */
+    private RayTracerBase rayTracer;
 
     @Override
     protected Camera clone() {
@@ -170,6 +182,64 @@ public class Camera implements Cloneable {
         return new Ray(position, pIJ.subtract(position).normalize());
     }
 
+    /**
+     * Renders the image based on the camera's scene and position.
+     * after executing this method, the image will be rendered inside the image-writer
+     * and the image file can be constructed
+     *
+     * @return the camera itself
+     */
+    public Camera renderImage() {
+        //running on columns, i = y
+        for (int i = 0; i < imageWriter.getNy(); ++i) {
+            //running on the row, j = x
+            for (int j = 0; j < imageWriter.getNx(); ++j) {
+                castRay(imageWriter.getNx(), imageWriter.getNy(), j, i);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Helper method for casting a ray through the given pixel and coloring it per calculation
+     *
+     * @param Nx     the amount of horizontal pixels
+     * @param Ny     the amount of vertical pixels
+     * @param column the column's index (x pixel) for casting the ray through
+     * @param row    the row's index (y pixel) for casting the ray through
+     */
+    private void castRay(int Nx, int Ny, int column, int row) {
+        Ray ray = constructRay(Nx, Ny, column, row);
+        imageWriter.writePixel(column, row, rayTracer.traceRay(ray));
+    }
+
+    /**
+     * Renders a grid (lines and columns) with the given interval and color.
+     * should be called AFTER rendering the image in order for the grid to be visible
+     *
+     * @param interval the pixels count between each line &amp; column of the grid
+     * @param color    the color for the grid
+     * @return the camera itself
+     */
+    public Camera printGrid(int interval, Color color) {
+        //running on columns, i = y
+        for (int i = 0; i < imageWriter.getNy(); ++i) {
+            //running on the row, j = x
+            for (int j = 0; j < imageWriter.getNx(); ++j) {
+                if (i % interval == 0 || j % interval == 0)
+                    imageWriter.writePixel(j, i, color);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Method for constructing a PNG file of our rendered image
+     */
+    public void writeToImage() {
+        imageWriter.writeToImage();
+    }
+
     //----------------Internal class Builder----------------
 
     /**
@@ -207,6 +277,19 @@ public class Camera implements Cloneable {
          */
         public Builder setLocation(Point point) {
             camera.position = point;
+            return this;
+        }
+
+        /**
+         * Loading the camera position in the scene from xml file from the given scene name
+         *
+         * @param sceneName the name of the scene listed in the scene file
+         * @return the builder object used in the construction
+         * @throws IllegalArgumentException if the given scene name does not exist
+         * @throws RuntimeException         if there was an error loading or parsing the scenes file
+         */
+        public Builder setLocationFromFile(String sceneName) {
+            camera.position = extractCameraPosition(sceneName);
             return this;
         }
 
@@ -262,6 +345,71 @@ public class Camera implements Cloneable {
         }
 
         /**
+         * Setter for the camera's image-writer
+         *
+         * @param imageWriter the image writer that will be used be the camera
+         * @return the builder object used in the construction
+         */
+        public Builder setImageWriter(ImageWriter imageWriter) {
+            camera.imageWriter = imageWriter;
+            return this;
+        }
+
+        /**
+         * Loading an Image writer from xml file
+         *
+         * @param sceneName the name of the scene listed in the scene file
+         * @param imageName the name for the image
+         * @return the builder object used in the construction
+         * @throws IllegalArgumentException if the given scene name does not exist
+         * @throws RuntimeException         if there was an error loading or parsing the scenes file
+         */
+        public Builder setImageWriterFromFile(String sceneName, String imageName) {
+            camera.imageWriter = extractImageWriter(sceneName, imageName);
+            return this;
+        }
+
+        /**
+         * Setter for the camera's Ray-tracer
+         *
+         * @param rayTracer a ray tracer for the camera
+         * @return the builder object used in the construction
+         */
+        public Builder setRayTracer(RayTracerBase rayTracer) {
+            camera.rayTracer = rayTracer;
+            return this;
+        }
+
+        /**
+         * Loading a ray tracer from an xml file. all data related to the scene will be loaded from the file
+         *
+         * @param sceneName the name of the scene listed in the scene file
+         * @return the builder object used in the construction
+         * @throws IllegalArgumentException if the given scene name does not exist
+         * @throws RuntimeException         if there was an error loading or parsing the scenes file
+         */
+        public Builder setRayTracerFromFile(String sceneName) {
+            Scene scene = extractPreset(sceneName);
+            if (scene == null)
+                throw new IllegalArgumentException("A scene with name: " + sceneName + " does not exist");
+            camera.rayTracer = new SimpleRayTracer(scene);
+            return this;
+        }
+
+        /**
+         * Extracting a pre-made setting preset of the camera
+         *
+         * @param presetName the name of the preset in the file (will also be the scene name)
+         * @param imageName  name for the image
+         * @return the builder object used in the construction
+         */
+        public Builder extractPresetFromFile(String presetName, String imageName) {
+            return setImageWriterFromFile(presetName, imageName)
+                    .setLocationFromFile(presetName)
+                    .setRayTracerFromFile(presetName);
+        }
+
+        /**
          * Build method for building and extracting the camera object from the builder
          *
          * @return a new camera object based on the values contained in the camera-builder object
@@ -290,6 +438,12 @@ public class Camera implements Cloneable {
             if (camera.vpWidth == 0)
                 throw new MissingResourceException(missingResourceMsg, camClassName,
                         "View plane width is uninitialized");
+            if (camera.imageWriter == null)
+                throw new MissingResourceException(missingResourceMsg, camClassName,
+                        "The Image writer is uninitialized");
+            if (camera.rayTracer == null)
+                throw new MissingResourceException(missingResourceMsg, camClassName,
+                        "The Ray tracer is uninitialized");
 
             camera.vTo = compare(camera.vTo.length(), 1d) ? camera.vTo : camera.vTo.normalize();
             camera.vUp = compare(camera.vUp.length(), 1d) ? camera.vUp : camera.vUp.normalize();
@@ -299,3 +453,4 @@ public class Camera implements Cloneable {
         }
     }
 }
+

@@ -28,6 +28,33 @@ public class Point {
     }
 
     /**
+     * Getter for the x coordinate of the point
+     *
+     * @return the x coordinate of the point
+     */
+    public double getX() {
+        return xyz.d1;
+    }
+
+    /**
+     * Getter for the y coordinate of the point
+     *
+     * @return the y coordinate of the point
+     */
+    public double getY() {
+        return xyz.d2;
+    }
+
+    /**
+     * Getter for the z coordinate of the point
+     *
+     * @return the z coordinate of the point
+     */
+    public double getZ() {
+        return xyz.d3;
+    }
+
+    /**
      * Constructor that builds a point from the given double3 object
      *
      * @param xyz double3 that contains the x,y,z coordinates of the point

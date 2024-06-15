@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import scene.Scene;
 
 import java.util.List;
 
@@ -29,6 +30,8 @@ public class CameraIntersectionsTest {
      * Camera builder for the tests
      */
     private final Camera.Builder cameraBuilder = Camera.getBuilder()
+            .setRayTracer(new SimpleRayTracer(new Scene("Test")))
+            .setImageWriter(new ImageWriter("Test", 1, 1))
             .setLocation(Point.ZERO)
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpDistance(1)
@@ -111,7 +114,7 @@ public class CameraIntersectionsTest {
      * Helper function for getting intersection count of a given camera through its view-plane
      *
      * @param cam              the camera
-     * @param geometry              geometry object (sphere\plane\triangle ect..)
+     * @param geometry         geometry object (sphere\plane\triangle ect..)
      * @param horizontalPixels amount of horizontal pixels for the view plane (column count)
      * @param verticalPixels   amount of vertical pixels for the view plane (row count)
      * @return the total amount of intersections from all the rays which were cast
