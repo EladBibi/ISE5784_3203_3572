@@ -14,7 +14,7 @@ public class Scene {
     /**
      * The name of the scene
      */
-    public String name;
+    public final String name;
     /**
      * Background color of the scene. default is black
      */
@@ -69,6 +69,5 @@ public class Scene {
         this.geometries = geometries;
         return this;
     }
-
 
 }

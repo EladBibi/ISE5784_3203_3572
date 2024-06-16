@@ -59,15 +59,6 @@ public class Camera implements Cloneable {
      */
     private RayTracerBase rayTracer;
 
-    @Override
-    protected Camera clone() {
-        try {
-            return (Camera) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError("Cloning failed");
-        }
-    }
-
     /**
      * Empty constructor
      */
@@ -190,11 +181,13 @@ public class Camera implements Cloneable {
      * @return the camera itself
      */
     public Camera renderImage() {
+        int nY = imageWriter.getNy();
+        int nX = imageWriter.getNx();
         //running on columns, i = y
-        for (int i = 0; i < imageWriter.getNy(); ++i) {
+        for (int i = 0; i < nY; ++i) {
             //running on the row, j = x
-            for (int j = 0; j < imageWriter.getNx(); ++j) {
-                castRay(imageWriter.getNx(), imageWriter.getNy(), j, i);
+            for (int j = 0; j < nX; ++j) {
+                castRay(nX, nY, j, i);
             }
         }
         return this;
@@ -203,13 +196,13 @@ public class Camera implements Cloneable {
     /**
      * Helper method for casting a ray through the given pixel and coloring it per calculation
      *
-     * @param Nx     the amount of horizontal pixels
-     * @param Ny     the amount of vertical pixels
+     * @param nX     the amount of horizontal pixels
+     * @param nY     the amount of vertical pixels
      * @param column the column's index (x pixel) for casting the ray through
      * @param row    the row's index (y pixel) for casting the ray through
      */
-    private void castRay(int Nx, int Ny, int column, int row) {
-        Ray ray = constructRay(Nx, Ny, column, row);
+    private void castRay(int nX, int nY, int column, int row) {
+        Ray ray = constructRay(nX, nY, column, row);
         imageWriter.writePixel(column, row, rayTracer.traceRay(ray));
     }
 
@@ -222,10 +215,12 @@ public class Camera implements Cloneable {
      * @return the camera itself
      */
     public Camera printGrid(int interval, Color color) {
+        int nY = imageWriter.getNy();
+        int nX = imageWriter.getNx();
         //running on columns, i = y
-        for (int i = 0; i < imageWriter.getNy(); ++i) {
+        for (int i = 0; i < nY; ++i) {
             //running on the row, j = x
-            for (int j = 0; j < imageWriter.getNx(); ++j) {
+            for (int j = 0; j < nX; ++j) {
                 if (i % interval == 0 || j % interval == 0)
                     imageWriter.writePixel(j, i, color);
             }
@@ -449,7 +444,11 @@ public class Camera implements Cloneable {
             camera.vUp = compare(camera.vUp.length(), 1d) ? camera.vUp : camera.vUp.normalize();
             camera.vRight = camera.vTo.crossProduct(camera.vUp).normalize();
 
-            return (Camera) camera.clone();
+            try {
+                return (Camera) camera.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError("Cloning failed");
+            }
         }
     }
 }
