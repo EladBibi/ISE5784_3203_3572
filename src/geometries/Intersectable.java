@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Interface which contain the intersection-finding method for our geometries
  *
- * @author  Elad Bibi &amp;Pini Goldfraind
+ * @author Elad Bibi &amp;Pini Goldfraind
  */
 public abstract class Intersectable {
 

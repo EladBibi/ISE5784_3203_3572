@@ -109,7 +109,7 @@ public class PolygonTests {
                 new Point(2, 4, 0),
                 new Point(-1, 6, 0),
                 new Point(-3, 4, 0),
-                new Point(-4,1, 0),
+                new Point(-4, 1, 0),
                 new Point(-1, -1, 0));
 
         // ============ Equivalence Partitions Tests ==============

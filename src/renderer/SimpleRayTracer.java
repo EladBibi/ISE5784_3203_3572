@@ -35,7 +35,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * Method that gives the color of a given point in the scene
      *
      * @param geoPoint a geo point in the 3D scene
-     * @param ray the ray that intersected the geo-point
+     * @param ray      the ray that intersected the geo-point
      * @return the point's color
      */
     private Color calcColor(GeoPoint geoPoint, Ray ray) {
@@ -45,7 +45,8 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Method that gives the calculated color of the given geo-point, with
      * calculated diffusive &amp; specular light from all the light-sources based on the material
-     * @param gp the geo-point containing the intersection point and intersected geometry object
+     *
+     * @param gp  the geo-point containing the intersection point and intersected geometry object
      * @param ray the ray that intersected with the geo-point
      * @return the total, calculated color intensity with diffusion &amp; specular &amp; emission light
      */
@@ -65,10 +66,8 @@ public class SimpleRayTracer extends RayTracerBase {
             //if the point is visible to the camera
             if (nl * nv > 0) {
                 Color iL = light.getIntensity(gp.point);
-//                color = color.add(iL.scale(calcDiffuse(material, nl)))
-//                        .add(iL.scale(calcSpecular(material, n, l, nl, v)));
                 color = color.add(iL.scale(calcDiffuse(material, nl)
-                        .add(calcSpecular(material, n,l,nl,v))));
+                        .add(calcSpecular(material, n, l, nl, v))));
             }
         }
         return color;
@@ -76,11 +75,12 @@ public class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Helper method for calculating the specular light factor based on the given parameters
+     *
      * @param material the material of the object we are working with
-     * @param n the normal of the intersection point
-     * @param l direction vector from the light-source to the intersection point
-     * @param nl the angle-Cos of the light-to-point vector and the point's normal vector
-     * @param v the direction of the ray that intersected with the point
+     * @param n        the normal of the intersection point
+     * @param l        direction vector from the light-source to the intersection point
+     * @param nl       the angle-Cos of the light-to-point vector and the point's normal vector
+     * @param v        the direction of the ray that intersected with the point
      * @return the should-be factor for specular light calculation. calculated from the given parameters
      */
     private Double3 calcSpecular(Material material, Vector n, Vector l, double nl, Vector v) {
@@ -95,8 +95,9 @@ public class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Helper method for calculating the Diffusional light factor based on the given parameters
+     *
      * @param material the material we are working with
-     * @param nl the angle-Cos of the light-to-point vector and the point's normal vector
+     * @param nl       the angle-Cos of the light-to-point vector and the point's normal vector
      * @return the should-be factor for Diffusional light calculation. calculated from the given parameters
      */
     private Double3 calcDiffuse(Material material, double nl) {

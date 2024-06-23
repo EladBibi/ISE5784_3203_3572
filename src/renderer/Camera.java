@@ -314,10 +314,10 @@ public class Camera implements Cloneable {
          * this method sets both the camera's position and direction
          *
          * @param lookAtPoint a point in the space we wish the camera to look at
-         * @param position the position for the camera in the space
+         * @param position    the position for the camera in the space
          * @return the builder object used in the construction
          * @throws IllegalArgumentException if the two given points, camera position and
-         * look-at point, are identical
+         *                                  look-at point, are identical
          */
         public Builder setLocationAndDirection(Point position, Point lookAtPoint) {
             if (lookAtPoint.equals(position)) {

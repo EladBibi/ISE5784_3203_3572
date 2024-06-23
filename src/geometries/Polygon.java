@@ -96,7 +96,7 @@ public class Polygon extends Geometry {
 
     @Override
     public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        var intersections = plane.findIntersections(ray);
+        List<Point> intersections = plane.findIntersections(ray);
         if (intersections == null) {
             return null;
         }
@@ -117,15 +117,13 @@ public class Polygon extends Geometry {
             v1 = v1Point.subtract(h);
             //head-to-vertex[i+1] vector
             v2 = v2Point.subtract(h);
-            //dot product between the two vectors. verifying that the sign is identical
-            //with all the vertexes
+            //verifying that the sign is identical with all the vertexes
             Vector n1 = v1.crossProduct(v2).normalize();
             sign = alignZero(n1.dotProduct(dir));
-
             if (i == 0) {
                 positive = sign > 0;
             } else if (positive != (sign > 0)) {
-                return null; //signs not matching! no intersection!
+                return null; //signs not matching - no intersection!
             }
         }
 

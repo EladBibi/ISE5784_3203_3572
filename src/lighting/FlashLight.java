@@ -46,8 +46,9 @@ public class FlashLight extends SpotLight {
 
     /**
      * Setter method for the flash-light's beam strength
+     *
      * @param beamFocusStrength the beam diameter of the flash-light source. the higher it is, the more focused
-     *      *                          and narrow the light projection will be
+     *                          *                          and narrow the light projection will be
      * @return the flash-light source object itself
      */
     public FlashLight setBeamFocusStrength(double beamFocusStrength) {
