@@ -14,7 +14,7 @@ public abstract class RayTracerBase {
     /**
      * The tracer's scene
      */
-    protected Scene scene;
+    protected final Scene scene;
 
     /**
      * Constructor that initializes the tracer with the given scene
@@ -26,11 +26,11 @@ public abstract class RayTracerBase {
     }
 
     /**
-     * Tracing the given ray through the tracer's scene and returning the color for
-     * the pixel in the view plane
+     * Tracing a given ray through the tracer's scene and returning the color for
+     * ray
      *
-     * @param ray a ray cast from the camera through the view plane into the scene
-     * @return the color for the pixel of the view plane which was in the ray's path
+     * @param ray a ray to trace
+     * @return the color of the ray
      */
     public abstract Color traceRay(Ray ray);
 }

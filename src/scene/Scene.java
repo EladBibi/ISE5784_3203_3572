@@ -2,7 +2,11 @@ package scene;
 
 import geometries.Geometries;
 import lighting.AmbientLight;
+import lighting.LightSource;
 import primitives.Color;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Scene class. contains the scene's name, background &amp; ambient color, geometries package
@@ -14,7 +18,7 @@ public class Scene {
     /**
      * The name of the scene
      */
-    public String name;
+    public final String name;
     /**
      * Background color of the scene. default is black
      */
@@ -27,6 +31,10 @@ public class Scene {
      * Geometries package of the scene. contains all the geometries that are in the scene
      */
     public Geometries geometries = new Geometries();
+    /**
+     * Light source container for the scene. contains all the light-sources that are in the scene
+     */
+    public List<LightSource> lights = new LinkedList<>();
 
     /**
      * Constructor that initializes the scene with the given name
@@ -70,5 +78,19 @@ public class Scene {
         return this;
     }
 
+    /**
+     * Setter for the light sources in the scene
+     *
+     * @param lights a collection of light-sources to be added to the scene
+     * @return the scene object itself
+     */
+    public Scene setLights(LightSource... lights) {
+        if (lights.length > 0) {
+            for (LightSource light : lights) {
+                this.lights.add(light);
+            }
+        }
+        return this;
+    }
 
 }

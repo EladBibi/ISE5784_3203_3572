@@ -19,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 class SphereTest {
 
+    /**
+     * A point used in for sphere tests
+     */
     private final Point p100 = new Point(1, 0, 0);
 
     /**
