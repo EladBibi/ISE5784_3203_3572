@@ -4,8 +4,6 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
-import java.util.List;
-
 import static primitives.Util.compare;
 import static primitives.Util.isZero;
 
@@ -56,8 +54,4 @@ public class Cylinder extends Tube {
         return point.subtract(axis.getPoint(distance)).normalize();
     }
 
-    @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        return null;
-    }
 }

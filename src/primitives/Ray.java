@@ -101,10 +101,10 @@ public class Ray {
     public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPoints) {
         if (geoPoints == null || geoPoints.isEmpty())
             return null;
-        double distance = this.head.distance(geoPoints.getFirst().point);
-        GeoPoint myGeoPoint = geoPoints.getFirst();
+        double distance = Double.POSITIVE_INFINITY;
+        GeoPoint myGeoPoint = null;
         for (GeoPoint geoPoint : geoPoints) {
-            double currentDistance = this.head.distance(geoPoint.point);
+            double currentDistance = this.head.distanceSquared(geoPoint.point);
             if (currentDistance < distance) {
                 distance = currentDistance;
                 myGeoPoint = geoPoint;

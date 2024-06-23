@@ -85,11 +85,7 @@ public class Scene {
      * @return the scene object itself
      */
     public Scene setLights(LightSource... lights) {
-        if (lights.length > 0) {
-            for (LightSource light : lights) {
-                this.lights.add(light);
-            }
-        }
+        this.lights.addAll(List.of(lights));
         return this;
     }
 

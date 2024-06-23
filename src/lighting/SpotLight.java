@@ -4,6 +4,8 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 
+import static primitives.Util.alignZero;
+
 /**
  * Represents a spot-light source. has position, direction and a powerful directional
  * light spread (can be viewed as a projector)
@@ -48,13 +50,9 @@ public class SpotLight extends PointLight {
     public Color getIntensity(Point p) {
         //extracting the angle from the spot-light forward direction
         //and the source-to-point direction
-        double angle = super.getL(p).dotProduct(direction);
-        double scalar = angle > 0 ? angle : 0;
-        return super.getIntensity(p).scale(scalar);
+        double angle = alignZero(getL(p).dotProduct(direction));
+        if (angle <= 0) return Color.BLACK;
+        return super.getIntensity(p).scale(angle);
     }
 
-    @Override
-    public Vector getL(Point p) {
-        return super.getL(p);
-    }
 }

@@ -18,7 +18,7 @@ public class FlashLight extends SpotLight {
      * The focus strength of the flash-light source. the higher it is, the more focused
      * and narrow the light projection will be
      */
-    private double beamFocusStrength = 15;
+    private double beamFocusStrength;
 
     /**
      * Constructor that initializes the flash-light source from teh given color, position, direction
@@ -61,7 +61,8 @@ public class FlashLight extends SpotLight {
         //vector from the light-source position to the point
         Vector l = getL(p);
         double angle = alignZero(l.dotProduct(direction));
-        double beamFactor = angle > 0 ? Math.pow(angle, beamFocusStrength) : 0;
+        if (angle <= 0) return Color.BLACK;
+        double beamFactor = Math.pow(angle, beamFocusStrength);
         //Scaling the intensity of the spot-light by the beam factor
         return super.getIntensity(p).scale(beamFactor);
     }

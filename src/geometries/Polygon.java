@@ -95,17 +95,15 @@ public class Polygon extends Geometry {
     }
 
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         List<Point> intersections = plane.findIntersections(ray);
-        if (intersections == null) {
+        if (intersections == null)
             return null;
-        }
 
         Point h = ray.getHead();
         Vector dir = ray.getDirection();
 
         Vector v1, v2;
-        Vector n = plane.getNormal();
         boolean positive = false;
         double sign;
 

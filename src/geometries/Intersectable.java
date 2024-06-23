@@ -43,12 +43,12 @@ public abstract class Intersectable {
             if (this == obj) return true;
             return (obj instanceof GeoPoint other)
                     && this.point.equals(other.point)
-                    && this.geometry.equals(other.geometry);
+                    && this.geometry == other.geometry;
         }
 
         @Override
         public String toString() {
-            return "" + this.point + " geometry: " + this.geometry.getClass();
+            return this.point + " geometry: " + this.geometry.getClass();
         }
     }
 
@@ -58,7 +58,7 @@ public abstract class Intersectable {
      * @param ray the ray that pierces through the scene, intersecting with 0 or more geometries
      * @return a list of points which are the ray's intersections with objects in the scene
      */
-    public List<Point> findIntersections(Ray ray) {
+    public final List<Point> findIntersections(Ray ray) {
         var geoList = findGeoIntersections(ray);
         return geoList == null ? null : geoList.stream().map(gp -> gp.point).toList();
     }
@@ -71,7 +71,7 @@ public abstract class Intersectable {
      * @return a list of geo points which are the intersections of the given ray
      * with the geometries in the scene. each geo-point will contain: (the intersection point, the intersected geometry)
      */
-    public List<GeoPoint> findGeoIntersections(Ray ray) {
+    public final List<GeoPoint> findGeoIntersections(Ray ray) {
         return findGeoIntersectionsHelper(ray);
     }
 
@@ -83,7 +83,5 @@ public abstract class Intersectable {
      * with the geometries in the scene. each geo-point will contain:
      * (the intersection point, the intersected geometry)
      */
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        return null;
-    }
+    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
 }
