@@ -1,6 +1,7 @@
 package primitives;
 
-import java.util.Comparator;
+import geometries.Intersectable.GeoPoint;
+
 import java.util.List;
 
 import static primitives.Util.isZero;
@@ -83,9 +84,32 @@ public class Ray {
      * Returns the point from the given list that is the closest to the ray's starting point
      *
      * @param points container of points in the space
-     * @return the closest point the ray's starting position (head point)
+     * @return the closest point to the ray's starting position (head point)
      */
     public Point findClosestPoint(List<Point> points) {
-        return points.stream().min(Comparator.comparingDouble(p -> this.head.distance(p))).orElse(null);
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(p, null)).toList()).point;
+    }
+
+    /**
+     * Returns the geo-point from the given list that is the closest to the ray's starting point
+     *
+     * @param geoPoints container of geo-points in the space
+     * @return the closest geo-point to the ray's starting position (head point).
+     * the comparison will be with the point field of each geo-point in the list
+     */
+    public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPoints) {
+        if (geoPoints == null || geoPoints.isEmpty())
+            return null;
+        double distance = this.head.distance(geoPoints.getFirst().point);
+        GeoPoint myGeoPoint = geoPoints.getFirst();
+        for (GeoPoint geoPoint : geoPoints) {
+            double currentDistance = this.head.distance(geoPoint.point);
+            if (currentDistance < distance) {
+                distance = currentDistance;
+                myGeoPoint = geoPoint;
+            }
+        }
+        return myGeoPoint;
     }
 }

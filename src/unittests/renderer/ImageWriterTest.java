@@ -10,8 +10,17 @@ import primitives.Color;
  */
 public class ImageWriterTest {
 
+    /**
+     * Horizontal pixel counts for the test images
+     */
     private int horizontalRes = 801;
+    /**
+     * Vertical pixel counts for the test images
+     */
     private int verticalRes = 501;
+    /**
+     * An image writer that will be used in the construction of the test images
+     */
     private ImageWriter imageWriter = new ImageWriter("first test", horizontalRes, verticalRes);
 
     /**
@@ -28,7 +37,7 @@ public class ImageWriterTest {
             //running on the row, j = x
             for (int j = 0; j < horizontalRes; ++j) {
                 Color color = i % cubeHeight == 0 || j % cubeWidth == 0 ?
-                         gridColor : backgroundColor;
+                        gridColor : backgroundColor;
                 imageWriter.writePixel(j, i, color);
             }
         }

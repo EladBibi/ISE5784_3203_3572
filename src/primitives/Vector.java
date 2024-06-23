@@ -9,6 +9,31 @@ package primitives;
 public final class Vector extends Point {
 
     /**
+     * Constant for the up vector (0, 1, 0)
+     */
+    public static final Vector UP = new Vector(0, 1, 0);
+    /**
+     * Constant for the down vector (0, -1, 0)
+     */
+    public static final Vector DOWN = new Vector(0, -1, 0);
+    /**
+     * Constant for the right vector (1, 0, 0)
+     */
+    public static final Vector RIGHT = new Vector(1, 0, 0);
+    /**
+     * Constant for the left vector (-1, 0, 0)
+     */
+    public static final Vector LEFT = new Vector(-1, 0, 0);
+    /**
+     * Constant for the forward vector (0, 0, 1)
+     */
+    public static final Vector FORWARDS = new Vector(0, 0, 1);
+    /**
+     * Constant for the backwards vector (0, 0, -1)
+     */
+    public static final Vector BACKWARDS = new Vector(0, 0, -1);
+
+    /**
      * Constructor that receives x,y,z coordinates to represent the vector's
      * direction from the axis center.
      * will throw exception if a zero-vector is given

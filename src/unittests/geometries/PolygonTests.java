@@ -5,6 +5,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -99,5 +101,56 @@ public class PolygonTests {
      */
     @Test
     void testFindIntersections() {
+        Point point = new Point(2, 2, 2);
+        Vector vector = new Vector(-0.5, 0, -1);
+        Polygon polygon = new Polygon(
+                new Point(1, 0, 0),
+                new Point(2, 2, 0),
+                new Point(2, 4, 0),
+                new Point(-1, 6, 0),
+                new Point(-3, 4, 0),
+                new Point(-4,1, 0),
+                new Point(-1, -1, 0));
+
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Standard intersection (1 point)
+        List<Point> expected = List.of(new Point(1, 2, 0));
+        assertEquals(1, polygon.findIntersections(new Ray(point, vector)).size(),
+                "Intersection with the polygon gives the wrong intersection-count");
+        assertEquals(expected, polygon.findIntersections(new Ray(point, vector)),
+                "Intersection with the polygon gives the wrong point");
+
+        // TC02: No intersections (0 points)
+        point = new Point(2, 2, 2);
+        vector = new Vector(1, 0, -1);
+        assertNull(polygon.findIntersections(new Ray(point, vector)),
+                "Wrong intersection count");
+
+        // =============== Boundary Values Tests ==================
+
+        // TC03: Intersection with a vertex (1 point)
+        point = new Point(2, 2, 2);
+        vector = new Vector(0, 0, -1);
+        expected = List.of(new Point(2, 2, 0));
+        assertEquals(1, polygon.findIntersections(new Ray(point, vector)).size(),
+                "Intersection with the polygon gives the wrong intersection-count");
+        assertEquals(expected, polygon.findIntersections(new Ray(point, vector)),
+                "Intersection with the polygon gives the wrong point");
+
+        // TC04: Intersection with an edge (1 point)
+        point = new Point(2, 3, 2);
+        vector = new Vector(0, 0, -1);
+        expected = List.of(new Point(2, 3, 0));
+        assertEquals(1, polygon.findIntersections(new Ray(point, vector)).size(),
+                "Intersection with the polygon gives the wrong intersection-count");
+        assertEquals(expected, polygon.findIntersections(new Ray(point, vector)),
+                "Intersection with the polygon gives the wrong point");
+
+        // TC05: Intersection with the same line as the edge, outside the polygon (0 points)
+        point = new Point(2, 5, 2);
+        vector = new Vector(0, 0, -1);
+        assertNull(polygon.findIntersections(new Ray(point, vector)),
+                "Wrong intersection count");
     }
 }

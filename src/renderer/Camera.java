@@ -23,7 +23,7 @@ public class Camera implements Cloneable {
     /**
      * The camera's position in the 3D space
      */
-    private Point position;
+    private Point position = Point.ZERO;
     /**
      * Up vector from the camera
      */
@@ -306,6 +306,26 @@ public class Camera implements Cloneable {
             }
             camera.vUp = vUp.normalize();
             camera.vTo = vTo.normalize();
+            return this;
+        }
+
+        /**
+         * Setter for the camera's position and direction in the space.
+         * this method sets both the camera's position and direction
+         *
+         * @param lookAtPoint a point in the space we wish the camera to look at
+         * @param position the position for the camera in the space
+         * @return the builder object used in the construction
+         * @throws IllegalArgumentException if the two given points, camera position and
+         * look-at point, are identical
+         */
+        public Builder setLocationAndDirection(Point position, Point lookAtPoint) {
+            if (lookAtPoint.equals(position)) {
+                throw new IllegalArgumentException("The look-at point cannot be the same as the camera position");
+            }
+            camera.position = position;
+            camera.vTo = lookAtPoint.subtract(camera.position).normalize();
+            camera.vUp = Vector.RIGHT.crossProduct(camera.vTo).normalize();
             return this;
         }
 

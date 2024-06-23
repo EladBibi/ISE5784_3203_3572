@@ -9,12 +9,8 @@ import primitives.Double3;
  *
  * @author Pini Goldfraind &amp; Elad Bibi
  */
-public class AmbientLight {
+public class AmbientLight extends Light {
 
-    /**
-     * The intensity of the ambient light color
-     */
-    private final Color intensity;
     /**
      * Constant for the representing NO ambient light (black color intensed to zero)
      */
@@ -28,7 +24,7 @@ public class AmbientLight {
      *              coords will be scaled with the respective xyz coords of the given double3 object
      */
     public AmbientLight(Color color, Double3 kA) {
-        this.intensity = color.scale(kA);
+        super(color.scale(kA));
     }
 
     /**
@@ -38,15 +34,7 @@ public class AmbientLight {
      * @param kA    scalar for scaling the given color with
      */
     public AmbientLight(Color color, Double kA) {
-        this.intensity = color.scale(kA);
+        super(color.scale(kA));
     }
 
-    /**
-     * Getter for the ambient-light's color intensity
-     *
-     * @return the intensity of the ambient-light's color
-     */
-    public Color getIntensity() {
-        return this.intensity;
-    }
 }
