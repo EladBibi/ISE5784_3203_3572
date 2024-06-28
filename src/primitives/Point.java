@@ -11,6 +11,7 @@ public class Point {
      * Constant for the axis-center point
      */
     public static final Point ZERO = new Point(Double3.ZERO);
+
     /**
      * Double3 object that represents the x,y,z coordinates in the 3d space
      */

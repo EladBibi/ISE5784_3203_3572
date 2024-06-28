@@ -17,6 +17,11 @@ import static primitives.Util.alignZero;
 public class SimpleRayTracer extends RayTracerBase {
 
     /**
+     * Delta constant used for shifting points towards the light-source in the unshaded method
+     */
+    private static final double DELTA = 0.1;
+
+    /**
      * Constructor that initializes the tracer with the given scene
      *
      * @param scene a scene for the tracer
@@ -64,7 +69,7 @@ public class SimpleRayTracer extends RayTracerBase {
             Vector l = light.getL(gp.point);
             double nl = alignZero(l.dotProduct(n));
             //if the point is visible to the camera
-            if (nl * nv > 0) {
+            if (nl * nv > 0 && unshaded(gp, light, l, n, nl)) {
                 Color iL = light.getIntensity(gp.point);
                 color = color.add(iL.scale(calcDiffuse(material, nl)
                         .add(calcSpecular(material, n, l, nl, v))));
@@ -103,4 +108,34 @@ public class SimpleRayTracer extends RayTracerBase {
     private Double3 calcDiffuse(Material material, double nl) {
         return material.kD.scale(Math.abs(nl));
     }
+
+    /**
+     * Method that returns true if the given point is shaded from the given light
+     *
+     * @param gp    a geo-point which is the intersection point we wish to check shading for
+     * @param light the light-source
+     * @param l     the direction vector from the light-source to the intersection point
+     * @param n     the normal-vector of the intersection point
+     * @param nl    the angle-cos between the normal and the l vector
+     * @return true if the point is unshaded, false otherwise
+     */
+    private boolean unshaded(GeoPoint gp, LightSource light, Vector l, Vector n, double nl) {
+        Vector pointToLightVector = l.scale(-1);
+        Vector epsVector = n.scale(nl < 0 ? DELTA : -DELTA);
+        Point shiftedPoint = gp.point.add(epsVector);
+        Ray shadingRay = new Ray(shiftedPoint, pointToLightVector);
+
+        var intersections = scene.geometries.findIntersections(shadingRay);
+        if (intersections == null)
+            return true;
+
+        //checking that the found intersections are between the light-source and the point
+        double distance = light.getDistanceSquared(shiftedPoint);
+        for (Point intersection : intersections) {
+            if (light.getDistanceSquared(intersection) < distance)
+                return false;
+        }
+        return true;
+    }
+
 }

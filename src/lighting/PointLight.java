@@ -81,6 +81,11 @@ public class PointLight extends Light implements LightSource {
     }
 
     @Override
+    public double getDistanceSquared(Point point) {
+        return position.distanceSquared(point);
+    }
+
+    @Override
     public Vector getL(Point p) {
         return p.subtract(position).normalize();
     }
