@@ -36,6 +36,21 @@ public class FlashLight extends SpotLight {
     }
 
     /**
+     * Constructor that initializes the flash-light source from teh given color, position, focus-point
+     * and beam focus strength
+     *
+     * @param intensity         the color intensity for the light source
+     * @param position          the position for the light source
+     * @param lookAtPoint       a point in the scene for the flash-light to focus on
+     * @param beamFocusStrength the beam diameter of the flash-light source. the higher it is, the more focused
+     *                          and narrow the light projection will be
+     */
+    public FlashLight(Color intensity, Point position, Point lookAtPoint, double beamFocusStrength) {
+        super(intensity, position, lookAtPoint);
+        this.beamFocusStrength = beamFocusStrength;
+    }
+
+    /**
      * Getter method for the flash-light's beam strength
      *
      * @return the beam strength of the flash-light source. the diameter size/strength of the flash-light

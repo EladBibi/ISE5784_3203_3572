@@ -31,6 +31,18 @@ public class SpotLight extends PointLight {
         this.direction = direction.normalize();
     }
 
+    /**
+     * Constructor that initializes the spot-light source with the given color, position and focus point
+     *
+     * @param intensity   the color intensity of the light source
+     * @param position    the position of the light source
+     * @param lookAtPoint a point in the scene for the spot-light to be focused on
+     */
+    public SpotLight(Color intensity, Point position, Point lookAtPoint) {
+        super(intensity, position);
+        direction = lookAtPoint.subtract(position).normalize();
+    }
+
     @Override
     public SpotLight setKc(double kC) {
         return (SpotLight) super.setKc(kC);

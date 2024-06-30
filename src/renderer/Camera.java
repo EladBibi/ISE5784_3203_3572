@@ -235,6 +235,18 @@ public class Camera implements Cloneable {
         imageWriter.writeToImage();
     }
 
+    /**
+     * Rotating the camera with the given angle
+     *
+     * @param degrees the angle in degrees for rotating the camera
+     * @return the camera object itself
+     */
+    public Camera rotate(double degrees) {
+        vUp = vUp.rotate(vTo, degrees);
+        vRight = vTo.crossProduct(vUp).normalize();
+        return this;
+    }
+
     //----------------Internal class Builder----------------
 
     /**
@@ -319,13 +331,15 @@ public class Camera implements Cloneable {
          * @throws IllegalArgumentException if the two given points, camera position and
          *                                  look-at point, are identical
          */
-        public Builder setLocationAndDirection(Point position, Point lookAtPoint) {
+        public Builder setFocusPoint(Point position, Point lookAtPoint) {
             if (lookAtPoint.equals(position)) {
                 throw new IllegalArgumentException("The look-at point cannot be the same as the camera position");
             }
             camera.position = position;
             camera.vTo = lookAtPoint.subtract(camera.position).normalize();
-            camera.vUp = Vector.RIGHT.crossProduct(camera.vTo).normalize();
+            Vector vectorOnPlane = camera.vTo.equals(Vector.RIGHT)
+                    ? Vector.FORWARDS : Vector.RIGHT;
+            camera.vUp = vectorOnPlane.crossProduct(camera.vTo).normalize();
             return this;
         }
 

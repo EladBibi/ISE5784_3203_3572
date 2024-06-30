@@ -14,15 +14,15 @@ public class Double3 {
     /**
      * First number
      */
-    final double d1;
+    protected final double d1;
     /**
      * Second number
      */
-    final double d2;
+    protected final double d2;
     /**
      * Third number
      */
-    final double d3;
+    protected final double d3;
 
     /**
      * Zero triad (0,0,0)

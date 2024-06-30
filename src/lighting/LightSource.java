@@ -23,6 +23,7 @@ public interface LightSource {
     /**
      * Gives the squared distance from the light source origin-point to the given point
      *
+     * @param point the point for calculating the distance to
      * @return the squared distance from the light source origin-point to the given point
      */
     double getDistanceSquared(Point point);

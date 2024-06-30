@@ -1,5 +1,8 @@
 package primitives;
 
+import static primitives.Util.alignZero;
+import static primitives.Util.compare;
+
 /**
  * Represents a Vector in a 3-Dimensional space.
  * Various methods are available for basic vector operations
@@ -131,6 +134,63 @@ public final class Vector extends Point {
      */
     public final Vector normalize() {
         return this.scale(1f / this.length());
+    }
+
+    /**
+     * Rotating a vector around a given axis
+     *
+     * @param axis    the axis vector for rotating the vector on. MUST be orthogonal
+     *                to the vector we are trying to rotate
+     * @param degrees angle of rotation in degrees
+     * @return a new rotated vector that is the current vector rotated around the given
+     * axis by the given degrees amount
+     * @throws IllegalArgumentException if the given axis vector is not orthogonal with the current vector
+     */
+    public Vector rotate(Vector axis, double degrees) {
+        // Convert degrees to radians
+        double radians = Math.toRadians(degrees);
+
+        if (!compare(this.dotProduct(axis), 0d))
+            throw new IllegalArgumentException("The vector is not on the given plane");
+
+        // Calculate trigonometric values
+        double cosRad = Math.cos(radians);
+        double sinRad = Math.sin(radians);
+        double oneMinusCos = 1 - cosRad;
+
+        double nx = axis.getX();
+        double ny = axis.getY();
+        double nz = axis.getZ();
+
+        // Construct the rotation matrix
+        Vector c1 = new Vector(
+                cosRad + nx * nx * oneMinusCos,
+                nx * ny * oneMinusCos - nz * sinRad,
+                nx * nz * oneMinusCos + ny * sinRad
+        );
+
+        Vector c2 = new Vector(
+                ny * nx * oneMinusCos + nz * sinRad,
+                cosRad + ny * ny * oneMinusCos,
+                ny * nz * oneMinusCos - nx * sinRad
+        );
+
+        Vector c3 = new Vector(
+                nz * nx * oneMinusCos - ny * sinRad,
+                nz * ny * oneMinusCos + nx * sinRad,
+                cosRad + nz * nz * oneMinusCos
+        );
+
+        // Apply the rotation matrix to the vector
+        double x = this.getX();
+        double y = this.getY();
+        double z = this.getZ();
+
+        double newX = c1.getX() * x + c2.getX() * y + c3.getX() * z;
+        double newY = c1.getY() * x + c2.getY() * y + c3.getY() * z;
+        double newZ = c1.getZ() * x + c2.getZ() * y + c3.getZ() * z;
+
+        return new Vector(alignZero(newX), alignZero(newY), alignZero(newZ)).normalize();
     }
 
     @Override

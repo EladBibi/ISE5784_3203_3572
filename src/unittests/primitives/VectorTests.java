@@ -1,5 +1,6 @@
 package primitives;
 
+import geometries.Plane;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -155,5 +156,66 @@ class VectorTests {
                 "the normalized vector is opposite to the original one");
         assertThrows(Exception.class, () -> v.crossProduct(u),
                 "the normalized vector is not parallel to the original one. exception throw is expected");
+    }
+
+    /**
+     * Test method for {@link Vector#rotate(Vector, double)}.
+     */
+    @Test
+    void testRotate() {
+        Vector n = new Vector(0, 0, 1);
+        Vector u = Vector.UP;
+
+        // TC01: Standard rotation on the xy plane (90 degrees)
+        Vector result1 = new Vector(1, 0, 0);
+        assertEquals(result1, u.rotate(n, 90), "wrong rotation vector");
+
+        // TC02: Standard rotation on the xy plane (180 degrees)
+        Vector result2 = new Vector(0, -1, 0);
+        assertEquals(result2, u.rotate(n, 180), "wrong rotation vector");
+
+        // TC03: Standard rotation on the xy plane (270 degrees)
+        Vector result3 = new Vector(-1, 0, 0);
+        assertEquals(result3, u.rotate(n, 270), "wrong rotation vector");
+
+        // TC04: Full rotation on the xy plane (360 degrees)
+        Vector result4 = Vector.UP;
+        assertEquals(result4, u.rotate(n, 360), "wrong rotation vector");
+
+        // =============== Boundary Values Tests ==================
+
+        // TC05: Zero degree rotation (no rotation)
+        Vector result5 = Vector.UP;
+        assertEquals(result5, u.rotate(n, 0), "wrong rotation vector");
+
+        // TC06: Rotate vector that is aligned with the normal (should raise an exception)
+        Vector alignedWithNormal = new Vector(0, 0, 1);
+        assertThrows(IllegalArgumentException.class, () -> alignedWithNormal.rotate(n, 90),
+                "Expected an IllegalArgumentException to be thrown");
+
+        // TC07: Rotation on a plane parallel to xy but with an arbitrary point
+        Plane arbitraryPlane = new Plane(new Point(3, 4, 5), n);
+        Vector result6 = new Vector(1, 0, 0);
+        assertEquals(result6, u.rotate(n, 90), "wrong rotation vector");
+
+        // TC08: Rotation with negative angle (should handle negative degrees correctly)
+        Vector result7 = new Vector(-1, 0, 0);
+        assertEquals(result7, u.rotate(n, -90), "wrong rotation vector");
+
+        // TC09: Rotation on the yz plane (-90 degrees)
+        Plane yzPlane = new Plane(new Point(0, 1, 0), new Vector(1, 0, 0));
+        Vector v = new Vector(0, 1, 0);
+        Vector result8 = new Vector(0, 0, 1);
+        assertEquals(result8, v.rotate(new Vector(1, 0, 0), -90), "wrong rotation vector");
+
+        // TC10: Rotation on the xz plane (-90 degrees)
+        Plane xzPlane = new Plane(new Point(1, 0, 0), new Vector(0, 1, 0));
+        Vector w = new Vector(1, 0, 0);
+        Vector result9 = new Vector(0, 0, -1);
+        assertEquals(result9, w.rotate(new Vector(0, 1, 0), -90), "wrong rotation vector");
+
+        // TC11: Large degree rotation (450 degrees, equivalent to 90 degrees)
+        Vector result10 = new Vector(1, 0, 0);
+        assertEquals(result10, u.rotate(n, 450), "wrong rotation vector");
     }
 }

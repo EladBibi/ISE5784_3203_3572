@@ -4,7 +4,7 @@ import geometries.Intersectable.GeoPoint;
 
 import java.util.List;
 
-import static primitives.Util.isZero;
+import static primitives.Util.alignZero;
 
 /**
  * Represents a Ray in a 3-Dimensional space.
@@ -15,9 +15,20 @@ import static primitives.Util.isZero;
 public class Ray {
 
     /**
+     * Delta constant used for shifting a point upwards or downwards from the original position
+     */
+    private static final double DELTA = 0.1;
+
+    /**
+     * The smallest allowed scalar for scaling the ray's direction vector. for preventing zero-vectors
+     */
+    private static final Double MIN_DIR_SCALAR = 0.000001;
+
+    /**
      * The ray's starting position in the 3D space
      */
     private final Point head;
+
 
     /**
      * The ray's direction vector normalized
@@ -34,6 +45,24 @@ public class Ray {
      */
     public Ray(Point head, Vector direction) {
         this.head = head;
+        if (direction.length() != 1f)
+            direction = direction.normalize();
+        this.direction = direction;
+    }
+
+    /**
+     * Constructor that initiates a ray with a shifted position forwards/backwards
+     * based on the angle of the given direction and the normal at the head-point
+     *
+     * @param head      starting position for the ray
+     * @param direction direction vector of the ray
+     * @param normal    normal vector at the ray's starting position
+     */
+    public Ray(Point head, Vector direction, Vector normal) {
+        double nv = normal.dotProduct(direction);
+        Vector epsVector = normal.scale(nv > 0 ? DELTA : -DELTA);
+        Point shiftedPoint = head.add(epsVector);
+        this.head = shiftedPoint;
         if (direction.length() != 1f)
             direction = direction.normalize();
         this.direction = direction;
@@ -77,7 +106,7 @@ public class Ray {
      * @return head point + t * direction vector
      */
     public Point getPoint(double t) {
-        return isZero(t) ? head : head.add(direction.scale(t));
+        return alignZero(t) < MIN_DIR_SCALAR ? head : head.add(direction.scale(t));
     }
 
     /**

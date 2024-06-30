@@ -4,6 +4,19 @@ package primitives;
  * Represents a material of an object
  */
 public class Material {
+
+    /**
+     * The transparency factor of the material. determines how much light
+     * passes through (1 = fully transparent)
+     */
+    public Double3 kT = Double3.ZERO;
+
+    /**
+     * The refraction factor of the material. determines how much light will
+     * bounce off the material (1 = reflective mirror)
+     */
+    public Double3 kR = Double3.ZERO;
+
     /**
      * The Diffusion factor of the material
      */
@@ -63,6 +76,50 @@ public class Material {
     }
 
     /**
+     * Setter for the transparency factor
+     *
+     * @param kT the transparency factor
+     * @return the material object itself
+     */
+    public Material setKt(Double3 kT) {
+        this.kT = kT;
+        return this;
+    }
+
+    /**
+     * Setter for the transparency factor
+     *
+     * @param kT the transparency factor
+     * @return the material object itself
+     */
+    public Material setKt(Double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+
+    /**
+     * Setter for the reflectiveness factor
+     *
+     * @param kR the reflectiveness factor
+     * @return the material object itself
+     */
+    public Material setKr(Double3 kR) {
+        this.kR = kR;
+        return this;
+    }
+
+    /**
+     * Setter for the reflectiveness factor
+     *
+     * @param kR the reflectiveness factor
+     * @return the material object itself
+     */
+    public Material setKr(Double kR) {
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+    /**
      * Setter for the shininess factor of the material
      *
      * @param nShininess the shininess factor for the material
@@ -72,4 +129,6 @@ public class Material {
         this.nShininess = nShininess;
         return this;
     }
+
+
 }

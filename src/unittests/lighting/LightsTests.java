@@ -315,7 +315,7 @@ public class LightsTests {
 
         //----------------------camera----------------------
         camera2.setImageWriter(new ImageWriter("FunImage2", 1920, 1080))
-                .setLocationAndDirection(new Point(1, 1, 1300), Point.ZERO)
+                .setFocusPoint(new Point(1, 1, 1300), Point.ZERO)
                 .setVpSize(54, 96)
                 .setVpDistance(10)
                 .setRayTracer(tracer)
