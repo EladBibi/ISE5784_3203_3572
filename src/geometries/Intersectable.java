@@ -54,34 +54,61 @@ public abstract class Intersectable {
 
     /**
      * Method that gives all the intersection points of a given ray with objects(geometries) in our 3D scene
+     * without range limitation(up to infinity)
      *
      * @param ray the ray that pierces through the scene, intersecting with 0 or more geometries
      * @return a list of points which are the ray's intersections with objects in the scene
      */
     public final List<Point> findIntersections(Ray ray) {
-        var geoList = findGeoIntersections(ray);
+        return findIntersections(ray, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * Gives all the intersection points of the ray with the scene that are within the given distance-range
+     * from the ray's starting point
+     *
+     * @param ray         the ray that pierces through the scene, intersecting with 0 or more geometries
+     * @param maxDistance distance range. how far from the ray's starting point we will look for intersections
+     * @return a list of points which are the found intersection points inside the given distance range
+     */
+    public final List<Point> findIntersections(Ray ray, double maxDistance) {
+        var geoList = findGeoIntersections(ray, maxDistance);
         return geoList == null ? null : geoList.stream().map(gp -> gp.point).toList();
     }
 
     /**
-     * Gives all the intersection points of a given ray with geometries in the scene as
-     * geo-points(the intersection point, the intersected geometry)
+     * Gives all the intersection geo-points of a given ray with geometries in the scene
+     * without distance-range limitation(will look for intersections up to infinity)
      *
      * @param ray a ray we wish to trace its intersections
      * @return a list of geo points which are the intersections of the given ray
      * with the geometries in the scene. each geo-point will contain: (the intersection point, the intersected geometry)
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray) {
-        return findGeoIntersectionsHelper(ray);
+        return findGeoIntersections(ray, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * Gives all the intersection points of the ray with the scene that are within the given distance-range
+     * from the ray's starting point
+     *
+     * @param ray         a ray we wish to trace its intersections
+     * @param maxDistance distance range. how far from the ray's starting point we will look for intersections
+     * @return a list of geo points which are the found intersection points inside the given distance range.
+     * each geo-point will contain: (the intersection point, the intersected geometry)
+     */
+    public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+        return findGeoIntersectionsHelper(ray, maxDistance);
     }
 
     /**
      * Helper method for getting all the intersection points of a given ray with geometries in the scene
      *
-     * @param ray a ray we wish to trace its intersections
+     * @param ray         a ray we wish to trace its intersections
+     * @param maxDistance distance range. how far from the ray's starting point we will look for intersections
      * @return a list of geo points which are the intersections of the given ray
      * with the geometries in the scene. each geo-point will contain:
      * (the intersection point, the intersected geometry)
      */
-    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
+    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 }

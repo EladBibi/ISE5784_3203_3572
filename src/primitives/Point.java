@@ -107,6 +107,33 @@ public class Point {
         return dx * dx + dy * dy + dz * dz;
     }
 
+    /**
+     * Performs Quadratic Interpolate using bezier-curves with the given points.
+     * the method accepts origin and destination points, as well as an interpolation point
+     * as well as normalized double (with range 0 to 1) to represent where we are along the curve.
+     * the given point will be positioned on the curve created by the origin, destination and interpolation points.
+     * if the given normalized double equals to 1, we are at the beginning of the curve, which is the origin point
+     * if the given normalized double equals to 0, we are at the end of the curve, which is the destination point
+     * for each value in between, the given point will be along the curve respective to the curve's length and
+     * the given percentage as double
+     *
+     * @param originPoint        the origin point, where the curve starts from
+     * @param interpolationPoint the interpolation point, will be used for creating the bezier-curve between the origin and destination
+     * @param endPoint           the ending/destination point, where the curve ends
+     * @param t                  normalized double (range: 0 to 1), represents where we are along the curve, percentage wise
+     * @return the point which is t percent along the curve from the origin to the destination point
+     * @throws IllegalArgumentException if the given double parameter t is not normalized ( t &lt; 0 or t &gt; 1)
+     */
+    public static Point quadraticInterpolate(Point originPoint, Point interpolationPoint, Point endPoint, double t) {
+        if (t < 0 || t > 1) {
+            throw new IllegalArgumentException("Interpolation parameter t must be between 0 and 1");
+        }
+        double x = Math.pow(1 - t, 2) * originPoint.getX() + 2 * (1 - t) * t * interpolationPoint.getX() + Math.pow(t, 2) * endPoint.getX();
+        double y = Math.pow(1 - t, 2) * originPoint.getY() + 2 * (1 - t) * t * interpolationPoint.getY() + Math.pow(t, 2) * endPoint.getY();
+        double z = Math.pow(1 - t, 2) * originPoint.getZ() + 2 * (1 - t) * t * interpolationPoint.getZ() + Math.pow(t, 2) * endPoint.getZ();
+        return new Point(x, y, z);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

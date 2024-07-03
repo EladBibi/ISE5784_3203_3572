@@ -1,6 +1,7 @@
 out/
 doc/
 images/
+videos/
 # Compiled class file
 *.class
 

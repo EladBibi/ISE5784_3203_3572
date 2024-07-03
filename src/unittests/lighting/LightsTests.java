@@ -1,6 +1,7 @@
-package lighting;
+package unittests.renderer;
 
 import geometries.*;
+import lighting.*;
 import org.junit.jupiter.api.Test;
 import primitives.*;
 import renderer.Camera;
@@ -17,31 +18,32 @@ import static java.awt.Color.*;
  */
 public class LightsTests {
     /**
-     * First scene for some of the tests
+     * First scene for some of tests
      */
     private final Scene scene1 = new Scene("Test scene");
     /**
-     * Second scene for some of the tests
+     * Second scene for some of tests
      */
     private final Scene scene2 = new Scene("Test scene")
             .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.15)));
 
     /**
-     * First camera builder for some of the tests
+     * First camera builder for some of tests
      */
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setRayTracer(new SimpleRayTracer(scene1))
             .setLocation(new Point(0, 0, 1000))
-            //.setDirection(Point.ZERO, Vector.UP)
-            .setDirection(Vector.BACKWARDS, Vector.UP)
+            //.setDirection(Vector.BACKWARDS,Vector.UP)
+            .setFocusPoint(new Point(0, 0, 1000), Point.ZERO)
             .setVpSize(150, 150).setVpDistance(1000);
     /**
-     * Second camera builder for some of the tests
+     * Second camera builder for some of tests
      */
     private final Camera.Builder camera2 = Camera.getBuilder()
             .setRayTracer(new SimpleRayTracer(scene2))
             .setLocation(new Point(0, 0, 1000))
-            .setDirection(Vector.BACKWARDS, Vector.UP)
+            //.setDirection(Vector.BACKWARDS,Vector.UP)
+            .setFocusPoint(new Point(0, 0, 1000), Point.ZERO)
             .setVpSize(200, 200).setVpDistance(1000);
 
     /**
@@ -234,10 +236,10 @@ public class LightsTests {
     public void sphereSpotSharp() {
         scene1.geometries.add(sphere);
         scene1.lights
-                .add(new FlashLight(sphereLightColor, sphereLightPosition, new Vector(1, 1, -0.5), 15)
+                .add(new SpotLight(sphereLightColor, sphereLightPosition, new Vector(1, 1, -0.5))
                         .setKl(0.001).setKq(0.00004));
 
-        camera1.setImageWriter(new ImageWriter("lightSphereFlashLight", 500, 500))
+        camera1.setImageWriter(new ImageWriter("lightSphereSpotSharp", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -249,14 +251,15 @@ public class LightsTests {
     @Test
     public void trianglesSpotSharp() {
         scene2.geometries.add(triangle1, triangle2);
-        scene2.lights.add(new FlashLight(trianglesLightColor, trianglesLightPosition, trianglesLightDirection, 15)
+        scene2.lights.add(new SpotLight(trianglesLightColor, trianglesLightPosition, trianglesLightDirection)
                 .setKl(0.001).setKq(0.00004));
 
-        camera2.setImageWriter(new ImageWriter("lightTrianglesFlashLight", 500, 500))
+        camera2.setImageWriter(new ImageWriter("lightTrianglesSpotSharp", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
     }
+
 
     /**
      * Tests for fun!

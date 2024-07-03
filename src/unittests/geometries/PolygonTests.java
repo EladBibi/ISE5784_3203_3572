@@ -153,4 +153,38 @@ public class PolygonTests {
         assertNull(polygon.findIntersections(new Ray(point, vector)),
                 "Wrong intersection count");
     }
+
+    /**
+     * Test method for {@link geometries.Polygon#findGeoIntersections(Ray, double)}.
+     */
+    @Test
+    void testFindGeoIntersections() {
+        String msg = "Distance-based intersections calculation does not work properly";
+        Point p1 = new Point(1, 0, 0);
+        Point p2 = new Point(0, -1, 0);
+        Point p3 = new Point(-1, 0, 0);
+        Point p4 = new Point(0, 1, 0);
+        Polygon polygon = new Polygon(p1, p2, p3, p4);
+        double maxDistance = 4d;
+
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Intersection is within the distance(one intersection)
+        Ray ray = new Ray(new Point(0.2, 0.2, -3), Vector.FORWARDS);
+        assertEquals(1, polygon.findGeoIntersections(ray, maxDistance).size(), msg);
+
+        // TC02: Intersection is outside the distance(no intersection)
+        ray = new Ray(new Point(0.2, 0.2, -5), Vector.FORWARDS);
+        assertNull(polygon.findGeoIntersections(ray, maxDistance), msg);
+
+        // TC03: No distance limitation is given(1 intersection)
+        ray = new Ray(new Point(0.2, 0.2, -20), Vector.FORWARDS);
+        assertEquals(1, polygon.findGeoIntersections(ray).size(), msg);
+
+        // =============== Boundary Values Tests ==================
+
+        // TC04: Intersection is precisely in the given distance range(no intersection)
+        ray = new Ray(new Point(0.2, 0.2, -4), Vector.FORWARDS);
+        assertNull(polygon.findGeoIntersections(ray, maxDistance), msg);
+    }
 }

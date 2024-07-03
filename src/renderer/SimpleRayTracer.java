@@ -17,7 +17,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the maximum recursive iterations for each pixel in the ray tracing process
      */
-    private static final int MAX_CALC_COLOR_LEVEL = 40;
+    private static final int MAX_CALC_COLOR_LEVEL = 10;
     /**
      * Static constant for the lowest distinguishable color intensity
      */
@@ -114,9 +114,8 @@ public class SimpleRayTracer extends RayTracerBase {
      */
     private Ray constructRefractedRay(GeoPoint geoPoint, Ray ray) {
         Point point = geoPoint.point;
-        Vector v = ray.getDirection();
         Vector n = geoPoint.geometry.getNormal(point);
-        return new Ray(point, v, n);
+        return new Ray(point, ray.getDirection(), n);
     }
 
     /**
@@ -130,10 +129,10 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector v = ray.getDirection();
         Vector n = geoPoint.geometry.getNormal(geoPoint.point);
 
-        double nv = n.dotProduct(v);
+        double vn = v.dotProduct(n);
 
-        Vector r = v.subtract(n.scale(2 * nv)).normalize();
-        return new Ray(ray.getHead(), v, n);
+        Vector r = v.subtract(n.scale(2 * vn));
+        return new Ray(geoPoint.point, r, n);
     }
 
     /**
@@ -233,9 +232,9 @@ public class SimpleRayTracer extends RayTracerBase {
             return true;
 
         //checking that the found intersections are between the light-source and the point
-        double distance = light.getDistanceSquared(gp.point);
+        double distance = light.getDistance(gp.point);
         for (GeoPoint intersection : intersections) {
-            if (light.getDistanceSquared(intersection.point) < distance
+            if (gp.point.distanceSquared(intersection.point) < distance
                     && intersection.geometry.getMaterial().kT.equals(0))
                 return false;
         }
@@ -256,21 +255,18 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector pointToLightVector = l.scale(-1);
         Ray shadingRay = new Ray(gp.point, pointToLightVector, n);
 
-        var intersections = scene.geometries.findGeoIntersections(shadingRay);
+        double distance = light.getDistance(gp.point);
+        var intersections = scene.geometries.findGeoIntersections(shadingRay, distance);
 
         Double3 ktr = Double3.ONE;
         if (intersections == null)
             return ktr;
 
-        //calculating the distance from the point to the light source
-        double distance = light.getDistanceSquared(gp.point);
         for (GeoPoint intersection : intersections) {
             //summing the transparency factor of all the objects in the way
-            if (light.getDistanceSquared(intersection.point) < distance) {
-                ktr = ktr.product(intersection.geometry.getMaterial().kT);
-                if (ktr.lowerThan(MIN_CALC_COLOR_K))
-                    return ktr;
-            }
+            ktr = ktr.product(intersection.geometry.getMaterial().kT);
+            if (ktr.lowerThan(MIN_CALC_COLOR_K))
+                return ktr;
         }
         return ktr;
     }

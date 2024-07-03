@@ -4,8 +4,6 @@ import geometries.Intersectable.GeoPoint;
 
 import java.util.List;
 
-import static primitives.Util.alignZero;
-
 /**
  * Represents a Ray in a 3-Dimensional space.
  * contains head-point for the ray's starting position and a normalized direction vector
@@ -18,11 +16,6 @@ public class Ray {
      * Delta constant used for shifting a point upwards or downwards from the original position
      */
     private static final double DELTA = 0.1;
-
-    /**
-     * The smallest allowed scalar for scaling the ray's direction vector. for preventing zero-vectors
-     */
-    private static final Double MIN_DIR_SCALAR = 0.000001;
 
     /**
      * The ray's starting position in the 3D space
@@ -60,10 +53,10 @@ public class Ray {
      */
     public Ray(Point head, Vector direction, Vector normal) {
         double nv = normal.dotProduct(direction);
-        Vector epsVector = normal.scale(nv > 0 ? DELTA : -DELTA);
+        Vector epsVector = normal.scale(nv < 0 ? -DELTA : DELTA);
         Point shiftedPoint = head.add(epsVector);
         this.head = shiftedPoint;
-        if (direction.length() != 1f)
+        if (direction.length() != 1d)
             direction = direction.normalize();
         this.direction = direction;
     }
@@ -106,7 +99,11 @@ public class Ray {
      * @return head point + t * direction vector
      */
     public Point getPoint(double t) {
-        return alignZero(t) < MIN_DIR_SCALAR ? head : head.add(direction.scale(t));
+        try {
+            return head.add(direction.scale(t));
+        } catch (IllegalArgumentException ignore) {
+            return head;
+        }
     }
 
     /**

@@ -12,27 +12,27 @@ import static primitives.Util.compare;
 public final class Vector extends Point {
 
     /**
-     * Constant for the up vector (0, 1, 0)
+     * Constant for the positive y-axis direction vector(0, 1, 0)
      */
     public static final Vector UP = new Vector(0, 1, 0);
     /**
-     * Constant for the down vector (0, -1, 0)
+     * Constant for the negative y-axis direction vector (0, -1, 0)
      */
     public static final Vector DOWN = new Vector(0, -1, 0);
     /**
-     * Constant for the right vector (1, 0, 0)
+     * Constant for the positive x-axis direction vector (1, 0, 0)
      */
     public static final Vector RIGHT = new Vector(1, 0, 0);
     /**
-     * Constant for the left vector (-1, 0, 0)
+     * Constant for the negative x-axis direction vector (-1, 0, 0)
      */
     public static final Vector LEFT = new Vector(-1, 0, 0);
     /**
-     * Constant for the forward vector (0, 0, 1)
+     * Constant for the positive z-axis direction vector (0, 0, 1)
      */
     public static final Vector FORWARDS = new Vector(0, 0, 1);
     /**
-     * Constant for the backwards vector (0, 0, -1)
+     * Constant for the negative z-axis direction vector (0, 0, -1)
      */
     public static final Vector BACKWARDS = new Vector(0, 0, -1);
 

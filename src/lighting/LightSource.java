@@ -26,7 +26,7 @@ public interface LightSource {
      * @param point the point for calculating the distance to
      * @return the squared distance from the light source origin-point to the given point
      */
-    double getDistanceSquared(Point point);
+    double getDistance(Point point);
 
     /**
      * Gives the normalized direction vector from this light-source to the given point

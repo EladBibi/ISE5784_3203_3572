@@ -191,4 +191,42 @@ class SphereTest {
         assertNull(sphere.findIntersections(new Ray(point, vector)),
                 "Ray is tangent to the center point, starts outside. 0 points");
     }
+
+    /**
+     * Test method for {@link geometries.Sphere#findGeoIntersections(Ray, double)} (Ray)}.
+     */
+    @Test
+    public void testFindGeoIntersections() {
+        String msg = "Distance-based intersections calculation does not work properly";
+        Point center = new Point(1, 0, 0);
+        Sphere sphere = new Sphere(center, 2d);
+        double maxDistance = 10d;
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Both Intersection points are within the distance(2 intersections)
+        Ray ray = new Ray(new Point(-3, 0, 0), Vector.RIGHT);
+        assertEquals(2, sphere.findGeoIntersections(ray, maxDistance).size(), msg);
+
+        // TC02: Only one intersection is within the distance(1 intersection)
+        ray = new Ray(new Point(-9, 0, 0), Vector.RIGHT);
+        assertEquals(1, sphere.findGeoIntersections(ray, maxDistance).size(), msg);
+
+        // TC03: Both intersections are outside the distance range(no intersection)
+        ray = new Ray(new Point(-15, 0, 0), Vector.RIGHT);
+        assertNull(sphere.findGeoIntersections(ray, maxDistance), msg);
+
+        // TC04: There is one intersection point, and it is inside the range(1 intersection)
+        ray = new Ray(new Point(-0.5, 0, 0), Vector.RIGHT);
+        assertEquals(1, sphere.findGeoIntersections(ray, maxDistance).size(), msg);
+
+        // TC05: There is one intersection point, and it is outside the range(no intersection)
+        ray = new Ray(new Point(-0.5, 0, 0), Vector.RIGHT);
+        assertNull(sphere.findGeoIntersections(ray, 3d), msg);
+
+        // =============== Boundary Values Tests ==================
+
+        // TC06: Intersection is precisely in the given distance range(no intersection)
+        ray = new Ray(new Point(-11, 0, 0), Vector.RIGHT);
+        assertNull(sphere.findGeoIntersections(ray, maxDistance), msg);
+    }
 }

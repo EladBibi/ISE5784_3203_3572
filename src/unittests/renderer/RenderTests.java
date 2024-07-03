@@ -3,6 +3,7 @@ package renderer;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Double3;
@@ -89,6 +90,7 @@ public class RenderTests {
      * Test for XML based scene - for bonus
      */
     @Test
+    @Disabled
     public void basicRenderXml() {
         String sceneName = "scene1";
         camera

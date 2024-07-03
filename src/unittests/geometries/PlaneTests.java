@@ -135,4 +135,31 @@ class PlaneTests {
         assertNull(planeAltCtor.findIntersections(new Ray(point, vector)),
                 "The ray begins at the point saved by the plane(the point provided to the constructor - q)");
     }
+
+    /**
+     * Test method for {@link Plane#findGeoIntersections(Ray, double)}.
+     */
+    @Test
+    void testFindGeoIntersections() {
+        String msg = "Distance-based intersections calculation does not work properly";
+        Point point = new Point(2, 1, 0);
+        Vector n = Vector.FORWARDS;
+        Plane plane = new Plane(point, n);
+        double maxDistance = 4d;
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Intersection is within the distance(one intersection)
+        Ray ray = new Ray(new Point(0.5, 0, -3), Vector.FORWARDS);
+        assertEquals(1, plane.findGeoIntersections(ray, maxDistance).size(), msg);
+
+        // TC02: Intersection is outside the distance(no intersection)
+        ray = new Ray(new Point(0.5, 0, -5), Vector.FORWARDS);
+        assertNull(plane.findGeoIntersections(ray, maxDistance), msg);
+
+        // =============== Boundary Values Tests ==================
+
+        // TC03: Intersection is precisely in the given distance range(no intersection)
+        ray = new Ray(new Point(0.5, 0, -4), Vector.FORWARDS);
+        assertNull(plane.findGeoIntersections(ray, maxDistance), msg);
+    }
 }
