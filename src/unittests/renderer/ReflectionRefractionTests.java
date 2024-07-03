@@ -5,7 +5,6 @@ import geometries.Polygon;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
-import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
 import primitives.*;
@@ -118,6 +117,7 @@ public class ReflectionRefractionTests {
      */
     @Test
     public void testImage1() {
+        //big diamond
         Point a1 = new Point(100, 100, 100);
         Point top = new Point(0, 200, 0);
         Point a3 = new Point(150, 100, 0);
@@ -128,6 +128,7 @@ public class ReflectionRefractionTests {
         Point a8 = new Point(-100, 100, 100);
         Point a9 = new Point(0, 100, 150);
         Point bottom = new Point(0, -150, 0);
+        //small internal diamond
         Point k = new Point(0, 100, 0);
         Point k1 = new Point(40, 40, 40);
         Point k2 = new Point(0, 40, 60);
@@ -138,7 +139,7 @@ public class ReflectionRefractionTests {
         Point k7 = new Point(40, 40, -40);
         Point k8 = new Point(60, 40, 0);
         Point k9 = new Point(0, -20, 0);
-
+        //cube 1
         Point c1 = new Point(-200, -150, -250);
         Point c2 = new Point(-300, -150, -250);
         Point c3 = new Point(-300, -150, -350);
@@ -147,39 +148,33 @@ public class ReflectionRefractionTests {
         Point c6 = new Point(-300, -50, -350);
         Point c7 = new Point(-300, -50, -250);
         Point c8 = new Point(-200, -50, -250);
-        Point cc1 = new Point(-330, -150, -270);
-        Point cc2 = new Point(-430, -150, -270);
-        Point cc3 = new Point(-430, -150, -330);
-        Point cc4 = new Point(-330, -150, -330);
-        Point cc5 = new Point(-330, -90, -330);
-        Point cc6 = new Point(-430, -90, -330);
-        Point cc7 = new Point(-430, -90, -270);
-        Point cc8 = new Point(-330, -90, -270);
+        //cube 2
+        Point cc1 = new Point(-400, -150, -110);
+        Point cc2 = new Point(-500, -150, -110);
+        Point cc3 = new Point(-500, -150, -190);
+        Point cc4 = new Point(-400, -150, -190);
+        Point cc5 = new Point(-400, -90, -190);
+        Point cc6 = new Point(-500, -90, -190);
+        Point cc7 = new Point(-500, -90, -110);
+        Point cc8 = new Point(-400, -90, -110);
+        //diamond inside cube
+        Point d1 = new Point(-250, -60, -300);
+        Point d2 = new Point(-280, -90, -300);
+        Point d3 = new Point(-250, -90, -330);
+        Point d4 = new Point(-220, -90, -300);
+        Point d5 = new Point(-250, -90, -270);
+        Point d6 = new Point(-250, -140, -300);
 
-        Point s1 = new Point(350, -150, 0);
-        Point s2 = new Point(340, -150, 20);
-        Point s3 = new Point(340, -150, 40);
-        Point s4 = new Point(340, -150, 60);
-        Point s5 = new Point(332.03612, -150, 78.05912);
-        Point s6 = new Point(320, -150, 100);
-        Point s7 = new Point(300, -150, 120);
-        Point s8 = new Point(286.52088, -150, 140.32397);
-        Point s9 = new Point(275.15374, -150, 160);
-        Point s10 = new Point(270, -150, 180);
-        Point s11 = new Point(260, -150, 200);
-        Point s12 = new Point(250, -150, 220);
-        Point s13 = new Point(240, -150, 240);
-        Point s14 = new Point(226.16019, -150, 260);
-        Point s15 = new Point(210, -150, 275);
-        Point s16 = new Point(200, -150, 295);
-        Point s17 = new Point(190, -150, 313.94112);
 
-        Material bigDiamondMat = new Material().setKd(0.2d).setKs(0.2d).setShininess(20).setKr(0.1d).setKt(0.9d);
-        Material smallDiamondMat = new Material().setKd(0.3d).setKs(0.7d).setShininess(500).setKt(0.8);
-        Material cubeMat = new Material().setKd(0.9d).setKs(0.9d).setShininess(700).setKt(0.7d).setKr(0d);
-        Material planeMat = new Material().setKd(0.1d).setKs(0.2d).setShininess(300).setKr(0.2d);
-        Material sphereMat = new Material().setKd(0.1d).setKs(0.1d).setShininess(30).setKr(0.2d).setKt(0.3d);
+        Material bigDiamondMat = new Material().setKd(0.2d).setKs(0.2d).setShininess(20).setKt(0.7d);
+        Material smallDiamondMat = new Material().setKd(0.8d).setKs(0.2d).setShininess(600).setKr(0.6).setKt(0.3);
+        Material cubeDiamondMat = new Material().setKd(0.6d).setKs(0.4d).setShininess(500).setKr(0.5).setKt(0.5);
+        Material cubeMat = new Material().setKd(0.5d).setKs(0.5d).setShininess(700).setKt(0.7d).setKr(0.2d);
+        Material planeMat = new Material().setKd(0.3d).setKs(0.3d).setShininess(300).setKr(0.3d);
+
         Color cubeColor = Color.BLACK;
+        Color smallDiamondColor = new Color(15, 5, 0);
+        Color diamondCubeColor = new Color(3, 8, 13);
         double sphereRadius = 10d;
 
         scene.geometries.add(
@@ -203,85 +198,83 @@ public class ReflectionRefractionTests {
                 new Triangle(a8, bottom, a9).setMaterial(bigDiamondMat),
                 new Triangle(a9, bottom, a1).setMaterial(bigDiamondMat),
                 //little diamond
-                new Triangle(k1, k, k2).setMaterial(smallDiamondMat),
-                new Triangle(k2, k, k3).setMaterial(smallDiamondMat),
-                new Triangle(k3, k, k4).setMaterial(smallDiamondMat),
-                new Triangle(k4, k, k5).setMaterial(smallDiamondMat),
-                new Triangle(k5, k, k6).setMaterial(smallDiamondMat),
-                new Triangle(k6, k, k7).setMaterial(smallDiamondMat),
-                new Triangle(k7, k, k8).setMaterial(smallDiamondMat),
-                new Triangle(k8, k, k1).setMaterial(smallDiamondMat),
-                new Triangle(k1, k9, k2).setMaterial(smallDiamondMat),
-                new Triangle(k2, k9, k3).setMaterial(smallDiamondMat),
-                new Triangle(k3, k9, k4).setMaterial(smallDiamondMat),
-                new Triangle(k4, k9, k5).setMaterial(smallDiamondMat),
-                new Triangle(k5, k9, k6).setMaterial(smallDiamondMat),
-                new Triangle(k6, k9, k7).setMaterial(smallDiamondMat),
-                new Triangle(k7, k9, k8).setMaterial(smallDiamondMat),
-                new Triangle(k8, k9, k1).setMaterial(smallDiamondMat),
+                new Triangle(k1, k, k2).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k2, k, k3).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k3, k, k4).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k4, k, k5).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k5, k, k6).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k6, k, k7).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k7, k, k8).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k8, k, k1).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k1, k9, k2).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k2, k9, k3).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k3, k9, k4).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k4, k9, k5).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k5, k9, k6).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k6, k9, k7).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k7, k9, k8).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
+                new Triangle(k8, k9, k1).setMaterial(smallDiamondMat).setEmission(smallDiamondColor),
                 //cube1
                 new Polygon(c1, c2, c3, c4).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(c5, c6, c7, c8).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(c1, c2, c7, c8).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(c2, c3, c6, c7).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(c3, c4, c5, c6).setMaterial(cubeMat).setEmission(cubeColor),
-                new Polygon(c1, c4, c5, c8).setMaterial(cubeMat).setEmission(cubeColor)
+                new Polygon(c1, c4, c5, c8).setMaterial(cubeMat).setEmission(cubeColor),
                 //cube2
-//              new Polygon(cc1,cc2,cc3,cc4).setMaterial(cubeMat).setEmission(cubeColor),
-//              new Polygon(c5,cc6,cc7,cc8).setMaterial(cubeMat).setEmission(cubeColor),
-//              new Polygon(cc1,cc2,cc7,cc8).setMaterial(cubeMat).setEmission(cubeColor),
-//              new Polygon(cc2,cc3,cc6,cc7).setMaterial(cubeMat).setEmission(cubeColor),
-//              new Polygon(cc3,cc4,cc5,cc6).setMaterial(cubeMat).setEmission(cubeColor),
-//              new Polygon(cc1,cc4,cc5,cc8).setMaterial(cubeMat).setEmission(cubeColor)
-                //spheres
-//              new Sphere(s1,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s2,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s3,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s4,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s5,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s6,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s7,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s8,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s9,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s10,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s11,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s12,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s13,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s14,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s15,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s16,sphereRadius).setMaterial(sphereMat),
-//              new Sphere(s17,sphereRadius).setMaterial(sphereMat)
+                new Polygon(cc1, cc2, cc3, cc4).setMaterial(cubeMat).setEmission(cubeColor),
+                new Polygon(cc5, cc6, cc7, cc8).setMaterial(cubeMat).setEmission(cubeColor),
+                new Polygon(cc1, cc2, cc7, cc8).setMaterial(cubeMat).setEmission(cubeColor),
+                new Polygon(cc2, cc3, cc6, cc7).setMaterial(cubeMat).setEmission(cubeColor),
+                new Polygon(cc3, cc4, cc5, cc6).setMaterial(cubeMat).setEmission(cubeColor),
+                new Polygon(cc1, cc4, cc5, cc8).setMaterial(cubeMat).setEmission(cubeColor),
+                //diamond inside cube
+                new Triangle(d2, d1, d3).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d3, d1, d4).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d4, d1, d5).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d5, d1, d2).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d2, d6, d3).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d3, d6, d4).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d4, d6, d5).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
+                new Triangle(d5, d6, d2).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor)
         );
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0d));
 
-        Color spotColor1 = new Color(122, 81, 48);
-        Color pointColor2 = new Color(256, 175, 109);
-        Color spotColor3 = new Color(270, 263, 171);
+        Color spotColor1 = new Color(89, 42, 62);
+        Color spotColor2 = new Color(77, 20, 33);
+        Color spotColor3 = new Color(79, 57, 30);
+        Color pointColor1 = new Color(64, 37, 15);
+        Color pointColor2 = new Color(36, 31, 61);
         scene.setLights(
-                new PointLight(pointColor2, new Point(0, 40, 0))
-                        .setKl(4E-5).setKq(2E-7),
+//                new PointLight(pointColor1, new Point(100, 100, 100))
+//                        .setKl(4E-5).setKq(2E-7),
+//                new PointLight(pointColor1, new Point(-50, 130, -50))
+//                        .setKl(4E-5).setKq(2E-7),
+//                new PointLight(pointColor2, new Point(-250,-70,-330))
+//                        .setKl(4E-5).setKq(2E-7),
                 new SpotLight(spotColor1, new Point(-453, 84, 200), Point.ZERO)
                         .setKl(4E-5).setKq(2E-7),
-                new SpotLight(spotColor3, new Point(-374.41164, 400.63026, -879.30782), Point.ZERO)
+                new SpotLight(spotColor2, new Point(-874.41164, 300.63026, -400.30782), Point.ZERO)
+                        .setKl(4E-5).setKq(2E-7),
+                new SpotLight(spotColor3, new Point(-800, 300, 900), new Point(-200, -10, 0))
                         .setKl(4E-5).setKq(2E-7)
-//              new SpotLight(spotColor1, new Point(150, 0, -150), Point.ZERO)
-//                      .setKl(4E-5).setKq(2E-7),
-//              new SpotLight(spotColor1, new Point(150, 0, 150), Point.ZERO)
-//                      .setKl(4E-5).setKq(2E-7),
-//              new SpotLight(spotColor1, new Point(0, 250, 0), top)
-//                      .setKl(4E-5).setKq(2E-7)
-//              new SpotLight(spotColor3,new Point(-350,100,-350),new Point(-250,-150,-300))
-//                      .setKl(4E-5).setKq(2E-7)
         );
 
+        Point vidStartingPnt = new Point(-1200, 700, 4000);
+        Point vidEndingPnt = new Point(1500, 100, -2000);
+        Point vidInterpolationPnt = new Point(6000, 1500, 1500);
+        Point vidFocusPnt = new Point(-200, -20, 0);
+
         cameraBuilder
-                .setFocusPoint(new Point(-2800, 2000, 3500), new Point(-140, 0, 0))
+                .setFocusPoint(vidStartingPnt, vidFocusPnt)
                 .setVpDistance(1000)
-                .setVpSize(200, 200)
-                .setImageWriter(new ImageWriter("bonusImage5", 800, 800))
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter("bonusImage15", 1280, 720))
                 .build()
                 .rotate(0)
-                .renderImage()
-                .writeToImage();
+//                .renderImage()
+//                .writeToImage();
+                .generateVideo(125, 0, "diamond_scene_video_720p", 1280, 720,
+                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
     }
 }

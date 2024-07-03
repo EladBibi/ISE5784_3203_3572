@@ -236,6 +236,63 @@ public class Camera implements Cloneable {
     }
 
     /**
+     * Generate multiple frames along a given bezier-curve which can than be combined into a video
+     *
+     * @param frames        the total amount of frames that will be generated for this video
+     * @param startFrom     the frame to start from, relevant if we already generated some frames in the past.
+     *                      since the camera positioning is recalculated every single frame independently, as long as the rest
+     *                      of the input parameters are the same, we can continue to generate frames from where we stopped
+     * @param name          the name of the frames, each frame-image will be named with a running index-number: "name + (frame-number)"
+     * @param nX            horizontal resolution (pixel count)
+     * @param nY            vertical resolution (pixel count)
+     * @param focusPoint    the point which the camera will focus at throughout all the frames
+     * @param origin        the origin point, where the camera will start from at the first frame
+     * @param destination   interpolation point for forming a bezier-curve on which the camera will move (see the
+     *                      'quadraticInterpolate' method description in the point class for a more detailed explanation)
+     * @param interpolation the destination point, where the camera should reach at the last frame
+     * @param rotation      rotation of the camera throughout all the frames (in degrees). leave 0 for no rotation
+     */
+    public void generateVideo(int frames, int startFrom, String name, int nX, int nY, Point focusPoint, Point origin,
+                              Point destination, Point interpolation, double rotation) {
+        for (int i = startFrom; i < frames; ++i) {
+            double positionOnRoute = (double) i / (double) frames;
+            String frameName = name + i;
+            imageWriter = new ImageWriter(frameName, nX, nY);
+            Point position = Point.quadraticInterpolate(origin, interpolation, destination, positionOnRoute);
+            setFocusPoint(position, focusPoint);
+            rotate(rotation);
+            renderImage();
+            writeToImage();
+        }
+    }
+
+    /**
+     * Helper method for setting the camera position and focus on a given point
+     *
+     * @param position    the position point for the camera in the scene
+     * @param lookAtPoint the point in the scene we wish the camera to focus at
+     * @throws IllegalArgumentException if the given position and focus points are equal
+     */
+    private void setFocusPoint(Point position, Point lookAtPoint) {
+        if (lookAtPoint.equals(position)) {
+            throw new IllegalArgumentException("The look-at point cannot be the same as the camera position");
+        }
+        this.position = position;
+        this.vTo = lookAtPoint.subtract(position).normalize();
+
+        Vector up = Vector.UP;
+
+        //checking if the up vector is parallel to vTo
+        if (Math.abs(vTo.dotProduct(up)) == 1) {
+            up = Vector.FORWARDS;
+        }
+
+        this.vUp = up.crossProduct(vTo).normalize();
+        this.vUp = this.vTo.crossProduct(this.vUp).normalize();
+        this.vRight = this.vTo.crossProduct(this.vUp).normalize();
+    }
+
+    /**
      * Rotating the camera with the given angle
      *
      * @param degrees the angle in degrees for rotating the camera
@@ -332,14 +389,7 @@ public class Camera implements Cloneable {
          *                                  look-at point, are identical
          */
         public Builder setFocusPoint(Point position, Point lookAtPoint) {
-            if (lookAtPoint.equals(position)) {
-                throw new IllegalArgumentException("The look-at point cannot be the same as the camera position");
-            }
-            camera.position = position;
-            camera.vTo = lookAtPoint.subtract(camera.position).normalize();
-            Vector vectorOnPlane = camera.vTo.equals(Vector.RIGHT)
-                    ? Vector.FORWARDS : Vector.RIGHT;
-            camera.vUp = vectorOnPlane.crossProduct(camera.vTo).normalize();
+            camera.setFocusPoint(position, lookAtPoint);
             return this;
         }
 

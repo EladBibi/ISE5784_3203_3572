@@ -22,7 +22,7 @@ public class Ray {
     /**
      * The smallest allowed scalar for scaling the ray's direction vector. for preventing zero-vectors
      */
-    private static final Double MIN_DIR_SCALAR = 0.000001;
+    private static final Double MIN_DIR_SCALAR = 0.0000001;
 
     /**
      * The ray's starting position in the 3D space

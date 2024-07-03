@@ -17,11 +17,11 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the maximum recursive iterations for each pixel in the ray tracing process
      */
-    private static final int MAX_CALC_COLOR_LEVEL = 40;
+    private static final int MAX_CALC_COLOR_LEVEL = 10;
     /**
      * Static constant for the lowest distinguishable color intensity
      */
-    private static final Double3 MIN_CALC_COLOR_K = new Double3(0.0000001);
+    private static final Double3 MIN_CALC_COLOR_K = new Double3(0.00001);
     /**
      * Static constant for the starting color intensity factor
      */
@@ -114,9 +114,8 @@ public class SimpleRayTracer extends RayTracerBase {
      */
     private Ray constructRefractedRay(GeoPoint geoPoint, Ray ray) {
         Point point = geoPoint.point;
-        Vector v = ray.getDirection();
         Vector n = geoPoint.geometry.getNormal(point);
-        return new Ray(point, v, n);
+        return new Ray(point, ray.getDirection(), n);
     }
 
     /**

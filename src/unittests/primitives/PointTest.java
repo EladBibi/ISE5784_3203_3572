@@ -112,4 +112,26 @@ class PointTest {
         assertEquals(0d, alignZero(p1.distanceSquared(p1)),
                 "point squared distance to itself is not zero");
     }
+
+    /**
+     * Test method for {@link primitives.Point#quadraticInterpolate(Point, Point, Point, double)}.
+     */
+    @Test
+    void testQuadraticInterpolate() {
+        Point start = new Point(0, 0, 100);
+        Point end = new Point(100, 0, 0);
+        Point interpolation = new Point(100, 0, 100);
+
+        Point s = Point.quadraticInterpolate(start, interpolation, end, 0);
+        Point p1 = Point.quadraticInterpolate(start, interpolation, end, 0.1);
+        Point p2 = Point.quadraticInterpolate(start, interpolation, end, 0.2);
+        Point p3 = Point.quadraticInterpolate(start, interpolation, end, 0.3);
+        Point p4 = Point.quadraticInterpolate(start, interpolation, end, 0.4);
+        Point p5 = Point.quadraticInterpolate(start, interpolation, end, 0.5);
+        Point p6 = Point.quadraticInterpolate(start, interpolation, end, 0.6);
+        Point p7 = Point.quadraticInterpolate(start, interpolation, end, 0.7);
+        Point p8 = Point.quadraticInterpolate(start, interpolation, end, 0.8);
+        Point p9 = Point.quadraticInterpolate(start, interpolation, end, 0.9);
+        Point p10 = Point.quadraticInterpolate(start, interpolation, end, 1);
+    }
 }
