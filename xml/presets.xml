@@ -1,27 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<presets>
-	<preset name = "scene1">
-		<camera-position p0 = "0 0 0"/>	
-		<image-writer nx="1000" ny="1000"/>	
-		<background-color color="75 127 90" />
-		<ambient-light color="255 191 191" scalar ="1 1 1"/>
-		<geometries>
-			<sphere center="0 0 -100" radius="50" />
-			<triangle p0="-100 0 -100" p1="0 100 -100" p2="-100 100 -100" />
-			<triangle p0="-100 0 -100" p1="0 -100 -100" p2="-100 -100 -100" />
-			<triangle p0="100 0 -100" p1="0 -100 -100" p2="100 -100 -100" />
-		</geometries>
-	</preset>
-	<preset name = "testScene">
-		<camera-position p0 = "2 5 40"/>
-		<image-writer nx="2000" ny="1000"/>		
-		<background-color color="75 127 90" />
-		<ambient-light color="255 191 191" scalar ="2 2 2"/>
-		<geometries>
-			<sphere center="0 0 -100" radius="50" />
-			<triangle p0="-100 0 -100" p1="0 100 -100" p2="-100 100 -100" />
-			<triangle p0="-100 0 -100" p1="0 -100 -100" p2="-100 -100 -100" />
-			<triangle p0="100 0 -100" p1="0 -100 -100" p2="100 -100 -100" />
-		</geometries>
-	</preset>
-</presets>
+1) 192.168.86.61
+2) 1
+3) 17
+4) 20
+5) 36
+6) b
+7) 
+8) 
+9) incrementing by one
+10) 1
+11) false
+12) no
+13) yes
+14) offset
+15) more fragments
+16) 1500
+17) offset
+18) offset
+19) 

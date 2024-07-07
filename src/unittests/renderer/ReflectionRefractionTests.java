@@ -264,7 +264,7 @@ public class ReflectionRefractionTests {
         Color spotColor2 = new Color(77, 20, 33);
         Color spotColor3 = new Color(79, 57, 30);
         Color spotColor4 = new Color(59, 35, 21);
-        Color pointColor1 = new Color(20, 82, 58);
+        Color pointColor1 = new Color(28, 97, 64);
         Color pointColor2 = new Color(36, 31, 61);
         scene.setLights(
                 new PointLight(pointColor1, new Point(-150, 0, -150))
@@ -283,21 +283,21 @@ public class ReflectionRefractionTests {
                         .setKl(4E-5).setKq(2E-7)
         );
 
-        Point vidStartingPnt = new Point(3500, 0, 0);
-        Point vidEndingPnt = new Point(0, 1400, -3500);
-        Point vidInterpolationPnt = new Point(3500, 700, -3500);
+        Point vidStartingPnt = new Point(-3500, 600, 0);
+        Point vidEndingPnt = new Point(0, 1400, 3500);
+        Point vidInterpolationPnt = new Point(-3000, 1000, 3000);
         Point vidFocusPnt = new Point(-100, 0, -100);
 
         cameraBuilder
-                .setFocusPoint(new Point(400, -1200, -3500), new Point(-100, 0, -100))
+                .setFocusPoint(new Point(900, 1200, -3500), new Point(-100, 0, -100))
                 .setVpDistance(1050)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("bonusImage1", 1280, 720))
+                .setImageWriter(new ImageWriter("bonusImage3", 1820, 720))
                 .build()
-                .rotate(0)
-//                .renderImage()
-//                .writeToImage();
-                .generateVideo(125, 28, "diamonds scene vid 4 HD", 1280, 720,
-                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
+                .rotate(-40)
+                .renderImage()
+                .writeToImage();
+//                .generateVideo(125, 0, "test vid HD", 1280, 720,
+//                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
     }
 }

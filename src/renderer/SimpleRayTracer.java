@@ -17,7 +17,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the maximum recursive iterations for each pixel in the ray tracing process
      */
-    private static final int MAX_CALC_COLOR_LEVEL = 10;
+    private static final int MAX_CALC_COLOR_LEVEL = 15;
     /**
      * Static constant for the lowest distinguishable color intensity
      */
