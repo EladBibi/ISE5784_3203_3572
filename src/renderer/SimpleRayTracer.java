@@ -21,7 +21,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the lowest distinguishable color intensity
      */
-    private static final Double3 MIN_CALC_COLOR_K = new Double3(0.0000001);
+    private static final Double3 MIN_CALC_COLOR_K = new Double3(0.00001);
     /**
      * Static constant for the starting color intensity factor
      */
