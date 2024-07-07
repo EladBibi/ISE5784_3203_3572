@@ -82,6 +82,6 @@ public class Plane extends Geometry {
 
         Vector vhq = q.subtract(h);
         double t = alignZero(normal.dotProduct(vhq) / nv);
-        return t > 0 && t < maxDistance ? List.of(new GeoPoint(ray.getPoint(t), this)) : null;
+        return t > 0 && alignZero(t - maxDistance) < 0 ? List.of(new GeoPoint(ray.getPoint(t), this)) : null;
     }
 }

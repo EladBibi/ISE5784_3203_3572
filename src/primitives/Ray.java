@@ -48,16 +48,13 @@ public class Ray {
      * based on the angle of the given direction and the normal at the head-point
      *
      * @param head      starting position for the ray
-     * @param direction direction vector of the ray
+     * @param direction direction vector of the ray which must be normalized ahead
      * @param normal    normal vector at the ray's starting position
      */
     public Ray(Point head, Vector direction, Vector normal) {
         double nv = normal.dotProduct(direction);
         Vector epsVector = normal.scale(nv < 0 ? -DELTA : DELTA);
-        Point shiftedPoint = head.add(epsVector);
-        this.head = shiftedPoint;
-        if (direction.length() != 1d)
-            direction = direction.normalize();
+        this.head = head.add(epsVector);
         this.direction = direction;
     }
 

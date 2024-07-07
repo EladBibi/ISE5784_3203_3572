@@ -63,7 +63,6 @@ public class Camera implements Cloneable {
      * Empty constructor
      */
     private Camera() {
-
     }
 
     /**
@@ -71,6 +70,7 @@ public class Camera implements Cloneable {
      *
      * @return the camera's position point
      */
+    @SuppressWarnings("unused")
     public Point getPosition() {
         return this.position;
     }
@@ -81,6 +81,7 @@ public class Camera implements Cloneable {
      *
      * @return the camera's vUp vector
      */
+    @SuppressWarnings("unused")
     public Vector getVup() {
         return this.vUp;
     }
@@ -91,6 +92,7 @@ public class Camera implements Cloneable {
      *
      * @return the camera's vRight vector
      */
+    @SuppressWarnings("unused")
     public Vector getVright() {
         return this.vRight;
     }
@@ -101,6 +103,7 @@ public class Camera implements Cloneable {
      *
      * @return the camera's vTo vector
      */
+    @SuppressWarnings("unused")
     public Vector getVto() {
         return this.vTo;
     }
@@ -110,6 +113,7 @@ public class Camera implements Cloneable {
      *
      * @return the camera's distance from the view plane
      */
+    @SuppressWarnings("unused")
     public double getVpDistance() {
         return this.vpDistance;
     }
@@ -119,6 +123,7 @@ public class Camera implements Cloneable {
      *
      * @return the view plane's width
      */
+    @SuppressWarnings("unused")
     public double getVpWidth() {
         return this.vpWidth;
     }
@@ -128,6 +133,7 @@ public class Camera implements Cloneable {
      *
      * @return the view plane's height
      */
+    @SuppressWarnings("unused")
     public double getVpHeight() {
         return this.vpHeight;
     }

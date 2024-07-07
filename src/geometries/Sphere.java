@@ -59,15 +59,15 @@ public class Sphere extends RadialGeometry {
 
         double t1 = alignZero(tm - th);
         double t2 = alignZero(tm + th);
-
         //t2 > t1 therefore, it is enough to check t2 <= 0
-        if (t1 >= maxDistance || t2 <= 0) // no intersections OR all points are outside the given range
+        if (alignZero(t1 - maxDistance) >= 0 || t2 <= 0) // no intersections OR all points are outside the given range
             return null;
-        else if (t1 > 0) // there are two intersections: either one or both are inside the range
-            return t2 >= maxDistance ? List.of(new GeoPoint(ray.getPoint(t1), this))
-                    : List.of(new GeoPoint(ray.getPoint(t1), this),
-                    new GeoPoint(ray.getPoint(t2), this));
-        else // there is only one intersection: inside or outside the range
-            return t2 < maxDistance ? List.of(new GeoPoint(ray.getPoint(t2), this)) : null;
+
+        if (t1 > 0) // there are two intersections: either one or both are inside the range
+            return alignZero(t2 - maxDistance) >= 0
+                    ? List.of(new GeoPoint(ray.getPoint(t1), this))
+                    : List.of(new GeoPoint(ray.getPoint(t1), this), new GeoPoint(ray.getPoint(t2), this));
+        // there is only one intersection: inside or outside the range
+        return alignZero(t2 - maxDistance) >= 0 ? null : List.of(new GeoPoint(ray.getPoint(t2), this));
     }
 }

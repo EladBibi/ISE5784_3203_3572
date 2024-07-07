@@ -25,7 +25,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the starting color intensity factor
      */
-    private static final Double3 STARTING_K = new Double3(1d);
+    private static final Double3 STARTING_K = Double3.ONE;
 
     /**
      * Constructor that initializes the tracer with the given scene
@@ -113,9 +113,8 @@ public class SimpleRayTracer extends RayTracerBase {
      * @return the refraction ray of the given ray through the geometry of the intersection point
      */
     private Ray constructRefractedRay(GeoPoint geoPoint, Ray ray) {
-        Point point = geoPoint.point;
-        Vector n = geoPoint.geometry.getNormal(point);
-        return new Ray(point, ray.getDirection(), n);
+        Vector n = geoPoint.geometry.getNormal(geoPoint.point);
+        return new Ray(geoPoint.point, ray.getDirection(), n);
     }
 
     /**
@@ -128,7 +127,6 @@ public class SimpleRayTracer extends RayTracerBase {
     private Ray constructReflectedRay(GeoPoint geoPoint, Ray ray) {
         Vector v = ray.getDirection();
         Vector n = geoPoint.geometry.getNormal(geoPoint.point);
-
         double vn = v.dotProduct(n);
 
         Vector r = v.subtract(n.scale(2 * vn));
@@ -197,9 +195,8 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector nInverted = n.scale(d);
         Vector r = l.add(nInverted);
 
-        Vector vInverted = v.scale(-1);
-        double factor = Math.abs(Math.pow(vInverted.dotProduct(r), material.nShininess));
-        return material.kS.scale(factor);
+        double minusVR = -alignZero(v.dotProduct(r));
+        return minusVR <= 0 ? Double3.ZERO : material.kS.scale(Math.pow(minusVR, material.nShininess));
     }
 
     /**
@@ -223,6 +220,8 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param nl    the angle-cos between the normal and the l vector
      * @return true if the point is unshaded, false otherwise
      */
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("unused")
     private boolean unshaded(GeoPoint gp, LightSource light, Vector l, Vector n, double nl) {
         Vector pointToLightVector = l.scale(-1);
         Ray shadingRay = new Ray(gp.point, pointToLightVector, n);
@@ -235,7 +234,7 @@ public class SimpleRayTracer extends RayTracerBase {
         double distance = light.getDistance(gp.point);
         for (GeoPoint intersection : intersections) {
             if (gp.point.distanceSquared(intersection.point) < distance
-                    && intersection.geometry.getMaterial().kT.equals(0))
+                    && intersection.geometry.getMaterial().kT.equals(Double3.ZERO))
                 return false;
         }
         return true;
@@ -255,10 +254,8 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector pointToLightVector = l.scale(-1);
         Ray shadingRay = new Ray(gp.point, pointToLightVector, n);
 
-        double distance = light.getDistance(gp.point);
-        var intersections = scene.geometries.findGeoIntersections(shadingRay, distance);
-
         Double3 ktr = Double3.ONE;
+        var intersections = scene.geometries.findGeoIntersections(shadingRay, light.getDistance(gp.point));
         if (intersections == null)
             return ktr;
 
@@ -266,7 +263,7 @@ public class SimpleRayTracer extends RayTracerBase {
             //summing the transparency factor of all the objects in the way
             ktr = ktr.product(intersection.geometry.getMaterial().kT);
             if (ktr.lowerThan(MIN_CALC_COLOR_K))
-                return ktr;
+                return Double3.ZERO;
         }
         return ktr;
     }
