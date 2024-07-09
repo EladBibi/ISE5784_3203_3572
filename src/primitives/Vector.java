@@ -137,6 +137,15 @@ public final class Vector extends Point {
     }
 
     /**
+     * Inverts the given vector
+     *
+     * @return a new vector that has the opposite direction of the given vector and the same length
+     */
+    public final Vector inverted() {
+        return this.scale(-1d);
+    }
+
+    /**
      * Rotating a vector around a given axis
      *
      * @param axis    the axis vector for rotating the vector on. MUST be orthogonal

@@ -4,6 +4,7 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static primitives.Util.alignZero;
@@ -18,7 +19,7 @@ public class Sphere extends RadialGeometry {
     /**
      * The center point of the sphere
      */
-    private final Point center;
+    private Point center;
 
     /**
      * Constructor that initializes the sphere from the given center-point and radius
@@ -29,6 +30,20 @@ public class Sphere extends RadialGeometry {
     public Sphere(Point center, double radius) {
         super(radius);
         this.center = center;
+    }
+
+    /**
+     * Constructor that initializes the sphere from the given center-point and radius.
+     * and with a pivot position, used for moving and rotating the geometry
+     *
+     * @param center point that represents the sphere's center
+     * @param radius sphere's radius
+     * @param pivot the pivot position of the geometry. moving and rotating the object will be done
+     *              around the pivot position
+     */
+    public Sphere(Point center, double radius, Point pivot) {
+        this(center,radius);
+        this.pivot = pivot;
     }
 
     @Override
@@ -69,5 +84,19 @@ public class Sphere extends RadialGeometry {
                     : List.of(new GeoPoint(ray.getPoint(t1), this), new GeoPoint(ray.getPoint(t2), this));
         // there is only one intersection: inside or outside the range
         return alignZero(t2 - maxDistance) >= 0 ? null : List.of(new GeoPoint(ray.getPoint(t2), this));
+    }
+
+    @Override
+    public Intersectable moveCloneTo(Point position) {
+        Sphere cloned = (Sphere)this.getClone();
+        Vector movement = position.subtract(pivot);
+        cloned.pivot = position;
+        cloned.center = center.add(movement);
+        return cloned;
+    }
+
+    @Override
+    public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
+        return this.getClone();
     }
 }

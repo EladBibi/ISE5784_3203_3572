@@ -3,13 +3,14 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import renderer.Camera;
 
 import java.util.List;
 
 import static primitives.Util.isZero;
 
 /**
- * A Tube in a three-dimensional space, represented with a center axis-ray and a radius.
+ * A Tube in a three-dimensional space - infinite tube. represented with a center axis-ray and a radius.
  *
  * @author Pini Goldfraind &amp; Elad Bibi
  */
@@ -46,5 +47,15 @@ public class Tube extends RadialGeometry {
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         return null;
+    }
+
+    @Override
+    public Intersectable moveCloneTo(Point position) {
+        return this.getClone();
+    }
+
+    @Override
+    public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
+        return this.getClone();
     }
 }

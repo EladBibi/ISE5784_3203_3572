@@ -4,6 +4,7 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static primitives.Util.alignZero;
@@ -19,11 +20,11 @@ public class Polygon extends Geometry {
     /**
      * List of polygon's vertices
      */
-    protected final List<Point> vertices;
+    protected List<Point> vertices;
     /**
      * Associated plane in which the polygon lays
      */
-    protected final Plane plane;
+    protected Plane plane;
     /**
      * The size of the polygon - the amount of the vertices in the polygon
      */
@@ -126,5 +127,24 @@ public class Polygon extends Geometry {
         }
 
         return List.of(new GeoPoint(intersections.getFirst(), this));
+    }
+
+    @Override
+    public Intersectable moveCloneTo(Point position) {
+        Polygon cloned = (Polygon) this.getClone();
+        Vector movement = position.subtract(pivot);
+        cloned.pivot = position;
+        List<Point> newVertices = new LinkedList<>();
+        for(Point point : vertices){
+            newVertices.add(point.add(movement));
+        }
+        cloned.vertices = newVertices;
+        cloned.plane = (Plane) plane.moveCloneTo(position);
+        return cloned;
+    }
+
+    @Override
+    public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
+        return this.getClone();
     }
 }

@@ -5,6 +5,8 @@ import lighting.LightSource;
 import primitives.*;
 import scene.Scene;
 
+import java.util.List;
+
 import static primitives.Util.alignZero;
 
 /**
@@ -17,15 +19,20 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the maximum recursive iterations for each pixel in the ray tracing process
      */
-    private static final int MAX_CALC_COLOR_LEVEL = 15;
+    private static final int MAX_CALC_COLOR_LEVEL = 5;
     /**
      * Static constant for the lowest distinguishable color intensity
      */
-    private static final Double3 MIN_CALC_COLOR_K = new Double3(0.00001);
+    private static final Double3 MIN_CALC_COLOR_K = new Double3(0.0001);
     /**
      * Static constant for the starting color intensity factor
      */
     private static final Double3 STARTING_K = Double3.ONE;
+
+    /**
+     * The grid size for the beam-casting algorithms.
+     */
+    private int gridSize = 2;
 
     /**
      * Constructor that initializes the tracer with the given scene
@@ -60,49 +67,66 @@ public class SimpleRayTracer extends RayTracerBase {
      *
      * @param geoPoint       a geo point in the scene
      * @param ray            the ray that intersected the geo point
-     * @param iterationsLeft the amount of iterations left for the current pixel
-     * @param k              the current color intensity factor
+     * @param iterationsLeft the amount of iterations left for the current thread
+     * @param k              the current color intensity factor, will exit the recursion loop if it gets insignificantly low
      * @return the color for the pixel
      */
     private Color calcColor(GeoPoint geoPoint, Ray ray, int iterationsLeft, Double3 k) {
         Color color = calcLocalEffects(geoPoint, ray, k);
-        return iterationsLeft == 1 ? color
+        return iterationsLeft <= 1 ? color
                 : color.add(calcGlobalEffects(geoPoint, ray, iterationsLeft, k));
     }
 
     /**
-     * Calculates the pixel color from global effects such as refraction and reflection
+     * Calculates the global lighting effects of the given geo-point. effects such as reflection and transparency
      *
-     * @param gp             the geo-point of the intersected point
-     * @param ray            the ray that intersected the point
-     * @param iterationsLeft the amount of iterations left for the current pixel
-     * @param k              the current color intensity factor
-     * @return the color for the pixel
+     * @param gp             the intersection geo-point
+     * @param ray            the ray that intersected the geo-point
+     * @param iterationsLeft the amount of iterations left for the current thread
+     * @param k              the current color intensity factor, will exit the recursion loop if it gets insignificantly low
+     * @return the calculated global color intensity for the given geo-point
      */
     private Color calcGlobalEffects(GeoPoint gp, Ray ray, int iterationsLeft, Double3 k) {
-        Material material = gp.geometry.getMaterial();
-        return calcGlobalEffects(constructRefractedRay(gp, ray), material.kT, iterationsLeft, k)
-                .add(calcGlobalEffects(constructReflectedRay(gp, ray), material.kR, iterationsLeft, k));
+        Color color = Color.BLACK;
+        Vector n = gp.geometry.getNormal(gp.point);
+
+        Material gpMat = gp.geometry.getMaterial();
+        Double3 kkx = gpMat.kR.product(k);
+        if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
+            //generating a beam of rays in the general reflection direction and adding its average color
+            Ray reflectedRay = constructReflectedRay(gp, ray);
+            List<Ray> beam = reflectedRay.generateBeam(n, gridSize, gpMat.reflectionBlur, gpMat.reflectionBlurRange, gpMat.blurLod);
+            color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kR));
+        }
+
+        kkx = gpMat.kT.product(k);
+        if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
+            //generating a beam of rays in the general refraction direction and adding its average color
+            Ray refractedRay = constructRefractedRay(gp, ray);
+            List<Ray> beam = refractedRay.generateBeam(n, gridSize, gpMat.transparencyBlur, gpMat.transparencyBlurRange, gpMat.blurLod);
+            color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kT));
+        }
+        return color;
     }
 
     /**
-     * Method that calculates the color of the closest intersection point with the given ray
-     * and scales it based on the given scalar
+     * Gives the average color of the given beam of rays. will only sum up the color of the
+     * intersections and will ignore rays that miss (reach infinity)
      *
-     * @param ray            a ray for the tracing
-     * @param kX             scalar for scaling the calculated color(can simulate transparency/reflectiveness)
-     * @param iterationsLeft the amount of recursive iterations left for the color calculation of the
-     *                       current thread
-     * @param k              the current color intensity
-     * @return the calculated color scaled by the given scalar
+     * @param beam           the beam of rays
+     * @param iterationsLeft the amount of iterations left for the current thread
+     * @param k              the current color intensity factor, will exit the recursion loop if it gets insignificantly low
+     * @return the average color of the beam of rays calculated from all the found intersections with the beam
      */
-    private Color calcGlobalEffects(Ray ray, Double3 kX, int iterationsLeft, Double3 k) {
-        Double3 kkx = kX.product(k);
-        if (kkx.lowerThan(MIN_CALC_COLOR_K))
-            return Color.BLACK;
-        GeoPoint gp = findClosestIntersection(ray);
-        return gp == null ? scene.background
-                : calcColor(gp, ray, iterationsLeft - 1, kkx).scale(kX);
+    private Color calcAverageBeamColor(List<Ray> beam, int iterationsLeft, Double3 k) {
+        Color color = Color.BLACK;
+        for (Ray ray : beam) {
+            GeoPoint intersection = findClosestIntersection(ray);
+            if (intersection != null)
+                color = color.add(calcColor(intersection, ray, iterationsLeft - 1, k));
+        }
+        //TODO reducing by the expected rays count instead of the actual count
+        return color.reduce(beam.size());
     }
 
     /**
@@ -226,15 +250,12 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector pointToLightVector = l.scale(-1);
         Ray shadingRay = new Ray(gp.point, pointToLightVector, n);
 
-        var intersections = scene.geometries.findGeoIntersections(shadingRay);
+        var intersections = scene.geometries.findGeoIntersections(shadingRay, light.getDistance(gp.point));
         if (intersections == null)
             return true;
 
-        //checking that the found intersections are between the light-source and the point
-        double distance = light.getDistance(gp.point);
         for (GeoPoint intersection : intersections) {
-            if (gp.point.distanceSquared(intersection.point) < distance
-                    && intersection.geometry.getMaterial().kT.equals(Double3.ZERO))
+            if (intersection.geometry.getMaterial().kT.equals(Double3.ZERO))
                 return false;
         }
         return true;

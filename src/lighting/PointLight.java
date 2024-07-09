@@ -17,7 +17,8 @@ public class PointLight extends Light implements LightSource {
      */
     protected final Point position;
     /**
-     * Constant factor for light range from the source. with the weakest effect on spread
+     * Constant factor for light range from the source. with the weakest effect on spread.
+     * default is one
      */
     private double kC = 1;
     /**
@@ -54,7 +55,8 @@ public class PointLight extends Light implements LightSource {
     /**
      * Setter for the second light spread factor
      *
-     * @param kL kL factor used when computing the color intensity at range from the source
+     * @param kL kL factor used when computing the color intensity at range from the source.
+     *           the higher it is, the shorter the range the light-source will have (light fades faster)
      * @return the point light source object itself
      */
     public PointLight setKl(double kL) {
@@ -65,7 +67,8 @@ public class PointLight extends Light implements LightSource {
     /**
      * Setter for the third, strongest light spread factor
      *
-     * @param kQ kQ factor used when computing the color intensity at range from the source
+     * @param kQ kQ factor used when computing the color intensity at range from the source.
+     *           the higher it is, the shorter the range the light-source will have (light fades faster)
      * @return the point light source object itself
      */
     public PointLight setKq(double kQ) {

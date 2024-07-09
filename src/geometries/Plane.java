@@ -20,11 +20,11 @@ public class Plane extends Geometry {
     /**
      * A point on the plane
      */
-    private final Point q;
+    private Point q;
     /**
      * A normal vector to the plane
      */
-    private final Vector normal;
+    private Vector normal;
 
     /**
      * Constructor that initializes the plane from the three given unique points
@@ -59,6 +59,20 @@ public class Plane extends Geometry {
     }
 
     /**
+     * Constructor that initializes the plane from the given point and vector.
+     * and with a pivot position, used for moving and rotating the geometry
+     *
+     * @param q      a point on the plane
+     * @param normal a vector that is orthogonal to the plane. will be normalized inside the constructor if it's not already
+     * @param pivot the pivot position of the geometry. moving and rotating the object will be done
+     *              around the pivot position
+     */
+    public Plane(Point q, Vector normal, Point pivot) {
+        this(q,normal);
+        this.pivot = pivot;
+    }
+
+    /**
      * Gives the normal-vector for this plane
      *
      * @return the plane's normal-vector
@@ -83,5 +97,19 @@ public class Plane extends Geometry {
         Vector vhq = q.subtract(h);
         double t = alignZero(normal.dotProduct(vhq) / nv);
         return t > 0 && alignZero(t - maxDistance) < 0 ? List.of(new GeoPoint(ray.getPoint(t), this)) : null;
+    }
+
+    @Override
+    public Intersectable moveCloneTo(Point position) {
+        Plane cloned = (Plane)this.getClone();
+        Vector movement = position.subtract(pivot);
+        cloned.pivot = position;
+        cloned.q = q.add(movement);
+        return cloned;
+    }
+
+    @Override
+    public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
+        return this.getClone();
     }
 }

@@ -39,7 +39,7 @@ class CylinderTests {
                 "Cylinder normal computation not working properly");
 
         // TC02: The Point is on the cylinder's bottom base (an inverted center-vector is expected as normal)
-        assertEquals(rayDir.scale(-1d), cylinder.getNormal(new Point(2.4, 1, -0.3)),
+        assertEquals(rayDir.inverted(), cylinder.getNormal(new Point(2.4, 1, -0.3)),
                 "Issue when computing normal for a point on the cylinder's base");
 
         // TC03: The Point is on the cylinder's ceiling (the center-vector is expected as normal)
@@ -50,7 +50,7 @@ class CylinderTests {
 
         // TC04: The Point is on the edge of the cylinder's base
         Point edgePoint = new Point(0.5, 1, 1);
-        assertEquals(rayDir.scale(-1d), cylinder.getNormal(edgePoint),
+        assertEquals(rayDir.inverted(), cylinder.getNormal(edgePoint),
                 "Issue when computing normal for a point that's on the base's edge");
 
         // TC05: The Point is on the edge of the cylinder's ceiling
@@ -59,7 +59,7 @@ class CylinderTests {
                 "Issue when computing normal for a point that's on the ceiling edge of the cylinder");
 
         // TC06: The Point is the cylinder's head-point(middle of the base)
-        assertEquals(rayDir.scale(-1d), cylinder.getNormal(rayHead),
+        assertEquals(rayDir.inverted(), cylinder.getNormal(rayHead),
                 "Issue when computing normal for the cylinder's head point");
 
         // TC07: The Point is the cylinder's head-point projected on the ceiling(middle of the ceiling)

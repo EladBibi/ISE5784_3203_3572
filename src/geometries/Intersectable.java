@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Elad Bibi &amp;Pini Goldfraind
  */
-public abstract class Intersectable {
+public abstract class Intersectable extends Movable implements Cloneable {
 
     /**
      * Internal GeoPoint class. contains a geometry object and a point ON the geometry object
@@ -111,4 +111,12 @@ public abstract class Intersectable {
      * (the intersection point, the intersected geometry)
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
+
+    public final Intersectable getClone(){
+        try {
+            return (Intersectable) this.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning failed");
+        }
+    }
 }

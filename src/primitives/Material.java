@@ -31,10 +31,39 @@ public class Material {
      */
     public int nShininess = 0;
 
+    public double transparencyBlur = 0;
+
+    //the distance
+    public double transparencyBlurRange = 0;
+
+    public double reflectionBlur = 0;
+
+    public double reflectionBlurRange = 0;
+
+    public int blurLod = 30;
+
+    public Material setTransparencyBlur(double blur, double blurRange) {
+        transparencyBlur = blur;
+        transparencyBlurRange = blurRange;
+        return this;
+    }
+
+    public Material setReflectionBlur(double blur, double blurRange) {
+        reflectionBlur = blur;
+        reflectionBlurRange = blurRange;
+        return this;
+    }
+
+    public Material setBlurLod(int rayCasts) {
+        blurLod = rayCasts;
+        return this;
+    }
+
     /**
      * Setter for the Diffusion factor of the material
      *
-     * @param kD kD factor for the material
+     * @param kD kD factor for the material.
+     *           the higher it is the larger the diffusion light-spread will be
      * @return the material object itself
      */
     public Material setKd(Double3 kD) {
@@ -67,7 +96,8 @@ public class Material {
     /**
      * Setter for the Specular factor of the material
      *
-     * @param kS kD factor for the material
+     * @param kS kD factor for the material.
+     *           the higher it is the stronger the specular light reflection will be
      * @return the material object itself
      */
     public Material setKs(Double kS) {
@@ -78,7 +108,7 @@ public class Material {
     /**
      * Setter for the transparency factor
      *
-     * @param kT the transparency factor
+     * @param kT the transparency factor. determines how mush light can pass through the material surface
      * @return the material object itself
      */
     public Material setKt(Double3 kT) {
@@ -89,7 +119,7 @@ public class Material {
     /**
      * Setter for the transparency factor
      *
-     * @param kT the transparency factor
+     * @param kT the transparency factor. determines how mush light can pass through the material surface
      * @return the material object itself
      */
     public Material setKt(Double kT) {
@@ -100,7 +130,8 @@ public class Material {
     /**
      * Setter for the reflectiveness factor
      *
-     * @param kR the reflectiveness factor
+     * @param kR the reflectiveness factor. determines how mush light gets
+     *           *           reflected off the material surface
      * @return the material object itself
      */
     public Material setKr(Double3 kR) {
@@ -111,7 +142,8 @@ public class Material {
     /**
      * Setter for the reflectiveness factor
      *
-     * @param kR the reflectiveness factor
+     * @param kR the reflectiveness factor. determines how mush light gets
+     *           reflected off the material surface
      * @return the material object itself
      */
     public Material setKr(Double kR) {
@@ -122,7 +154,8 @@ public class Material {
     /**
      * Setter for the shininess factor of the material
      *
-     * @param nShininess the shininess factor for the material
+     * @param nShininess the shininess factor for the material.
+     *                   the higher it is, the smaller the specular-light-reflection point will be
      * @return the material object itself
      */
     public Material setShininess(int nShininess) {

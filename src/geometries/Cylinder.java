@@ -8,7 +8,7 @@ import static primitives.Util.compare;
 import static primitives.Util.isZero;
 
 /**
- * A cylinder in a three-dimensional space, represented by a Tube and height
+ * A cylinder in a three-dimensional space - finite tube. represented by a Tube and height
  *
  * @author Pini Goldfraind &amp; Elad Bibi
  */
@@ -41,12 +41,12 @@ public class Cylinder extends Tube {
             distance = v.dotProduct(point.subtract(h));
         } catch (Exception ex) { //will get here if a zero-vector exception was thrown
             //handling the case where the point is in the middle of the cylinder's base
-            return v.scale(-1d);
+            return v.inverted();
         }
 
         //handling the case where the point is on the cylinder's base
         if (isZero(distance))
-            return v.scale(-1d);
+            return v.inverted();
             //handling the case where the point is on the cylinder's ceiling
         else if (compare(distance, this.height))
             return v;

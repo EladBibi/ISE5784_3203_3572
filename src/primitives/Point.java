@@ -68,7 +68,8 @@ public class Point {
      * Point Subtraction operation
      *
      * @param point second operand in the subtraction operation
-     * @return the subtraction result-vector, a vector from this point to the given point
+     * @return the subtraction result-vector, a vector from the GIVEN point to THIS point
+     * (given point -> this point)
      */
     public final Vector subtract(Point point) {
         return new Vector(this.xyz.subtract(point.xyz));

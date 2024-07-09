@@ -91,7 +91,7 @@ public class ImageWriter {
      * pixel color matrix in the directory of the project
      */
     public void writeToImage() {
-        try {
+        try {//TODO add folder support
             File file = new File(FOLDER_PATH + '/' + imageName + ".png");
             ImageIO.write(image, "png", file);
         } catch (IOException e) {
