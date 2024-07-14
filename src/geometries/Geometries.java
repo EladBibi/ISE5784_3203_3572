@@ -26,6 +26,7 @@ public class Geometries extends Intersectable {
 
     /**
      * Sets the given emission color for all the geometries that are contained in this geometries object
+     *
      * @param emission the emission color for the geometries
      * @return the geometries object itself
      */
@@ -38,6 +39,7 @@ public class Geometries extends Intersectable {
 
     /**
      * Sets the given material for all the geometries that are contained in this geometries object
+     *
      * @param material the material for the geometries
      * @return the geometries object itself
      */

@@ -6,6 +6,13 @@ package primitives;
 public class Material {
 
     /**
+     * The distance of the ray's origin from the blackboard used for the super-sampling
+     * algorithms for creating diffusive and reflective surfaces. the strength of the effect(aka
+     * the blackboard's size) will be determined by the given angle (the angle from the origin ray)
+     */
+    public final double SUPER_SAMPLING_BLACKBOARD_DISTANCE = 1;
+
+    /**
      * The transparency factor of the material. determines how much light
      * passes through (1 = fully transparent)
      */
@@ -32,30 +39,18 @@ public class Material {
     public int nShininess = 0;
 
     /**
+     * The diameter of the blackboard used for the diffusive glass effect.
      * The blurriness spread of objects that are obscured by the object with this material.
-     * (blurry or dirty mirror effect)
+     * (blurry or dirty glass effect)
      */
-    public double transparencyBlur = 0;
+    public double transparencyBlackboardDiameter = 0;
+
 
     /**
-     * The distance of the transparency blur effect. the lower it is, the closer objects
-     * need to be in order for them to be visible through the transparent material.
-     * (set to low number for an extremely blurry mirror effect. set to higher number to
-     * achieve a mirror that blurs object that are far)
-     */
-    public double transparencyBlurRange = 0;
-
-    /**
+     * The diameter of the blackboard used for the glossy surfaces effect.
      * How blurred objects will be reflected on this material
      */
-    public double reflectionBlur = 0;
-
-    /**
-     * The distance of the reflection blur effect. the lower it is, the stronger the blur effect of
-     * close object on this material. (set to low number for close object's reflection to be blurry.
-     * set to higher number to achieve blurrier reflection of far objects)
-     */
-    public double reflectionBlurRange = 0;
+    public double reflectionBlackboardDiameter = 0;
 
     /**
      * The minimum amount of ray casts per reflection blurriness multisampling computation.
@@ -72,14 +67,17 @@ public class Material {
     /**
      * Setter for the transparency blur effect
      *
-     * @param blur      how blur the material is
-     * @param blurRange how strong the blurriness effect is at range
-     * @param rayCasts the minimum amount of ray casts for the multisampling of this effect
+     * @param blurAngle the angle between the casting ray and the multisampling blackboard.
+     *                  the higher the angle, the more blurry objects that are behind the
+     *                  material will appear (blurred glass effect)
+     * @param rayCasts  the minimum amount of ray casts for the multisampling of this effect
      * @return the material object itself
      */
-    public Material setTransparencyBlur(double blur, double blurRange, int rayCasts) {
-        transparencyBlur = blur;
-        transparencyBlurRange = blurRange;
+    public Material setTransparencyBlur(double blurAngle, int rayCasts) {
+        if (blurAngle >= 90 || blurAngle < 0)
+            throw new IllegalArgumentException("The angle must be between 0 and 90");
+        double blurAngleInRadians = Math.toRadians(blurAngle);
+        transparencyBlackboardDiameter = 2 * Math.tan(blurAngleInRadians);
         transparencyBlurCasts = rayCasts;
         return this;
     }
@@ -87,37 +85,18 @@ public class Material {
     /**
      * Setter for the reflection blur effect
      *
-     * @param blur      how blurred objects will be reflected on this material
-     * @param blurRange how strong the blurriness effect is for objects at range
-     * @param rayCasts the minimum amount of ray casts for the multisampling of this effect
+     * @param blurAngle the angle between the casting ray and the multisampling blackboard.
+     *                  the higher the angle, the more blurry object's reflections will appear on the
+     *                  material (blurred mirror effect)
+     * @param rayCasts  the minimum amount of ray casts for the multisampling of this effect
      * @return the material object itself
      */
-    public Material setReflectionBlur(double blur, double blurRange, int rayCasts) {
-        reflectionBlur = blur;
-        reflectionBlurRange = blurRange;
+    public Material setReflectionBlur(double blurAngle, int rayCasts) {
+        if (blurAngle >= 90 || blurAngle < 0)
+            throw new IllegalArgumentException("The angle must be between 0 and 90");
+        double blurAngleInRadians = Math.toRadians(blurAngle);
+        reflectionBlackboardDiameter = 2 * Math.tan(blurAngleInRadians);
         reflectionBlurCasts = rayCasts;
-        return this;
-    }
-
-    /**
-     * Setter for the minimum amount of ray casts per reflection blurriness multisampling computation.
-     *
-     * @param rayCasts the minimum amount of ray casts
-     * @return the material object itself
-     */
-    public Material setReflectionBlurCasts(int rayCasts) {
-        reflectionBlurCasts = rayCasts;
-        return this;
-    }
-
-    /**
-     * Setter for the minimum amount of ray casts per transparency blurriness multisampling computation.
-     *
-     * @param rayCasts the minimum amount of ray casts
-     * @return the material object itself
-     */
-    public Material setTransparencyBlurCasts(int rayCasts) {
-        transparencyBlurCasts = rayCasts;
         return this;
     }
 

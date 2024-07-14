@@ -20,6 +20,10 @@ import static java.awt.Color.*;
  */
 public class RenderTests {
     /**
+     * Sub folder for images
+     */
+    private final String subFolder = "unittests/";
+    /**
      * Scene of the tests
      */
     private final Scene scene = new Scene("Test scene");
@@ -51,7 +55,7 @@ public class RenderTests {
 
         // right
         camera
-                .setImageWriter(new ImageWriter("base render test", 1000, 1000))
+                .setImageWriter(new ImageWriter(subFolder + "base render test", 1000, 1000))
                 .setLocation(Point.ZERO)
                 .build()
                 .renderImage()
@@ -79,7 +83,7 @@ public class RenderTests {
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2))); //
 
         camera
-                .setImageWriter(new ImageWriter("color render test", 1000, 1000))
+                .setImageWriter(new ImageWriter(subFolder + "color render test", 1000, 1000))
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(WHITE))

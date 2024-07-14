@@ -9,7 +9,10 @@ import primitives.Color;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class ImageWriterTest {
-
+    /**
+     * Sub folder for images
+     */
+    private final String subFolder = "unittests/";
     /**
      * Horizontal pixel counts for the test images
      */
@@ -21,7 +24,7 @@ public class ImageWriterTest {
     /**
      * An image writer that will be used in the construction of the test images
      */
-    private ImageWriter imageWriter = new ImageWriter("first test", horizontalRes, verticalRes);
+    private ImageWriter imageWriter = new ImageWriter(subFolder + "first test", horizontalRes, verticalRes);
 
     /**
      * Testing the image-writer with a basic image-render &amp; construction of a grid in an empty scene

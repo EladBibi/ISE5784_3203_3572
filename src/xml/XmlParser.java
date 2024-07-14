@@ -72,8 +72,7 @@ public class XmlParser {
             NodeList cameraPosition = sceneElement.getElementsByTagName("camera-position");
             if (cameraPosition.getLength() > 0) {
                 Element position = (Element) cameraPosition.item(0);
-                Point point = parsePoint(position.getAttribute("p0"));
-                return point;
+                return parsePoint(position.getAttribute("p0"));
             }
         }
         return null;

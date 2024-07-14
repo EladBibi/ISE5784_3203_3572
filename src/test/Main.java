@@ -111,7 +111,7 @@ public final class Main {
         try { // test zero vector
             v1.crossProduct(v2);
             out.println("ERROR: crossProduct() for parallel vectors does not throw an exception");
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Vector vr = v1.crossProduct(v3);
         if (!isZero(vr.length() - v1.length() * v3.length()))
@@ -127,7 +127,7 @@ public final class Main {
         try { // test that the vectors are co-lined
             v.crossProduct(u);
             out.println("ERROR: the normalized vector is not parallel to the original one");
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (v.dotProduct(u) < 0)
             out.println("ERROR: the normalized vector is opposite to the original one");

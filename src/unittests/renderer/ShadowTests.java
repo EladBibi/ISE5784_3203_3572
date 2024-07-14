@@ -22,6 +22,10 @@ import static java.awt.Color.WHITE;
  */
 public class ShadowTests {
     /**
+     * Sub folder for images
+     */
+    private final String subFolder = "unittests/";
+    /**
      * Scene of the tests
      */
     private final Scene scene = new Scene("Test scene");
@@ -57,7 +61,7 @@ public class ShadowTests {
         scene.lights.add( //
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3)) //
                         .setKl(1E-5).setKq(1.5E-7));
-        camera.setImageWriter(new ImageWriter(pictName, 400, 400))
+        camera.setImageWriter(new ImageWriter(subFolder + pictName, 400, 400))
                 .build()
                 .renderImage() //
                 .writeToImage();
@@ -135,7 +139,7 @@ public class ShadowTests {
                 new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4)) //
                         .setKl(4E-4).setKq(2E-5));
 
-        camera.setImageWriter(new ImageWriter("shadowTrianglesSphere", 600, 600))
+        camera.setImageWriter(new ImageWriter(subFolder + "shadowTrianglesSphere", 600, 600))
                 .build()
                 .renderImage()
                 .writeToImage();

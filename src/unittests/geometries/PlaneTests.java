@@ -20,7 +20,7 @@ class PlaneTests {
      * Delta value for accuracy when comparing the numbers of type 'double' in
      * assertEquals
      */
-    private final double DELTA = 0.000001;
+    final double DELTA = 0.000001;
 
     /**
      * Test method for {@link geometries.Plane#Plane(Point p1, Point p2, Point p3)}.

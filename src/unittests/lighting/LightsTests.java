@@ -1,7 +1,6 @@
 package lighting;
 
 import geometries.*;
-import lighting.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.*;
@@ -18,6 +17,10 @@ import static java.awt.Color.*;
  * @author Dan
  */
 public class LightsTests {
+    /**
+     * Sub folder for images
+     */
+    private final String subFolder = "unittests/";
     /**
      * First scene for some of the tests
      */
@@ -150,7 +153,7 @@ public class LightsTests {
         scene1.geometries.add(sphere);
         scene1.lights.add(new DirectionalLight(sphereLightColor, sphereLightDirection));
 
-        camera1.setImageWriter(new ImageWriter("lightSphereDirectional", 500, 500))
+        camera1.setImageWriter(new ImageWriter(subFolder + "lightSphereDirectional", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -165,7 +168,7 @@ public class LightsTests {
         scene1.lights.add(new PointLight(sphereLightColor, sphereLightPosition)
                 .setKl(0.001).setKq(0.0002));
 
-        camera1.setImageWriter(new ImageWriter("lightSpherePoint", 500, 500))
+        camera1.setImageWriter(new ImageWriter(subFolder + "lightSpherePoint", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -180,7 +183,7 @@ public class LightsTests {
         scene1.lights.add(new SpotLight(sphereLightColor, sphereLightPosition, sphereLightDirection)
                 .setKl(0.001).setKq(0.0001));
 
-        camera1.setImageWriter(new ImageWriter("lightSphereSpot", 500, 500))
+        camera1.setImageWriter(new ImageWriter(subFolder + "lightSphereSpot", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -194,7 +197,7 @@ public class LightsTests {
         scene2.geometries.add(triangle1, triangle2);
         scene2.lights.add(new DirectionalLight(trianglesLightColor, trianglesLightDirection));
 
-        camera2.setImageWriter(new ImageWriter("lightTrianglesDirectional", 500, 500)) //
+        camera2.setImageWriter(new ImageWriter(subFolder + "lightTrianglesDirectional", 500, 500)) //
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -209,7 +212,7 @@ public class LightsTests {
         scene2.lights.add(new PointLight(trianglesLightColor, trianglesLightPosition)
                 .setKl(0.001).setKq(0.0002));
 
-        camera2.setImageWriter(new ImageWriter("lightTrianglesPoint", 500, 500)) //
+        camera2.setImageWriter(new ImageWriter(subFolder + "lightTrianglesPoint", 500, 500)) //
                 .build() //
                 .renderImage() //
                 .writeToImage(); //
@@ -224,7 +227,7 @@ public class LightsTests {
         scene2.lights.add(new SpotLight(trianglesLightColor, trianglesLightPosition, trianglesLightDirection)
                 .setKl(0.001).setKq(0.0001));
 
-        camera2.setImageWriter(new ImageWriter("lightTrianglesSpot", 500, 500))
+        camera2.setImageWriter(new ImageWriter(subFolder + "lightTrianglesSpot", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -240,7 +243,7 @@ public class LightsTests {
                 .add(new SpotLight(sphereLightColor, sphereLightPosition, new Vector(1, 1, -0.5))
                         .setKl(0.001).setKq(0.00004));
 
-        camera1.setImageWriter(new ImageWriter("lightSphereSpotSharp", 500, 500))
+        camera1.setImageWriter(new ImageWriter(subFolder + "lightSphereSpotSharp", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -255,7 +258,7 @@ public class LightsTests {
         scene2.lights.add(new SpotLight(trianglesLightColor, trianglesLightPosition, trianglesLightDirection)
                 .setKl(0.001).setKq(0.00004));
 
-        camera2.setImageWriter(new ImageWriter("lightTrianglesSpotSharp", 500, 500))
+        camera2.setImageWriter(new ImageWriter(subFolder + "lightTrianglesSpotSharp", 500, 500))
                 .build()
                 .renderImage()
                 .writeToImage();

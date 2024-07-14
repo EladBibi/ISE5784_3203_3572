@@ -1,12 +1,12 @@
 package primitives;
 
 import geometries.Intersectable.GeoPoint;
+import scene.Blackboard;
 import scene.SquareBlackboard;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
 /**
@@ -100,7 +100,7 @@ public class Ray {
 
         //calculating the center point of the blackboard and forming it
         Point center = this.getPoint(distance);
-        SquareBlackboard Blackboard = new SquareBlackboard(gridSize, blackBoardDiameter, center, direction);
+        Blackboard Blackboard = new SquareBlackboard(blackBoardDiameter, center, direction, gridSize);
 
         //creating points on the blackboard and forming rays through them
         List<Point> points = Blackboard.randomizePoints(minTotalRayCasts);

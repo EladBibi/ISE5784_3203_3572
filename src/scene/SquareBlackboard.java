@@ -8,60 +8,30 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Square blackboard containing a 2D board in a 3D space, through which we can randomly generate
+ * Square blackboard containing a square 2D board in a 3D space, through which we can randomly generate
  * points in a gird pattern
  */
-public class SquareBlackboard {
+public class SquareBlackboard extends Blackboard {
 
     /**
      * The size of the grid
      */
-    private int gridSize;
-
-    /**
-     * The diameter of the 2D blackboard (the size of each side)
-     */
-    private double diameter;
-
-    /**
-     * The center point of the blackboard
-     */
-    private Point center;
-    /**
-     * The vector representing the up direction of the blackboard
-     */
-    private Vector up;
-    /**
-     * The vector representing the right direction of the blackboard.
-     * together with the up vector, we can represent a 2D blackboard
-     */
-    private Vector right;
+    private final int gridSize;
 
     /**
      * Constructor for the black board
+     *
      * @param gridSize the grid size of the blackboard (cell count in each row/column)
      * @param diameter the diameter of the blackboard (length of each side)
-     * @param center the center point of the blackboard
-     * @param normal normal vector for the blackboard. can be to either side of the blackboard
+     * @param center   the center point of the blackboard
+     * @param normal   normal vector for the blackboard. can be to either side of the blackboard
      */
-    public SquareBlackboard(int gridSize, double diameter, Point center, Vector normal) {
+    public SquareBlackboard(double diameter, Point center, Vector normal, int gridSize) {
+        super(diameter, center, normal);
         this.gridSize = gridSize % 2 == 0 ? ++gridSize : gridSize;
-        this.diameter = diameter;
-        this.center = center;
-
-        right = normal.equals(Vector.RIGHT) ? Vector.FORWARDS : Vector.RIGHT;
-        up = normal.crossProduct(right).normalize();
-        right = up.crossProduct(normal).normalize();
     }
 
-    /**
-     * Generate points on the blackboard's grid in a semi-random technique (jitter method)
-     * @param totalPoints the minimum total amount of points to generate.
-     *                    if the total cell count of the grid cannot be divided perfectly with this number,
-     *                    this number will be scaled up (so that there are even amount of points in each cell)
-     *
-     * @return a list of generated points on the blackboard
-     */
+    @Override
     public List<Point> randomizePoints(int totalPoints) {
         //calculating the point count for each cell
         int totalCellsCount = gridSize * gridSize;

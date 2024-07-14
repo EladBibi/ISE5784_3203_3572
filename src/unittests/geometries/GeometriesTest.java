@@ -13,20 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  *
  * @author Pini Goldfraind &amp; Elad Bibi
  */
-class GeometriesTest extends Object {
+class GeometriesTest {
 
     /**
      * Test method for {@link geometries.Geometries#findIntersections(Ray)}.
      */
     @Test
     void testFindIntersections() {
-        Plane plane1 = new Plane(new Point(1, 2, 6), new Point(0, 2, 7), new Point(10, 5, 3));
-        Plane plane2 = new Plane(new Point(0, 2, 1), new Point(0, 2, 3), new Point(10, 2, 0));
-        Sphere sphere1 = new Sphere(new Point(2, -3, 0), 0.7);
-        Sphere sphere2 = new Sphere(new Point(1, 0, 0), 1);
-        Triangle triangle1 = new Triangle(new Point(2.25, 2, -2.83), new Point(1.4, 2, -0.5), new Point(0.18, 2, -2.81));
-
-        Geometries geometries = new Geometries(plane1, plane2, sphere1, sphere2, triangle1);
+        Geometries geometries = sceneBuilder();
         Point point = new Point(1.68, 2.93, 0);
         Vector vector = new Vector(0, -1, 0);
 
@@ -65,4 +59,20 @@ class GeometriesTest extends Object {
         assertNull(emptyGeos.findIntersections(new Ray(point, vector)),
                 "Wrong intersection count");
     }
+
+    /**
+     * Builds the scene for the tests
+     *
+     * @return geometries object containing the object for the tests
+     */
+    private Geometries sceneBuilder() {
+        return new Geometries(
+                new Plane(new Point(1, 2, 6), new Point(0, 2, 7), new Point(10, 5, 3)),
+                new Plane(new Point(0, 2, 1), new Point(0, 2, 3), new Point(10, 2, 0)),
+                new Sphere(new Point(2, -3, 0), 0.7),
+                new Sphere(new Point(1, 0, 0), 1),
+                new Triangle(new Point(2.25, 2, -2.83), new Point(1.4, 2, -0.5), new Point(0.18, 2, -2.81))
+        );
+    }
+
 }

@@ -141,7 +141,7 @@ public class Polygon extends Geometry {
             newVertices.add(point.add(movement));
         }
         cloned.vertices = newVertices;
-        cloned.plane = (Plane)plane.moveCloneTo(position);
+        cloned.plane = (Plane) plane.moveCloneTo(position);
         return cloned;
     }
 

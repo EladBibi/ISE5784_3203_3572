@@ -177,8 +177,8 @@ public class Camera implements Cloneable {
         Point pc = position.add(vTo.scale(vpDistance));
 
         //pixel size
-        double rY = (double) vpHeight / nY;
-        double rX = (double) vpWidth / nX;
+        double rY = vpHeight / (double) nY;
+        double rX = vpWidth / (double) nX;
 
         //movement in each direction
         double yI = (i - (nY - 1) / 2d) * rY;

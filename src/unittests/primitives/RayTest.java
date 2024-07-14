@@ -5,11 +5,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for the ray class
  */
-class RayTest extends Object {
+class RayTest {
 
     /**
      * Test method for {@link primitives.Ray#getPoint(double)}.
@@ -54,7 +55,7 @@ class RayTest extends Object {
         // =============== Boundary Values Tests ==================
         //TC02 The list is empty, null is expected
         list = List.of();
-        assertEquals(null, ray.findClosestPoint(list), "Point list is empty");
+        assertNull(ray.findClosestPoint(list), "Point list is empty");
 
         //TC03 Closest point is at the beginning of the list
         list = List.of(d, c, a);

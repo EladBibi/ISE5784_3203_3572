@@ -30,7 +30,7 @@ public class SimpleRayTracer extends RayTracerBase {
     private static final Double3 STARTING_K = Double3.ONE;
 
     /**
-     * The grid size for the beam-casting algorithms.
+     * The grid size for the multisampling algorithms.
      */
     private static final int GRID_SIZE = 3;
 
@@ -103,8 +103,8 @@ public class SimpleRayTracer extends RayTracerBase {
         if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
             //generating a beam of rays in the general reflection direction and adding its average color
             Ray reflectedRay = constructReflectedRay(gp, rayDir);
-            List<Ray> beam = reflectedRay.generateBeam(GRID_SIZE, gpMat.reflectionBlur,
-                    gpMat.reflectionBlurRange, gpMat.reflectionBlurCasts);
+            List<Ray> beam = reflectedRay.generateBeam(GRID_SIZE, gpMat.reflectionBlackboardDiameter,
+                    gpMat.SUPER_SAMPLING_BLACKBOARD_DISTANCE, gpMat.reflectionBlurCasts);
             color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kR));
         }
 
@@ -112,8 +112,8 @@ public class SimpleRayTracer extends RayTracerBase {
         if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
             //generating a beam of rays in the general refraction direction and adding its average color
             Ray refractedRay = constructRefractedRay(gp, rayDir);
-            List<Ray> beam = refractedRay.generateBeam(GRID_SIZE, gpMat.transparencyBlur,
-                    gpMat.transparencyBlurRange, gpMat.transparencyBlurCasts);
+            List<Ray> beam = refractedRay.generateBeam(GRID_SIZE, gpMat.transparencyBlackboardDiameter,
+                    gpMat.SUPER_SAMPLING_BLACKBOARD_DISTANCE, gpMat.transparencyBlurCasts);
             color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kT));
         }
         return color;

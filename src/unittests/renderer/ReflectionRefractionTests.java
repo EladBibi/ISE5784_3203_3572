@@ -19,6 +19,10 @@ import static java.awt.Color.*;
  */
 public class ReflectionRefractionTests {
     /**
+     * Sub folder for images
+     */
+    private final String subFolder = "unittests/";
+    /**
      * Scene for the tests
      */
     private final Scene scene = new Scene("Test scene");
@@ -45,7 +49,7 @@ public class ReflectionRefractionTests {
 
         cameraBuilder.setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
                 .setVpSize(150, 150)
-                .setImageWriter(new ImageWriter("refractionTwoSpheres", 1080, 1080))
+                .setImageWriter(new ImageWriter(subFolder + "refractionTwoSpheres", 1080, 1080))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -76,7 +80,7 @@ public class ReflectionRefractionTests {
 
         cameraBuilder.setLocation(new Point(0, 0, 10000)).setVpDistance(10000)
                 .setVpSize(2500, 2500)
-                .setImageWriter(new ImageWriter("reflectionTwoSpheresMirrored", 1080, 1080))
+                .setImageWriter(new ImageWriter(subFolder + "reflectionTwoSpheresMirrored", 1080, 1080))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -104,7 +108,7 @@ public class ReflectionRefractionTests {
 
         cameraBuilder.setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
                 .setVpSize(200, 200)
-                .setImageWriter(new ImageWriter("refractionShadow", 1080, 1080))
+                .setImageWriter(new ImageWriter(subFolder + "refractionShadow", 1080, 1080))
                 .build()
                 .renderImage()
                 .writeToImage();

@@ -6,7 +6,10 @@ import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import primitives.*;
+import primitives.Color;
+import primitives.Material;
+import primitives.Point;
+import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
@@ -230,9 +233,9 @@ public class DiamondsScene {
         final Scene scene = new Scene("Test Scene");
 
         Material planeMat = new Material().setKd(0.9d).setKs(0.1d).setShininess(300).setKr(0.7d)
-                .setReflectionBlur(2d, 10d,1);
+                .setReflectionBlur(14, 27);
         Material sphereMat = new Material().setKd(0.3d).setKs(0.7d).setShininess(300).setKt(0.5d)
-                .setTransparencyBlur(0.5d, 30d,1);
+                .setTransparencyBlur(5, 27);
         Color planeColor = new Color(49, 21, 61);
         Color sphereColor = new Color(9, 64, 50);
         Color secSphereColor = new Color(15, 12, 44);
@@ -259,7 +262,7 @@ public class DiamondsScene {
                 .setFocusPoint(new Point(800, 300, 0), Point.ZERO)
                 .setVpDistance(100)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("testing/with aa 4 - X27 grid 3", 1280, 720))
+                .setImageWriter(new ImageWriter("testing/no aa, blur - X27 grid 3 -2", 800, 450))
                 .build()
                 .enableAntiAliasing(3, 27)
                 .renderImage()

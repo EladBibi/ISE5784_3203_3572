@@ -80,7 +80,7 @@ public class ChessScene {
                 .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "test render 8", 1280, 720))
+                .setImageWriter(new ImageWriter(directoryName + "test render 8", 800, 450))
                 .build()
                 .rotate(0)
                 .renderImage()
@@ -123,12 +123,12 @@ public class ChessScene {
      */
     @Test
     @Disabled
-    public void withDiffusiveReflectiveSurfaces(){
+    public void withDiffusiveReflectiveSurfaces() {
         boardMat = new Material().setKd(0.1).setKs(0.2).setShininess(400).setKr(0.6).setKt(0.1)
-                .setReflectionBlur(1d, 17d, 81);
+                .setReflectionBlur(3, 9);
         mainSurfaceMat = new Material().setKd(0.6).setKs(0.3).setShininess(200).setKr(0.1d);
         glassMat = new Material().setKs(0.1).setShininess(250).setKt(0.6).setKr(0.3)
-                .setReflectionBlur(5,190,81).setTransparencyBlur(6,1000,81);
+                .setReflectionBlur(1.5, 9).setTransparencyBlur(0.5, 9);
 
         scene.setGeometries(buildScene(new Point(3100, -1100, 5000), 130d));
         scene.setLights(
@@ -145,7 +145,7 @@ public class ChessScene {
                 .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "render 5 - no aa with blur X81", 800, 400))
+                .setImageWriter(new ImageWriter(directoryName + "render 6 - no aa with blur X9", 800, 450))
                 .build()
                 .rotate(0)
                 .renderImage()
@@ -153,9 +153,10 @@ public class ChessScene {
     }
 
     /**
-     * Method that bulilds the chess scene
+     * Method that builds the chess scene
+     *
      * @param moonPosition the position of the moon
-     * @param moonRadius the radius of the moon
+     * @param moonRadius   the radius of the moon
      * @return a geometries container which contains all the geometries of the chess scene
      */
     private Geometries buildScene(Point moonPosition, double moonRadius) {
@@ -221,9 +222,10 @@ public class ChessScene {
 
     /**
      * Builder method of the wall and window
-     * @param material the material of the wall
+     *
+     * @param material     the material of the wall
      * @param moonPosition position of the moon
-     * @param moonRadius radius of the moon
+     * @param moonRadius   radius of the moon
      * @return geometries container with a wall, window in the wall, a moon in the
      * distance(through the window)
      */
@@ -295,6 +297,7 @@ public class ChessScene {
 
     /**
      * Build method for the rook piece
+     *
      * @return a geometries container of a rook chess piece
      */
     private Geometries buildRook() {
@@ -409,8 +412,10 @@ public class ChessScene {
 //                new Polygon(t13,t14,t15,t16)
         );
     }
+
     /**
      * Build method for the knight piece
+     *
      * @param invertForwardDir invert the forward direction of the knight piece
      * @return a geometries container of the chess piece
      */
@@ -511,8 +516,6 @@ public class ChessScene {
         Point tt22 = new Point(-10.01, 121, n * -33);
         Point tt23 = new Point(-10.01, 105.03, n * -31);
         Point tt24 = new Point(-10.03, 98, n * -30);
-
-        Point top = new Point(0, 210, 0);
 
         return new Geometries(
                 new Polygon(point1, pointAt0, pointAt18, point2),
@@ -664,8 +667,10 @@ public class ChessScene {
                 new Triangle(tt23, tt24, t24)
         );
     }
+
     /**
      * Build method for the bishop piece
+     *
      * @return a geometries container of the chess piece
      */
     private Geometries buildBishop() {
@@ -792,8 +797,10 @@ public class ChessScene {
                 new Triangle(tt4, top, tt1)
         );
     }
+
     /**
      * Build method for the king piece
+     *
      * @return a geometries container of the chess piece
      */
     private Geometries buildKing() {
@@ -928,8 +935,10 @@ public class ChessScene {
                 new Triangle(t4, t1, topTop)
         );
     }
+
     /**
      * Build method for the queen piece
+     *
      * @return a geometries container of the chess piece
      */
     private Geometries buildQueen() {
@@ -1050,8 +1059,10 @@ public class ChessScene {
                 new Sphere(new Point(0, 210, 0), 10)
         );
     }
+
     /**
      * Build method for the pawn piece
+     *
      * @return a geometries container of the chess piece
      */
     private Geometries buildPawn() {
@@ -1147,15 +1158,15 @@ public class ChessScene {
                 new Sphere(new Point(0, 115, 0), 20)
         );
     }
+
     /**
      * Build method for the chess board
+     *
      * @return a geometries container of the chess board
      */
     private Geometries buildChessBoard() {
         Color blackCell = new Color(66, 62, 48);
         Color whiteCell = new Color(107, 106, 104);
-//        Color blackCell = new Color(43, 41, 31);
-//        Color whiteCell = new Color(87, 86, 83);
         Geometry blackSqr = new Polygon(new Point(-50, 0, -50), new Point(50, 0, -50),
                 new Point(50, 0, 50), new Point(-50, 0, 50)).setEmission(blackCell);
         Geometry whiteSqr = new Polygon(new Point(-50, 0, -50), new Point(50, 0, -50),
