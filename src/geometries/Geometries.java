@@ -1,8 +1,6 @@
 package geometries;
 
-import primitives.Point;
-import primitives.Ray;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -13,7 +11,7 @@ import java.util.List;
  *
  * @author Pini Goldfraind &amp; Elad Bibi
  */
-public class Geometries extends Intersectable{
+public class Geometries extends Intersectable {
 
     /**
      * Geometries container list
@@ -24,6 +22,30 @@ public class Geometries extends Intersectable{
      * Empty default constructor for creating an empty geometries container
      */
     public Geometries() {
+    }
+
+    /**
+     * Sets the given emission color for all the geometries that are contained in this geometries object
+     * @param emission the emission color for the geometries
+     * @return the geometries object itself
+     */
+    public Geometries setEmission(Color emission) {
+        for (Intersectable geo : geometries) {
+            ((Geometry) geo).setEmission(emission);
+        }
+        return this;
+    }
+
+    /**
+     * Sets the given material for all the geometries that are contained in this geometries object
+     * @param material the material for the geometries
+     * @return the geometries object itself
+     */
+    public Geometries setMaterial(Material material) {
+        for (Intersectable geo : geometries) {
+            ((Geometry) geo).setMaterial(material);
+        }
+        return this;
     }
 
     /**
@@ -41,8 +63,8 @@ public class Geometries extends Intersectable{
      * and with a pivot position, used for moving and rotating the geometry
      *
      * @param geometries one or more geometries objects to be put inside the new geometries container
-     * @param pivot the pivot position of the geometry. moving and rotating the object will be done
-     *              around the pivot position
+     * @param pivot      the pivot position of the geometry. moving and rotating the object will be done
+     *                   around the pivot position
      */
     public Geometries(Point pivot, Intersectable... geometries) {
         this(geometries);
@@ -77,7 +99,7 @@ public class Geometries extends Intersectable{
     @Override
     public Intersectable setPivot(Point point) {
         List<Intersectable> newGeometries = new LinkedList<>();
-        for(Intersectable geometry : geometries){
+        for (Intersectable geometry : geometries) {
             newGeometries.add(geometry.setPivot(point));
         }
         geometries = newGeometries;
@@ -89,7 +111,7 @@ public class Geometries extends Intersectable{
     public Intersectable moveCloneTo(Point position) {
         Geometries cloned = new Geometries();
         List<Intersectable> newGeometries = new LinkedList<>();
-        for(Intersectable geometry : geometries){
+        for (Intersectable geometry : geometries) {
             newGeometries.add(geometry.moveCloneTo(position));
         }
         cloned.geometries = newGeometries;
@@ -99,6 +121,6 @@ public class Geometries extends Intersectable{
 
     @Override
     public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
-        return this.getClone();
+        return this;
     }
 }

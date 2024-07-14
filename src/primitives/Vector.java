@@ -102,6 +102,7 @@ public final class Vector extends Point {
      *
      * @param vec2 second vector for the operation
      * @return a new vector that is orthogonal(perpendicular) to the two given vectors
+     * @throws IllegalArgumentException if the result is a zero vector
      */
     public final Vector crossProduct(Vector vec2) {
         return new Vector(this.xyz.d2 * vec2.xyz.d3 - this.xyz.d3 * vec2.xyz.d2,

@@ -20,7 +20,7 @@ public class Ray {
     /**
      * Delta constant used for shifting a point upwards or downwards from the original position
      */
-    private static final double DELTA = 0.1;
+    private static final double DELTA = 0.01;
 
     /**
      * The ray's starting position in the 3D space
@@ -80,22 +80,21 @@ public class Ray {
      * Generates a beam of rays from the head point of this ray through a squared blackboard with
      * the given diameter, which is located at the given distance from the head point.
      *
-     * @param n                  the normal at the intersection point through which we are generating our beam
      * @param gridSize           the size of the grid to create on the black board, rows and columns (total
      *                           cells: gridSize * gridSize)
      * @param blackBoardDiameter the diameter for the square blackboard (the width and height)
      * @param distance           the distance of the blackboard from beam's origin
-     * @param totalRayCasts      total rays we should cast through the blackboard, heavily impacts performance.
+     * @param minTotalRayCasts   total rays we should cast through the blackboard, heavily impacts performance.
      * @return a collection of rays which are all generated from the current ray's head point and pass
      * through a specified blackboard in the 3D space
      */
-    public List<Ray> generateBeam(Vector n, int gridSize, double blackBoardDiameter, double distance, int totalRayCasts) {
+    public List<Ray> generateBeam(int gridSize, double blackBoardDiameter, double distance, int minTotalRayCasts) {
         List<Ray> rays = new LinkedList<>();
         rays.add(this);
 
         //if there is 1 ray in the beam OR the blackboard size is 0, there is
         //no need to construct a beam
-        if (totalRayCasts == 1 || isZero(blackBoardDiameter)) {
+        if (minTotalRayCasts == 1 || isZero(blackBoardDiameter)) {
             return rays;
         }
 
@@ -103,18 +102,11 @@ public class Ray {
         Point center = this.getPoint(distance);
         SquareBlackboard Blackboard = new SquareBlackboard(gridSize, blackBoardDiameter, center, direction);
 
-        //the angle between the main ray's direction and the normal at the intersection point
-        double nv = n.dotProduct(this.direction);
-
         //creating points on the blackboard and forming rays through them
-        List<Point> points = Blackboard.randomizePoints(totalRayCasts);
+        List<Point> points = Blackboard.randomizePoints(minTotalRayCasts);
         for (Point point : points) {
             Vector dir = point.subtract(head).normalize();
-            //the angle between the normal at the original point and the new direction point
-            double nt = alignZero(n.dotProduct(dir));
-            if (nv * nt > 0) {
-                rays.add(new Ray(head, dir));
-            }
+            rays.add(new Ray(head, dir));
         }
         return rays;
     }

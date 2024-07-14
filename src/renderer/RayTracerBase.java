@@ -4,6 +4,8 @@ import primitives.Color;
 import primitives.Ray;
 import scene.Scene;
 
+import java.util.List;
+
 /**
  * Abstract ray tracer
  *
@@ -33,4 +35,12 @@ public abstract class RayTracerBase {
      * @return the color of the ray
      */
     public abstract Color traceRay(Ray ray);
+
+    /**
+     * Tracing a given beam of rays through the scene and returning its average color.
+     *
+     * @param beam a beam of rays. containing 1 or more rays
+     * @return the average color of the beam. achieved through the tracing of each ray in the beam
+     */
+    public abstract Color traceBeam(List<Ray> beam);
 }

@@ -132,14 +132,16 @@ public class Polygon extends Geometry {
     @Override
     public Intersectable moveCloneTo(Point position) {
         Polygon cloned = (Polygon) this.getClone();
+        if (position.equals(pivot))
+            return cloned;
         Vector movement = position.subtract(pivot);
         cloned.pivot = position;
         List<Point> newVertices = new LinkedList<>();
-        for(Point point : vertices){
+        for (Point point : vertices) {
             newVertices.add(point.add(movement));
         }
         cloned.vertices = newVertices;
-        cloned.plane = (Plane) plane.moveCloneTo(position);
+        cloned.plane = (Plane)plane.moveCloneTo(position);
         return cloned;
     }
 

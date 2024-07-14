@@ -32,7 +32,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * The grid size for the beam-casting algorithms.
      */
-    private int gridSize = 2;
+    private static final int GRID_SIZE = 3;
 
     /**
      * Constructor that initializes the tracer with the given scene
@@ -47,18 +47,27 @@ public class SimpleRayTracer extends RayTracerBase {
     public Color traceRay(Ray ray) {
         GeoPoint intersection = findClosestIntersection(ray);
         return intersection == null ? scene.background :
-                calcColor(intersection, ray);
+                calcColor(intersection, ray.getDirection());
+    }
+
+    @Override
+    public Color traceBeam(List<Ray> beam) {
+        Color finalColor = Color.BLACK;
+        for (Ray ray : beam) {
+            finalColor = finalColor.add(traceRay(ray));
+        }
+        return finalColor.reduce(beam.size());
     }
 
     /**
      * Method that gives the color of a given point in the scene
      *
      * @param geoPoint a geo point in the 3D scene
-     * @param ray      the ray that intersected the geo-point
+     * @param rayDir   the direction vector of the ray that intersected the geo-point
      * @return the point's color
      */
-    private Color calcColor(GeoPoint geoPoint, Ray ray) {
-        return calcColor(geoPoint, ray, MAX_CALC_COLOR_LEVEL, STARTING_K)
+    private Color calcColor(GeoPoint geoPoint, Vector rayDir) {
+        return calcColor(geoPoint, rayDir, MAX_CALC_COLOR_LEVEL, STARTING_K)
                 .add(scene.ambientLight.getIntensity());
     }
 
@@ -66,44 +75,45 @@ public class SimpleRayTracer extends RayTracerBase {
      * Method that gives the color of a given point in the scene
      *
      * @param geoPoint       a geo point in the scene
-     * @param ray            the ray that intersected the geo point
+     * @param rayDir         the direction vector of the ray that intersected the geo-point
      * @param iterationsLeft the amount of iterations left for the current thread
      * @param k              the current color intensity factor, will exit the recursion loop if it gets insignificantly low
      * @return the color for the pixel
      */
-    private Color calcColor(GeoPoint geoPoint, Ray ray, int iterationsLeft, Double3 k) {
-        Color color = calcLocalEffects(geoPoint, ray, k);
+    private Color calcColor(GeoPoint geoPoint, Vector rayDir, int iterationsLeft, Double3 k) {
+        Color color = calcLocalEffects(geoPoint, rayDir, k);
         return iterationsLeft <= 1 ? color
-                : color.add(calcGlobalEffects(geoPoint, ray, iterationsLeft, k));
+                : color.add(calcGlobalEffects(geoPoint, rayDir, iterationsLeft, k));
     }
 
     /**
      * Calculates the global lighting effects of the given geo-point. effects such as reflection and transparency
      *
      * @param gp             the intersection geo-point
-     * @param ray            the ray that intersected the geo-point
+     * @param rayDir         the direction vector of the ray that intersected the geo-point
      * @param iterationsLeft the amount of iterations left for the current thread
      * @param k              the current color intensity factor, will exit the recursion loop if it gets insignificantly low
      * @return the calculated global color intensity for the given geo-point
      */
-    private Color calcGlobalEffects(GeoPoint gp, Ray ray, int iterationsLeft, Double3 k) {
+    private Color calcGlobalEffects(GeoPoint gp, Vector rayDir, int iterationsLeft, Double3 k) {
         Color color = Color.BLACK;
-        Vector n = gp.geometry.getNormal(gp.point);
 
         Material gpMat = gp.geometry.getMaterial();
         Double3 kkx = gpMat.kR.product(k);
         if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
             //generating a beam of rays in the general reflection direction and adding its average color
-            Ray reflectedRay = constructReflectedRay(gp, ray);
-            List<Ray> beam = reflectedRay.generateBeam(n, gridSize, gpMat.reflectionBlur, gpMat.reflectionBlurRange, gpMat.blurLod);
+            Ray reflectedRay = constructReflectedRay(gp, rayDir);
+            List<Ray> beam = reflectedRay.generateBeam(GRID_SIZE, gpMat.reflectionBlur,
+                    gpMat.reflectionBlurRange, gpMat.reflectionBlurCasts);
             color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kR));
         }
 
         kkx = gpMat.kT.product(k);
         if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
             //generating a beam of rays in the general refraction direction and adding its average color
-            Ray refractedRay = constructRefractedRay(gp, ray);
-            List<Ray> beam = refractedRay.generateBeam(n, gridSize, gpMat.transparencyBlur, gpMat.transparencyBlurRange, gpMat.blurLod);
+            Ray refractedRay = constructRefractedRay(gp, rayDir);
+            List<Ray> beam = refractedRay.generateBeam(GRID_SIZE, gpMat.transparencyBlur,
+                    gpMat.transparencyBlurRange, gpMat.transparencyBlurCasts);
             color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kT));
         }
         return color;
@@ -122,10 +132,9 @@ public class SimpleRayTracer extends RayTracerBase {
         Color color = Color.BLACK;
         for (Ray ray : beam) {
             GeoPoint intersection = findClosestIntersection(ray);
-            if (intersection != null)
-                color = color.add(calcColor(intersection, ray, iterationsLeft - 1, k));
+            color = intersection == null ? color.add(scene.background)
+                    : color.add(calcColor(intersection, ray.getDirection(), iterationsLeft - 1, k));
         }
-        //TODO reducing by the expected rays count instead of the actual count
         return color.reduce(beam.size());
     }
 
@@ -133,27 +142,26 @@ public class SimpleRayTracer extends RayTracerBase {
      * Gives a refraction ray from the given intersection geo-point
      *
      * @param geoPoint an intersected geo point in the scene
-     * @param ray      the intersecting ray
+     * @param rayDir   the direction vector of the intersecting ray
      * @return the refraction ray of the given ray through the geometry of the intersection point
      */
-    private Ray constructRefractedRay(GeoPoint geoPoint, Ray ray) {
+    private Ray constructRefractedRay(GeoPoint geoPoint, Vector rayDir) {
         Vector n = geoPoint.geometry.getNormal(geoPoint.point);
-        return new Ray(geoPoint.point, ray.getDirection(), n);
+        return new Ray(geoPoint.point, rayDir, n);
     }
 
     /**
      * Gives a reflection ray from the given intersection geo-point
      *
      * @param geoPoint an intersected geo point in the scene
-     * @param ray      the intersecting ray
+     * @param rayDir   the direction vector of the intersecting ray
      * @return the reflection ray of the given ray from the geometry of the intersection point
      */
-    private Ray constructReflectedRay(GeoPoint geoPoint, Ray ray) {
-        Vector v = ray.getDirection();
+    private Ray constructReflectedRay(GeoPoint geoPoint, Vector rayDir) {
         Vector n = geoPoint.geometry.getNormal(geoPoint.point);
-        double vn = v.dotProduct(n);
+        double vn = rayDir.dotProduct(n);
 
-        Vector r = v.subtract(n.scale(2 * vn));
+        Vector r = rayDir.subtract(n.scale(2 * vn));
         return new Ray(geoPoint.point, r, n);
     }
 
@@ -173,15 +181,14 @@ public class SimpleRayTracer extends RayTracerBase {
      * Method that gives the calculated color of the given geo-point, with
      * calculated diffusive &amp; specular light from all the light-sources based on the material
      *
-     * @param k   the current light intensity of the thread
-     * @param gp  the geo-point containing the intersection point and intersected geometry object
-     * @param ray the ray that intersected with the geo-point
+     * @param k      the current light intensity of the thread
+     * @param gp     the geo-point containing the intersection point and intersected geometry object
+     * @param rayDir the direction vector of the ray that intersected with the geo-point
      * @return the total, calculated color intensity with diffusion &amp; specular &amp; emission light
      */
-    private Color calcLocalEffects(GeoPoint gp, Ray ray, Double3 k) {
+    private Color calcLocalEffects(GeoPoint gp, Vector rayDir, Double3 k) {
         Vector n = gp.geometry.getNormal(gp.point);
-        Vector v = ray.getDirection();
-        double nv = alignZero(n.dotProduct(v));
+        double nv = alignZero(n.dotProduct(rayDir));
         Color color = gp.geometry.getEmission();
         //point's normal is orthogonal to the ray - the point is not visible
         if (nv == 0)
@@ -197,7 +204,7 @@ public class SimpleRayTracer extends RayTracerBase {
                 if (!ktr.product(k).lowerThan(MIN_CALC_COLOR_K)) {
                     Color iL = light.getIntensity(gp.point).scale(ktr);
                     color = color.add(iL.scale(calcDiffuse(material, nl)
-                            .add(calcSpecular(material, n, l, nl, v))));
+                            .add(calcSpecular(material, n, l, nl, rayDir))));
                 }
             }
         }

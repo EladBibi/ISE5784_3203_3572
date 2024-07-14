@@ -124,7 +124,7 @@ public class CameraIntersectionsTest {
         int count = 0;
         for (int j = 0; j < verticalPixels; ++j) {
             for (int i = 0; i < horizontalPixels; ++i) {
-                Ray ray = cam.constructRay(horizontalPixels, verticalPixels, j, i);
+                Ray ray = cam.constructRay(horizontalPixels, verticalPixels, j, i).getFirst();
                 List<Point> intersections = geometry.findIntersections(ray);
                 count += intersections != null ? intersections.size() : 0;
             }

@@ -38,11 +38,11 @@ public class Sphere extends RadialGeometry {
      *
      * @param center point that represents the sphere's center
      * @param radius sphere's radius
-     * @param pivot the pivot position of the geometry. moving and rotating the object will be done
-     *              around the pivot position
+     * @param pivot  the pivot position of the geometry. moving and rotating the object will be done
+     *               around the pivot position
      */
     public Sphere(Point center, double radius, Point pivot) {
-        this(center,radius);
+        this(center, radius);
         this.pivot = pivot;
     }
 
@@ -88,7 +88,9 @@ public class Sphere extends RadialGeometry {
 
     @Override
     public Intersectable moveCloneTo(Point position) {
-        Sphere cloned = (Sphere)this.getClone();
+        Sphere cloned = (Sphere) this.getClone();
+        if (position.equals(pivot))
+            return cloned;
         Vector movement = position.subtract(pivot);
         cloned.pivot = position;
         cloned.center = center.add(movement);

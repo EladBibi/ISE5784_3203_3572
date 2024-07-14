@@ -31,31 +31,93 @@ public class Material {
      */
     public int nShininess = 0;
 
+    /**
+     * The blurriness spread of objects that are obscured by the object with this material.
+     * (blurry or dirty mirror effect)
+     */
     public double transparencyBlur = 0;
 
-    //the distance
+    /**
+     * The distance of the transparency blur effect. the lower it is, the closer objects
+     * need to be in order for them to be visible through the transparent material.
+     * (set to low number for an extremely blurry mirror effect. set to higher number to
+     * achieve a mirror that blurs object that are far)
+     */
     public double transparencyBlurRange = 0;
 
+    /**
+     * How blurred objects will be reflected on this material
+     */
     public double reflectionBlur = 0;
 
+    /**
+     * The distance of the reflection blur effect. the lower it is, the stronger the blur effect of
+     * close object on this material. (set to low number for close object's reflection to be blurry.
+     * set to higher number to achieve blurrier reflection of far objects)
+     */
     public double reflectionBlurRange = 0;
 
-    public int blurLod = 30;
+    /**
+     * The minimum amount of ray casts per reflection blurriness multisampling computation.
+     * improves image-quality but heavily impacts performance
+     */
+    public int reflectionBlurCasts = 1;
 
-    public Material setTransparencyBlur(double blur, double blurRange) {
+    /**
+     * The minimum amount of ray casts per transparency blurriness multisampling computation.
+     * improves image-quality but heavily impacts performance
+     */
+    public int transparencyBlurCasts = 1;
+
+    /**
+     * Setter for the transparency blur effect
+     *
+     * @param blur      how blur the material is
+     * @param blurRange how strong the blurriness effect is at range
+     * @param rayCasts the minimum amount of ray casts for the multisampling of this effect
+     * @return the material object itself
+     */
+    public Material setTransparencyBlur(double blur, double blurRange, int rayCasts) {
         transparencyBlur = blur;
         transparencyBlurRange = blurRange;
+        transparencyBlurCasts = rayCasts;
         return this;
     }
 
-    public Material setReflectionBlur(double blur, double blurRange) {
+    /**
+     * Setter for the reflection blur effect
+     *
+     * @param blur      how blurred objects will be reflected on this material
+     * @param blurRange how strong the blurriness effect is for objects at range
+     * @param rayCasts the minimum amount of ray casts for the multisampling of this effect
+     * @return the material object itself
+     */
+    public Material setReflectionBlur(double blur, double blurRange, int rayCasts) {
         reflectionBlur = blur;
         reflectionBlurRange = blurRange;
+        reflectionBlurCasts = rayCasts;
         return this;
     }
 
-    public Material setBlurLod(int rayCasts) {
-        blurLod = rayCasts;
+    /**
+     * Setter for the minimum amount of ray casts per reflection blurriness multisampling computation.
+     *
+     * @param rayCasts the minimum amount of ray casts
+     * @return the material object itself
+     */
+    public Material setReflectionBlurCasts(int rayCasts) {
+        reflectionBlurCasts = rayCasts;
+        return this;
+    }
+
+    /**
+     * Setter for the minimum amount of ray casts per transparency blurriness multisampling computation.
+     *
+     * @param rayCasts the minimum amount of ray casts
+     * @return the material object itself
+     */
+    public Material setTransparencyBlurCasts(int rayCasts) {
+        transparencyBlurCasts = rayCasts;
         return this;
     }
 

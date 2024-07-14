@@ -6,18 +6,19 @@ import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import primitives.Color;
-import primitives.Material;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
 import renderer.Camera;
 import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
 import scene.Scene;
 
-import static java.awt.Color.RED;
 import static java.awt.Color.WHITE;
 
+/**
+ * A scene with 3 boxes containing diamonds in varying shapes and sizes
+ * demonstrating the shading and lighting-model of our renderer. including
+ * diffusive &amp; specular lighting and reflection &amp; transparency ray casts
+ */
 public class DiamondsScene {
 
     /**
@@ -95,17 +96,17 @@ public class DiamondsScene {
         Material smallDiamondMat = new Material().setKd(0.8d).setKs(0.2d).setShininess(500).setKr(0.6).setKt(0.2);
         Material cubeDiamondMat = new Material().setKd(0.8d).setKs(0.2d).setShininess(500).setKr(0.7).setKt(0.2);
         Material cubeMat = new Material().setKd(0.5d).setKs(0.5d).setShininess(700).setKt(0.7d).setKr(0.2d);
-              //  .setTransparencyBlur(7d, 80).setBlurLod(10);
+        //  .setTransparencyBlur(7d, 80).setBlurLod(10);
         Material bigCubeMat = new Material().setKd(0.5d).setKs(0.5d).setShininess(700).setKt(0.9d);
-               // .setTransparencyBlur(10d, 120).setBlurLod(10);
+        // .setTransparencyBlur(10d, 120).setBlurLod(10);
         Material planeMat = new Material().setKd(0.3d).setKs(0.3d).setShininess(300).setKr(0.3d).setKt(0.6);
-               // .setReflectionBlur(20d, 600d).setBlurLod(10);
+        // .setReflectionBlur(20d, 600d).setBlurLod(10);
 
         Color cubeColor = Color.BLACK;
         Color smallDiamondColor = new Color(43, 25, 16);
         Color diamondCubeColor = new Color(9, 26, 43);
 
-        Geometries smallCube = new Geometries(new Point(-500,0,-200), new Polygon(cc1, cc2, cc3, cc4).setMaterial(cubeMat).setEmission(cubeColor),
+        Geometries smallCube = new Geometries(new Point(-500, 0, -200), new Polygon(cc1, cc2, cc3, cc4).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(cc5, cc6, cc7, cc8).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(cc1, cc2, cc7, cc8).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(cc2, cc3, cc6, cc7).setMaterial(cubeMat).setEmission(cubeColor),
@@ -210,8 +211,9 @@ public class DiamondsScene {
                 .setFocusPoint(new Point(-1000, 1700, 4000), new Point(-100, -120, -100))
                 .setVpDistance(800)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("bonusImage6", 1280, 720))
+                .setImageWriter(new ImageWriter("diamonds scene/bonusImage6 with aa - grid 1 X4", 1920, 1080))
                 .build()
+                .enableAntiAliasing(1, 4)
                 .rotate(0)
                 .renderImage()
                 .writeToImage();
@@ -219,15 +221,18 @@ public class DiamondsScene {
 //                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
     }
 
+    /**
+     * For random tests
+     */
     @Test
     @Disabled
     public void test() {
         final Scene scene = new Scene("Test Scene");
 
         Material planeMat = new Material().setKd(0.9d).setKs(0.1d).setShininess(300).setKr(0.7d)
-                .setReflectionBlur(2d, 10d).setBlurLod(75);
+                .setReflectionBlur(2d, 10d,1);
         Material sphereMat = new Material().setKd(0.3d).setKs(0.7d).setShininess(300).setKt(0.5d)
-                .setTransparencyBlur(8d, 30d).setBlurLod(20);
+                .setTransparencyBlur(0.5d, 30d,1);
         Color planeColor = new Color(49, 21, 61);
         Color sphereColor = new Color(9, 64, 50);
         Color secSphereColor = new Color(15, 12, 44);
@@ -254,8 +259,9 @@ public class DiamondsScene {
                 .setFocusPoint(new Point(800, 300, 0), Point.ZERO)
                 .setVpDistance(100)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("testImage3", 1280, 720))
+                .setImageWriter(new ImageWriter("testing/with aa 4 - X27 grid 3", 1280, 720))
                 .build()
+                .enableAntiAliasing(3, 27)
                 .renderImage()
                 .writeToImage();
     }

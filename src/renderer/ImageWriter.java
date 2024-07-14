@@ -38,9 +38,10 @@ public class ImageWriter {
      */
     private BufferedImage image;
     /**
-     * image file name, not including the file extension '.png'
+     * Image file name, not including the file extension '.png'
      */
     private String imageName;
+
     /**
      * logger for reporting I/O failures
      */
@@ -59,7 +60,6 @@ public class ImageWriter {
         this.imageName = imageName;
         this.nX = nX;
         this.nY = nY;
-
         image = new BufferedImage(nX, nY, BufferedImage.TYPE_INT_RGB);
     }
 
@@ -91,8 +91,12 @@ public class ImageWriter {
      * pixel color matrix in the directory of the project
      */
     public void writeToImage() {
-        try {//TODO add folder support
+        try {
             File file = new File(FOLDER_PATH + '/' + imageName + ".png");
+            //creating the directory if it does not exist
+            if (!file.exists()) {
+                file.mkdirs();
+            }
             ImageIO.write(image, "png", file);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "I/O error", e);

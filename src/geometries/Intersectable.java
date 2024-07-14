@@ -1,7 +1,9 @@
 package geometries;
 
+import primitives.Double3;
 import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 
 import java.util.List;
 
@@ -112,7 +114,17 @@ public abstract class Intersectable extends Movable implements Cloneable {
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
-    public final Intersectable getClone(){
+    @Override
+    public Intersectable moveCloneBy(double x, double y, double z) {
+        return this.moveCloneTo(pivot.add(new Vector(x, y, z)));
+    }
+
+    /**
+     * Gives a clone of the current object
+     *
+     * @return a clone of the current object
+     */
+    public final Intersectable getClone() {
         try {
             return (Intersectable) this.clone();
         } catch (CloneNotSupportedException e) {

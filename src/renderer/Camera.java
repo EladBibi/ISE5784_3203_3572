@@ -7,7 +7,12 @@ import primitives.Ray;
 import primitives.Vector;
 import scene.Scene;
 
+import java.util.List;
 import java.util.MissingResourceException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static primitives.Util.compare;
 import static primitives.Util.isZero;
@@ -58,6 +63,17 @@ public class Camera implements Cloneable {
      * the camera's ray-tracer
      */
     private RayTracerBase rayTracer;
+
+    /**
+     * The minimum amount of ray casts per pixel for the antialiasing edge-smoothing effect
+     */
+    private int antiAliasingRayCasts = 1;
+
+    /**
+     * The grid size for computing ray beams for the antialiasing edge-smoothing effect.
+     * (the cells count in the grid will be: gridSize^2)
+     */
+    private int gridSize = 1;
 
     /**
      * Empty constructor
@@ -156,7 +172,7 @@ public class Camera implements Cloneable {
      * @param i  the required row index in the view plane
      * @return a ray constructed through the pixel at column j and row i at the view-plane
      */
-    public Ray constructRay(int nX, int nY, int j, int i) {
+    public List<Ray> constructRay(int nX, int nY, int j, int i) {
         //center point of the view plane
         Point pc = position.add(vTo.scale(vpDistance));
 
@@ -176,7 +192,9 @@ public class Camera implements Cloneable {
             pIJ = pIJ.add(vUp.scale(-yI));
         }
 
-        return new Ray(position, pIJ.subtract(position).normalize());
+        Ray mainRay = new Ray(position, pIJ.subtract(position).normalize());
+        return antiAliasingRayCasts == 1 ? List.of(mainRay) : mainRay.generateBeam(
+                gridSize, Double.min(rY, rX), position.distance(pIJ), antiAliasingRayCasts);
     }
 
     /**
@@ -189,13 +207,37 @@ public class Camera implements Cloneable {
     public Camera renderImage() {
         int nY = imageWriter.getNy();
         int nX = imageWriter.getNx();
-        //running on columns, i = y
+        int totalPixels = nY * nX;
+        AtomicInteger completedPixels = new AtomicInteger(0);
+        AtomicInteger lastPrintedProgress = new AtomicInteger(-1);
+
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+        // Submit tasks for each pixel
         for (int i = 0; i < nY; ++i) {
-            //running on the row, j = x
             for (int j = 0; j < nX; ++j) {
-                castRay(nX, nY, j, i);
+                final int y = i;
+                final int x = j;
+                executor.submit(() -> {
+                    castRay(nX, nY, x, y);
+                    int completed = completedPixels.incrementAndGet();
+                    int progress = (int) ((completed / (double) totalPixels) * 100);
+                    if (lastPrintedProgress.getAndSet(progress) != progress) {
+                        System.out.println("Progress: " + progress + "%");
+                    }
+                });
             }
         }
+
+        // Shut down the executor and wait for all tasks to complete
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         return this;
     }
 
@@ -208,8 +250,11 @@ public class Camera implements Cloneable {
      * @param row    the row's index (y pixel) for casting the ray through
      */
     private void castRay(int nX, int nY, int column, int row) {
-        Ray ray = constructRay(nX, nY, column, row);
-        imageWriter.writePixel(column, row, rayTracer.traceRay(ray));
+        List<Ray> beam = constructRay(nX, nY, column, row);
+        if (antiAliasingRayCasts != 1)
+            imageWriter.writePixel(column, row, rayTracer.traceBeam(beam));
+        else
+            imageWriter.writePixel(column, row, rayTracer.traceRay(beam.getFirst()));
     }
 
     /**
@@ -296,6 +341,23 @@ public class Camera implements Cloneable {
         this.vUp = up.crossProduct(vTo).normalize();
         this.vUp = this.vTo.crossProduct(this.vUp).normalize();
         this.vRight = this.vTo.crossProduct(this.vUp).normalize();
+    }
+
+    /**
+     * Enable antialiasing effect for the image render.
+     *
+     * @param gridSize    the grid size for the multisampling beam computation
+     * @param minRayCasts the minimum amount of ray casts per pixel
+     * @return the camera object itself
+     */
+    public Camera enableAntiAliasing(int gridSize, int minRayCasts) {
+        if (gridSize <= 0)
+            throw new IllegalArgumentException("Grid size must be 1 or higher");
+        if (minRayCasts <= 0)
+            throw new IllegalArgumentException("Anti-Aliasing ray casts must be 1 or higher");
+        this.antiAliasingRayCasts = minRayCasts;
+        this.gridSize = gridSize;
+        return this;
     }
 
     /**

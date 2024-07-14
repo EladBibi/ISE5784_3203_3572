@@ -1,7 +1,8 @@
-package unittests.renderer;
+package lighting;
 
 import geometries.*;
 import lighting.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.*;
 import renderer.Camera;
@@ -18,17 +19,17 @@ import static java.awt.Color.*;
  */
 public class LightsTests {
     /**
-     * First scene for some of tests
+     * First scene for some of the tests
      */
     private final Scene scene1 = new Scene("Test scene");
     /**
-     * Second scene for some of tests
+     * Second scene for some of the tests
      */
     private final Scene scene2 = new Scene("Test scene")
             .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.15)));
 
     /**
-     * First camera builder for some of tests
+     * First camera builder for some of the tests
      */
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setRayTracer(new SimpleRayTracer(scene1))
@@ -37,7 +38,7 @@ public class LightsTests {
             .setFocusPoint(new Point(0, 0, 1000), Point.ZERO)
             .setVpSize(150, 150).setVpDistance(1000);
     /**
-     * Second camera builder for some of tests
+     * Second camera builder for some of the tests
      */
     private final Camera.Builder camera2 = Camera.getBuilder()
             .setRayTracer(new SimpleRayTracer(scene2))
@@ -265,6 +266,7 @@ public class LightsTests {
      * Tests for fun!
      */
     @Test
+    @Disabled
     public void miscellaneousTests() {
         Material material1 = new Material();
         //----------------------geometries----------------------

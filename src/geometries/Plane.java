@@ -40,10 +40,11 @@ public class Plane extends Geometry {
         this.q = p1;
         Vector v1 = p2.subtract(p1);
         Vector v2 = p3.subtract(p1);
-        this.normal = v1.crossProduct(v2).normalize();
-
-        if (this.normal.equals(Vector.ZERO))
+        try {
+            this.normal = v1.crossProduct(v2).normalize();
+        } catch (IllegalArgumentException zeroVectorEx) {
             throw new IllegalArgumentException("The points are linearly dependent. cannot form a plane");
+        }
     }
 
 
@@ -64,11 +65,11 @@ public class Plane extends Geometry {
      *
      * @param q      a point on the plane
      * @param normal a vector that is orthogonal to the plane. will be normalized inside the constructor if it's not already
-     * @param pivot the pivot position of the geometry. moving and rotating the object will be done
-     *              around the pivot position
+     * @param pivot  the pivot position of the geometry. moving and rotating the object will be done
+     *               around the pivot position
      */
     public Plane(Point q, Vector normal, Point pivot) {
-        this(q,normal);
+        this(q, normal);
         this.pivot = pivot;
     }
 
@@ -101,7 +102,9 @@ public class Plane extends Geometry {
 
     @Override
     public Intersectable moveCloneTo(Point position) {
-        Plane cloned = (Plane)this.getClone();
+        Plane cloned = (Plane) this.getClone();
+        if (position.equals(pivot))
+            return cloned;
         Vector movement = position.subtract(pivot);
         cloned.pivot = position;
         cloned.q = q.add(movement);
