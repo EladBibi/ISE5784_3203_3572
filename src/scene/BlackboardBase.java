@@ -9,7 +9,7 @@ import java.util.List;
  * Abstract class representing a 2D blackboard in a 3D space, through which we can randomly generate
  * points. the blackboard's shape and pattern of point-generation, is up to the implementing class
  */
-public abstract class Blackboard {
+public abstract class BlackboardBase {
 
     /**
      * The diameter of the 2D blackboard (the size of each side)
@@ -39,7 +39,7 @@ public abstract class Blackboard {
      * @param center   the center point of the blackboard
      * @param normal   normal vector for the black board(can be either direction)
      */
-    protected Blackboard(double diameter, Point center, Vector normal) {
+    protected BlackboardBase(double diameter, Point center, Vector normal) {
         this.diameter = diameter;
         this.center = center;
         Vector v = normal.equals(Vector.RIGHT) ? Vector.FORWARDS : Vector.RIGHT;

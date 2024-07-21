@@ -11,7 +11,7 @@ import java.util.Random;
  * Square blackboard containing a square 2D board in a 3D space, through which we can randomly generate
  * points in a gird pattern
  */
-public class SquareBlackboard extends Blackboard {
+public class SquareBlackboard extends BlackboardBase {
 
     /**
      * The size of the grid

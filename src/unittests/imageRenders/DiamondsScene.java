@@ -1,6 +1,9 @@
 package imageRenders;
 
-import geometries.*;
+import geometries.Geometries;
+import geometries.Plane;
+import geometries.Polygon;
+import geometries.Triangle;
 import lighting.AmbientLight;
 import lighting.PointLight;
 import lighting.SpotLight;
@@ -234,24 +237,26 @@ public class DiamondsScene {
 
         Material planeMat = new Material().setKd(0.9d).setKs(0.1d).setShininess(300).setKr(0.7d)
                 .setReflectionBlur(14, 27);
-        Material sphereMat = new Material().setKd(0.3d).setKs(0.7d).setShininess(300).setKt(0.5d)
-                .setTransparencyBlur(5, 27);
-        Color planeColor = new Color(49, 21, 61);
+        Material sphereMat = new Material().setKd(0.3d).setKs(0.7d).setShininess(300).setKt(0.5d).setKr(200d)
+                .setReflectionBlur(20, 9);
+        Color planeColor = Color.BLACK;
         Color sphereColor = new Color(9, 64, 50);
         Color secSphereColor = new Color(15, 12, 44);
 
         scene.geometries.add(
                 new Geometries(),
-                new Plane(new Point(1, 0, 1), Vector.UP).setMaterial(planeMat).setEmission(planeColor),
-                new Sphere(new Point(0, 200, 0), 180).setMaterial(sphereMat).setEmission(sphereColor),
-                new Sphere(new Point(0, 100, 0), 50).setEmission(secSphereColor)
+                new Triangle(new Point(200, 700, 200), new Point(-200, 700, -200), new Point(-200, 700, 200))
+                        .setMaterial(sphereMat).setEmission(sphereColor),
+                new Plane(new Point(1, 0, 1), Vector.UP).setMaterial(planeMat).setEmission(planeColor)
+                //new Sphere(new Point(0, 200, 0), 180).setMaterial(sphereMat).setEmission(sphereColor)
+//                new Sphere(new Point(0, 100, 0), 50).setEmission(secSphereColor)
         );
 
         Color spotColor1 = new Color(166, 152, 48);
         Color pointColor1 = new Color(46, 94, 41);
         scene.setLights(
-                new SpotLight(spotColor1, new Point(0, 500, 0), Point.ZERO)
-                        .setKl(0.00001).setKq(0.0000002)
+//                new SpotLight(spotColor1, new Point(0, 500, 0), Point.ZERO)
+//                        .setKl(0.00001).setKq(0.0000002)
 //                new PointLight(spotColor1, new Point(400, 100, 400))
 //                            .setKl(0.000001).setKq(0.0000002)
 
@@ -262,7 +267,7 @@ public class DiamondsScene {
                 .setFocusPoint(new Point(800, 300, 0), Point.ZERO)
                 .setVpDistance(100)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("testing/no aa, blur - X27 grid 3 -2", 800, 450))
+                .setImageWriter(new ImageWriter("test emission 2", 800, 450))
                 .build()
                 .enableAntiAliasing(3, 27)
                 .renderImage()
