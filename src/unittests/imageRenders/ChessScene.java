@@ -1,6 +1,7 @@
 package imageRenders;
 
 import geometries.*;
+import lighting.DirectionalLight;
 import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Disabled;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Material;
 import primitives.Point;
+import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
@@ -85,7 +87,6 @@ public class ChessScene {
                 .rotate(0)
                 .renderImage()
                 .writeToImage();
-
     }
 
     /**
@@ -146,6 +147,38 @@ public class ChessScene {
                 .setVpDistance(600)
                 .setVpSize(135, 240)
                 .setImageWriter(new ImageWriter(directoryName + "render 6 - no aa with blur X9", 800, 450))
+                .build()
+                .rotate(0)
+                .renderImage()
+                .writeToImage();
+    }
+
+    /**
+     * Test Render of the scene with different setting presets
+     */
+    @Test
+    @Disabled
+    public void alternative() {
+        boardMat = new Material().setKd(0.1).setKs(0.2).setShininess(400).setKr(0.6).setKt(0.1);
+        //.setReflectionBlur(1.2, 81);
+        mainSurfaceMat = new Material().setKd(0.6).setKs(0.3).setShininess(200).setKr(0.1d);
+
+        scene.setGeometries(buildScene(new Point(3100, 430, 5000), 110d));
+        scene.setLights(
+//                81, 171, 161    70, 122, 148
+                new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
+                //new SpotLight(new Color(55, 97, 117), new Point(-200, 80, -200), new Point(450, 0, 450)),
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
+//                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
+//                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
+//                        .setKq(0.0000001)
+        );
+        cameraBuilder
+                .setRayTracer(new SimpleRayTracer(scene))
+                .setFocusPoint(new Point(-900, 300, -2200), new Point(400, 60, 420))
+                .setVpDistance(600)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "render 7.6 - no effects", 1280, 720))
                 .build()
                 .rotate(0)
                 .renderImage()

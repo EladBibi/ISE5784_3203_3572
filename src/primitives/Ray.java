@@ -1,8 +1,8 @@
 package primitives;
 
 import geometries.Intersectable.GeoPoint;
-import scene.BlackboardBase;
-import scene.SquareBlackboard;
+import renderer.BlackboardBase;
+import renderer.SquareBlackboard;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -90,12 +90,11 @@ public class Ray {
      */
     public List<Ray> generateBeam(int gridSize, double blackBoardDiameter, double distance, int minTotalRayCasts) {
         List<Ray> rays = new LinkedList<>();
-        rays.add(this);
 
         //if there is 1 ray in the beam OR the blackboard size is 0, there is
         //no need to construct a beam
         if (minTotalRayCasts == 1 || isZero(blackBoardDiameter)) {
-            return rays;
+            return List.of(this);
         }
 
         //calculating the center point of the blackboard and forming it

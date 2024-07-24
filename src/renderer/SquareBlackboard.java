@@ -1,4 +1,4 @@
-package scene;
+package renderer;
 
 import primitives.Point;
 import primitives.Vector;

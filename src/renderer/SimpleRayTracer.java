@@ -19,7 +19,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Static constant for the maximum recursive iterations for each pixel in the ray tracing process
      */
-    private static final int MAX_CALC_COLOR_LEVEL = 5;
+    private static final int MAX_CALC_COLOR_LEVEL = 10;
     /**
      * Static constant for the lowest distinguishable color intensity
      */
@@ -32,7 +32,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * The grid size for the multisampling algorithms.
      */
-    private static final int GRID_SIZE = 3;
+    private static final int GRID_SIZE = 9;
 
     /**
      * Constructor that initializes the tracer with the given scene
@@ -97,7 +97,6 @@ public class SimpleRayTracer extends RayTracerBase {
      */
     private Color calcGlobalEffects(GeoPoint gp, Vector rayDir, int iterationsLeft, Double3 k) {
         Color color = Color.BLACK;
-
         Material gpMat = gp.geometry.getMaterial();
         Double3 kkx = gpMat.kR.product(k);
         if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
