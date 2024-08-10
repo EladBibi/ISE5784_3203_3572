@@ -149,10 +149,20 @@ public class Double3 {
      *
      * @param other other triad
      * @return true if all the numbers are less that appropriate numbers in
-     * other
-     * triad, false otherwise
+     * other triad, false otherwise
      */
     public boolean lowerThan(Double3 other) {
         return d1 < other.d1 && d2 < other.d2 && d3 < other.d3;
+    }
+
+    /**
+     * Checks whether all the numbers are higher than three numbers in another triad
+     *
+     * @param other other triad
+     * @return true if all the numbers are higher than the appropriate numbers in
+     * other triad, false otherwise
+     */
+    public boolean higherThan(Double3 other){
+        return !this.lowerThan(other) && !this.equals(other);
     }
 }

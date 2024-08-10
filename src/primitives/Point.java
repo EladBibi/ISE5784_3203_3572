@@ -1,5 +1,7 @@
 package primitives;
 
+import java.util.Objects;
+
 /**
  * A point in a three-dimensional space, represented by three coordinates x,y,z
  *
@@ -76,6 +78,16 @@ public class Point {
     }
 
     /**
+     * Performs unconventional scalar subtraction.
+     * subtracts the given scalar from each of the point's x,y,z coordinates
+     * @param d the subtraction scalar factor
+     * @return the following point: (x - d, y - d, z - d)
+     */
+    public final Point subtract(double d){
+        return new Point(getX() - d, getY() - d, getZ() -d);
+    }
+
+    /**
      * Point addition operation
      *
      * @param vec a vector as the second operand in the addition
@@ -140,6 +152,11 @@ public class Point {
         if (this == obj) return true;
         return (obj instanceof Point other)
                 && this.xyz.equals(other.xyz);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getY(), getZ());
     }
 
     @Override

@@ -6,6 +6,7 @@ import primitives.Vector;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -130,6 +131,32 @@ public class Polygon extends Geometry {
     }
 
     @Override
+    public Point getMinCoordinates() {
+        double x = Double.MAX_VALUE;
+        double y = Double.MAX_VALUE;
+        double z = Double.MAX_VALUE;
+        for (Point point : vertices){
+            x = point.getX() < x ? point.getX() : x;
+            y = point.getY() < y ? point.getY() : y;
+            z = point.getZ() < z ? point.getZ() : z;
+        }
+        return new Point(x,y,z);
+    }
+
+    @Override
+    public Point getMaxCoordinates() {
+        double x = Double.MIN_VALUE;
+        double y = Double.MIN_VALUE;
+        double z = Double.MIN_VALUE;
+        for (Point point : vertices){
+            x = point.getX() > x ? point.getX() : x;
+            y = point.getY() > y ? point.getY() : y;
+            z = point.getZ() > z ? point.getZ() : z;
+        }
+        return new Point(x,y,z);
+    }
+
+    @Override
     public Intersectable moveCloneTo(Point position) {
         Polygon cloned = (Polygon) this.getClone();
         if (position.equals(pivot))
@@ -148,5 +175,18 @@ public class Polygon extends Geometry {
     @Override
     public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
         return this.getClone();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true; // Check if both references are identical
+        if (obj == null || getClass() != obj.getClass()) return false; // Ensure the object is of the same class
+        Polygon other = (Polygon) obj;
+        return vertices.equals(other.vertices) && plane.equals(other.plane); // Compare relevant fields
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vertices, plane);
     }
 }

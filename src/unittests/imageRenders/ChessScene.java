@@ -1,9 +1,7 @@
 package imageRenders;
 
 import geometries.*;
-import lighting.DirectionalLight;
-import lighting.PointLight;
-import lighting.SpotLight;
+import lighting.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
@@ -13,7 +11,13 @@ import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
+import renderer.VoxelRayTracer;
 import scene.Scene;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Image renders for the 'mini-project stage 1'
@@ -39,27 +43,63 @@ public class ChessScene {
     /**
      * Material of the chess board
      */
-    private Material boardMat = new Material().setKd(0.1).setKs(0.2).setShininess(400).setKr(0.6).setKt(0.1);
+    private final Material boardMat = new Material().setKd(0.1).setKs(0.2).setShininess(400).setKr(0.6).setKt(0.1);
     /**
      * Material of the chess pieces
      */
-    private Material chessPieceMat = new Material().setKd(0.5).setKs(0.3).setShininess(200).setKr(0.2);
+    private final Material chessPieceMat = new Material().setKd(0.5).setKs(0.3).setShininess(200).setKr(0.2);
     /**
      * Material of the main surface in the scene
      */
-    private Material mainSurfaceMat = new Material().setKd(0.6).setKs(0.3).setShininess(200).setKr(0.1d);
+    private final Material mainSurfaceMat = new Material().setKd(0.6).setKs(0.3).setShininess(200).setKr(0.1d);
     /**
      * Material of the window glass
      */
-    private Material glassMat = new Material().setKs(0.1).setShininess(250).setKt(0.6).setKr(0.3);
+    private final Material glassMat = new Material().setKs(0.1).setShininess(250).setKt(0.6).setKr(0.3);
     /**
      * Material of the moon
      */
-    private Material moonMat = new Material().setKd(0.5).setKt(0d);
+    private final Material moonMat = new Material().setKd(0.5).setKt(0d);
     /**
      * Material of the window panels
      */
-    private Material winPanelMat = new Material().setKd(0.1).setKs(0.2).setKr(0.05d);
+    private final Material winPanelMat = new Material().setKd(0.1).setKs(0.2).setKr(0.05d);
+    /**
+     * Position of the moon through the window
+     */
+    private final Point moonPosition = new Point(3100, -1100, 5000);
+    /**
+     * Radius of the moon (moon size)
+     */
+    private double moonRadius = 130d;
+
+    /**
+     * Generate a video
+     */
+    @Test
+    @Disabled
+    public void video() {
+        scene.setGeometries(buildScene());
+        scene.setLights(
+//                81, 171, 161    70, 122, 148
+                new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
+//                new SpotLight(new Color(38, 36, 97), new Point(100, 100, -200), new Point(450, 0, 450))
+                //new DirectionalLight(new Color(105, 82, 42), new Vector(-0.7,-0.2, 1))
+                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001)
+//                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
+//                        .setKq(0.0000001)
+        );
+        cameraBuilder
+                .setRayTracer(new VoxelRayTracer(scene))
+                .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
+                .setVpDistance(800)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "video 1/frame ", 800, 450))
+                .build()
+                .enableMultiThreading(5)
+                .generateVideo(100,83, directoryName + "video 1/frame ", 1280, 720,new Point(425, 65, 450), new Point(-900, 1450, -2200),
+                        new Point(-1900, 250, -700),new Point(-2000, 750, -2200),0,6);
+    }
 
     /**
      * Regular Render of the scene with no antialiasing and no diffusive/reflective surfaces effects
@@ -67,7 +107,7 @@ public class ChessScene {
     @Test
     @Disabled
     public void noSpecialEffects() {
-        scene.setGeometries(buildScene(new Point(3100, -1100, 5000), 130d));
+        scene.setGeometries(buildScene());
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
@@ -82,10 +122,10 @@ public class ChessScene {
                 .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "test render 8", 800, 450))
+                .setImageWriter(new ImageWriter(directoryName + "test render 9", 800, 450))
                 .build()
                 .rotate(0)
-                .renderImage()
+                .renderImage(8)
                 .writeToImage();
     }
 
@@ -95,7 +135,7 @@ public class ChessScene {
     @Test
     @Disabled
     public void withAntiAliasing() {
-        scene.setGeometries(buildScene(new Point(3100, -1100, 5000), 130d));
+        scene.setGeometries(buildScene());
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
@@ -110,9 +150,10 @@ public class ChessScene {
                 .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "render 5 - with aa X27 no blur", 1280, 720))
+                .setImageWriter(new ImageWriter(directoryName + "simple-test 1 - aa 9", 800, 450))
                 .build()
-                .enableAntiAliasing(3, 27)
+                .enableAntiAliasing(3, 9)
+                .enableMultiThreading(5)
                 .rotate(0)
                 .renderImage()
                 .writeToImage();
@@ -125,13 +166,10 @@ public class ChessScene {
     @Test
     @Disabled
     public void withDiffusiveReflectiveSurfaces() {
-        boardMat = new Material().setKd(0.1).setKs(0.2).setShininess(400).setKr(0.6).setKt(0.1)
-                .setReflectionBlur(3, 9);
-        mainSurfaceMat = new Material().setKd(0.6).setKs(0.3).setShininess(200).setKr(0.1d);
-        glassMat = new Material().setKs(0.1).setShininess(250).setKt(0.6).setKr(0.3)
-                .setReflectionBlur(1.5, 9).setTransparencyBlur(0.5, 9);
+        boardMat.setReflectionBlur(3, 9);
+        glassMat.setReflectionBlur(1.5, 9).setTransparencyBlur(0.5, 9);
 
-        scene.setGeometries(buildScene(new Point(3100, -1100, 5000), 130d));
+        scene.setGeometries(buildScene());
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
@@ -142,12 +180,13 @@ public class ChessScene {
                         .setKq(0.0000001)
         );
         cameraBuilder
-                .setRayTracer(new SimpleRayTracer(scene))
+                .setRayTracer(new VoxelRayTracer(scene))
                 .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "render 6 - no aa with blur X9", 800, 450))
+                .setImageWriter(new ImageWriter(directoryName + "voxel test - no aa with blur X9", 400, 200))
                 .build()
+                .enableMultiThreading(4)
                 .rotate(0)
                 .renderImage()
                 .writeToImage();
@@ -158,47 +197,68 @@ public class ChessScene {
      */
     @Test
     @Disabled
-    public void alternative() {
-        boardMat = new Material().setKd(0.1).setKs(0.2).setShininess(400).setKr(0.6).setKt(0.1);
-        //.setReflectionBlur(1.2, 81);
-        mainSurfaceMat = new Material().setKd(0.6).setKs(0.3).setShininess(200).setKr(0.1d);
-
-        scene.setGeometries(buildScene(new Point(3100, 430, 5000), 110d));
+    public void simpleRender(){
+        scene.setGeometries(buildScene());
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
                 //new SpotLight(new Color(55, 97, 117), new Point(-200, 80, -200), new Point(450, 0, 450)),
-                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8,-0.3, 1))
 //                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
 //                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
 //                        .setKq(0.0000001)
         );
         cameraBuilder
                 .setRayTracer(new SimpleRayTracer(scene))
-                .setFocusPoint(new Point(-900, 300, -2200), new Point(400, 60, 420))
+                .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "render 7.6 - no effects", 1280, 720))
+                .setImageWriter(new ImageWriter(directoryName + "simple tracer - no effects", 1280, 720))
                 .build()
-                .rotate(0)
-                .renderImage()
+                .enableMultiThreading(5)
+                .renderImage(10)
+                .writeToImage();
+    }
+    /**
+     * Test Render of the scene with different setting presets
+     */
+    @Test
+    @Disabled
+    public void voxelRender(){
+        scene.setGeometries(buildScene());
+        scene.setLights(
+//                81, 171, 161    70, 122, 148
+                new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
+                //new SpotLight(new Color(55, 97, 117), new Point(-200, 80, -200), new Point(450, 0, 450)),
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8,-0.3, 1))
+//                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
+//                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
+//                        .setKq(0.0000001)
+        );
+        cameraBuilder
+                .setRayTracer(new VoxelRayTracer(scene))
+                .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
+                .setVpDistance(600)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "voxel tracer - no effects", 1280, 720))
+                .build()
+                .enableMultiThreading(5)
+                .renderImage(10)
                 .writeToImage();
     }
 
     /**
      * Method that builds the chess scene
      *
-     * @param moonPosition the position of the moon
-     * @param moonRadius   the radius of the moon
      * @return a geometries container which contains all the geometries of the chess scene
      */
-    private Geometries buildScene(Point moonPosition, double moonRadius) {
+    private Geometries buildScene() {
         Geometries geometries = new Geometries();
         Color whiteColor = new Color(41, 41, 41);
         Color blackColor = new Color(41, 34, 0);
 
-        Polygon surface = new Polygon(new Point(-6000, -20, 1100), new Point(6000, -20, 1100),
-                new Point(6000, -20, -1100), new Point(-6000, -20, -1100));
+        Polygon surface = new Polygon(new Point(-1200, -20, 1100), new Point(1800, -20, 1100),
+                new Point(1800, -20, -1100), new Point(-1200, -20, -1100));
 
         Intersectable blackPawn = buildPawn().setEmission(blackColor).setMaterial(chessPieceMat);
         Intersectable blackKing = buildKing().setEmission(blackColor).setMaterial(chessPieceMat);
@@ -215,7 +275,7 @@ public class ChessScene {
         geometries.add(
                 surface.setMaterial(mainSurfaceMat),
                 buildChessBoard().setMaterial(boardMat),
-                buildWallWithWindow(mainSurfaceMat, moonPosition, moonRadius).moveCloneTo(new Point(0, 0, 1100)),
+                buildWallWithWindow(mainSurfaceMat).moveCloneTo(new Point(0, 0, 1100)),
                 whitePawn.moveCloneTo(new Point(50, 0, 150)),
                 whitePawn.moveCloneTo(new Point(150, 0, 150)),
                 whitePawn.moveCloneTo(new Point(250, 0, 150)),
@@ -257,22 +317,20 @@ public class ChessScene {
      * Builder method of the wall and window
      *
      * @param material     the material of the wall
-     * @param moonPosition position of the moon
-     * @param moonRadius   radius of the moon
      * @return geometries container with a wall, window in the wall, a moon in the
      * distance(through the window)
      */
-    private Geometries buildWallWithWindow(Material material, Point moonPosition, double moonRadius) {
+    private Geometries buildWallWithWindow(Material material) {
         double windowLedgeLength = 80;
-        Point p1 = new Point(-5000, -500, 0);
+        Point p1 = new Point(-1200, -500, 0);
         Point p2 = new Point(0, -500, 0);
         Point p3 = new Point(0, 2000, 0);
-        Point p4 = new Point(-5000, 2000, 0);
+        Point p4 = new Point(-1200, 2000, 0);
 
-        Point p5 = new Point(5000, -500, 0);
+        Point p5 = new Point(1800, -500, 0);
         Point p6 = new Point(900, -500, 0);
         Point p7 = new Point(900, 2000, 0);
-        Point p8 = new Point(5000, 2000, 0);
+        Point p8 = new Point(1800, 2000, 0);
 
         Point p9 = new Point(900, -500, 0);
         Point p10 = new Point(0, -500, 0);

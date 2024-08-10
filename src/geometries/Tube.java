@@ -49,6 +49,16 @@ public class Tube extends RadialGeometry {
     }
 
     @Override
+    public Point getMinCoordinates() {
+        return null;
+    }
+
+    @Override
+    public Point getMaxCoordinates() {
+        return null;
+    }
+
+    @Override
     public Intersectable moveCloneTo(Point position) {
         return this.getClone();
     }

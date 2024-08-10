@@ -42,6 +42,30 @@ public class Color {
     }
 
     /**
+     * Getter for the red value of this rgb color
+     * @return the red value of this color
+     */
+    public double getRed(){
+        return rgb.d1;
+    }
+
+    /**
+     * Getter for the green value of this rgb color
+     * @return the green value of this color
+     */
+    public double getGreen(){
+        return rgb.d2;
+    }
+
+    /**
+     * Getter for the blue value of this rgb color
+     * @return the blue value of this color
+     */
+    public double getBlue(){
+        return rgb.d3;
+    }
+
+    /**
      * Constructor to generate a color according to RGB components Each component
      * in
      * range 0..255 (for printed white color) or more [for lights]

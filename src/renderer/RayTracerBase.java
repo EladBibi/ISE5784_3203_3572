@@ -14,6 +14,15 @@ import java.util.List;
 public abstract class RayTracerBase {
 
     /**
+     * The default value for the maximum recursive iterations for each pixel in the ray tracing process
+     */
+    protected final static int DEFAULT_MAX_RECURSION_DEPTH = 8;
+    /**
+     * Maximum recursive iterations number for the current image render
+     */
+    protected static int maxRecursionLevel = DEFAULT_MAX_RECURSION_DEPTH;
+
+    /**
      * The tracer's scene
      */
     protected final Scene scene;
@@ -25,6 +34,21 @@ public abstract class RayTracerBase {
      */
     public RayTracerBase(Scene scene) {
         this.scene = scene;
+    }
+
+    /**
+     * Set the maximum recursion depth of the tracer
+     * @param n the required maximum recursion depth value
+     */
+    protected void setMaxRecursionDepth(int n){
+        maxRecursionLevel = n;
+    }
+
+    /**
+     * Reset the maximum recursion depth value of the tracer to the default value
+     */
+    protected void resetMaxRecursionDepth(){
+        maxRecursionLevel = DEFAULT_MAX_RECURSION_DEPTH;
     }
 
     /**

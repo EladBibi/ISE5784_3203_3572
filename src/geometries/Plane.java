@@ -6,6 +6,7 @@ import primitives.Util;
 import primitives.Vector;
 
 import java.util.List;
+import java.util.Objects;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -16,6 +17,8 @@ import static primitives.Util.isZero;
  * @author Pini Goldfraind &amp; Elad Bibi
  */
 public class Plane extends Geometry {
+
+    private final double DISTANCE = 99999;
 
     /**
      * A point on the plane
@@ -101,6 +104,16 @@ public class Plane extends Geometry {
     }
 
     @Override
+    public Point getMinCoordinates() {
+        return q.subtract(DISTANCE);
+    }
+
+    @Override
+    public Point getMaxCoordinates() {
+        return q.subtract(-DISTANCE);
+    }
+
+    @Override
     public Intersectable moveCloneTo(Point position) {
         Plane cloned = (Plane) this.getClone();
         if (position.equals(pivot))
@@ -114,5 +127,18 @@ public class Plane extends Geometry {
     @Override
     public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
         return this.getClone();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true; // Check if both references are identical
+        if (obj == null || getClass() != obj.getClass()) return false; // Ensure the object is a Plane
+        Plane other = (Plane) obj;
+        return q.equals(other.q) && normal.equals(other.normal); // Compare the point and the normal vector
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(q, normal); // Generate hash code based on the point and the normal vector
     }
 }

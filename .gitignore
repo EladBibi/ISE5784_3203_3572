@@ -3,6 +3,7 @@ doc/
 images/
 videos/
 calibration/
+unittests/imageRenders/LandscapeScene
 
 # Compiled class file
 *.class

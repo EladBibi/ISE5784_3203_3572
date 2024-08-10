@@ -1,10 +1,12 @@
 package geometries;
 
+import primitives.Double3;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -39,12 +41,24 @@ public abstract class Intersectable extends Movable implements Cloneable {
             this.point = point;
         }
 
+//        @Override
+//        public boolean equals(Object obj) {//TODO clean up
+//            if (this == obj) return true;
+//            return (obj instanceof GeoPoint other)
+//                    && this.point.equals(other.point)
+//                    && this.geometry == other.geometry;
+//        }
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;
-            return (obj instanceof GeoPoint other)
-                    && this.point.equals(other.point)
-                    && this.geometry == other.geometry;
+            if (this == obj) return true; // Check if both references are identical
+            if (obj == null || getClass() != obj.getClass()) return false; // Ensure the object is a GeoPoint
+            GeoPoint other = (GeoPoint) obj;
+            return point.equals(other.point) && geometry.equals(other.geometry); // Compare relevant fields
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(point, geometry);
         }
 
         @Override
@@ -112,6 +126,18 @@ public abstract class Intersectable extends Movable implements Cloneable {
      * (the intersection point, the intersected geometry)
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
+
+    /**
+     * Calculates the minimum (lowest) x,y,z coordinates of this geometry object
+     * @return the minimum (lowest) x,y,z coordinates of this geometry object
+     */
+    public abstract Point getMinCoordinates();
+
+    /**
+     * Calculates the maximum (highest) x,y,z coordinates of this geometry object
+     * @return the maximum (highest) x,y,z coordinates of this geometry object
+     */
+    public abstract Point getMaxCoordinates();
 
     @Override
     public Intersectable moveCloneBy(double x, double y, double z) {

@@ -77,8 +77,9 @@ public class Ray {
     }
 
     /**
-     * Generates a beam of rays from the head point of this ray through a squared blackboard with
-     * the given diameter, which is located at the given distance from the head point.
+     * Generates a beam of rays from the head point of this ray through a blackboard with
+     * the given diameter, which is located at the given distance from the head point and faces
+     * the same direction as the main ray.
      *
      * @param gridSize           the size of the grid to create on the black board, rows and columns (total
      *                           cells: gridSize * gridSize)
@@ -89,6 +90,25 @@ public class Ray {
      * through a specified blackboard in the 3D space
      */
     public List<Ray> generateBeam(int gridSize, double blackBoardDiameter, double distance, int minTotalRayCasts) {
+        return generateBeam(gridSize, blackBoardDiameter, distance, minTotalRayCasts, direction);
+    }
+
+    /**
+     * Generates a beam of rays from the head point of this ray through a blackboard with
+     * the given diameter, which is located at the given distance from the head point and faces
+     * the given direction.
+     *
+     * @param gridSize           the size of the grid to create on the black board, rows and columns (total
+     *                           cells: gridSize * gridSize)
+     * @param blackBoardDiameter the diameter for the square blackboard (the width and height)
+     * @param distance           the distance of the blackboard from beam's origin
+     * @param minTotalRayCasts   total rays we should cast through the blackboard, heavily impacts performance.
+     * @param normal             the normal vector of the black board(the direction in which the blackboard will be facing)
+     * @return a collection of rays which are all generated from the current ray's head point and pass
+     * through a specified blackboard in the 3D space
+     */
+    public List<Ray> generateBeam(int gridSize, double blackBoardDiameter, double distance,
+                                  int minTotalRayCasts, Vector normal) {
         List<Ray> rays = new LinkedList<>();
 
         //if there is 1 ray in the beam OR the blackboard size is 0, there is
@@ -99,7 +119,7 @@ public class Ray {
 
         //calculating the center point of the blackboard and forming it
         Point center = this.getPoint(distance);
-        BlackboardBase BlackboardBase = new SquareBlackboard(blackBoardDiameter, center, direction, gridSize);
+        BlackboardBase BlackboardBase = new SquareBlackboard(blackBoardDiameter, center, normal, gridSize);
 
         //creating points on the blackboard and forming rays through them
         List<Point> points = BlackboardBase.randomizePoints(minTotalRayCasts);

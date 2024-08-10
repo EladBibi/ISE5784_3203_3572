@@ -16,6 +16,7 @@ import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
+import renderer.VoxelRayTracer;
 import scene.Scene;
 
 import static java.awt.Color.WHITE;
@@ -26,6 +27,11 @@ import static java.awt.Color.WHITE;
  * diffusive &amp; specular lighting and reflection &amp; transparency ray casts
  */
 public class DiamondsScene {
+
+    /**
+     * The inner folder for the images
+     */
+    private final String directoryName = "diamonds scene/";
 
     /**
      * Camera builder for the renderings
@@ -39,6 +45,56 @@ public class DiamondsScene {
     @Disabled
     public void bonusImage() {
         final Scene scene = new Scene("Diamonds Scene");
+        scene.geometries.add(buildScene());
+        scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0d));
+        Color spotColor1 = new Color(86, 135, 204);
+        Color spotColor2 = new Color(77, 20, 33);
+        Color spotColor3 = new Color(79, 57, 30);
+        Color spotColor4 = new Color(59, 35, 21);
+        Color pointColor1 = new Color(28, 97, 64);
+        Color pointColor2 = new Color(36, 31, 61);
+        scene.setLights(
+                new PointLight(pointColor1, new Point(-150, 0, -150))
+                        .setKl(4E-5).setKq(2E-7),
+//                new PointLight(pointColor1, new Point(-50, 130, -50))
+//                        .setKl(4E-5).setKq(2E-7),
+//                new PointLight(pointColor2, new Point(-250,-70,-330))
+//                        .setKl(4E-5).setKq(2E-7),
+                new SpotLight(spotColor1, new Point(-400, 80, 200), new Point(-100, 0, -100))
+                        .setKl(4E-5).setKq(2E-7),
+//                new SpotLight(spotColor2, new Point(-874.41164, 300.63026, -400.30782), Point.ZERO)
+//                        .setKl(4E-5).setKq(2E-7),
+//                new SpotLight(spotColor3, new Point(-800, 300, 900), new Point(-200, -10, 0))
+//                        .setKl(4E-5).setKq(2E-7),
+                new SpotLight(spotColor4, new Point(-1300, 300, -1300), new Point(0, 0, 0))
+                        .setKl(4E-5).setKq(2E-7)
+        );
+
+        Point vidStartingPnt = new Point(3500, 0, 0);
+        Point vidEndingPnt = new Point(0, 1400, -3500);
+        Point vidInterpolationPnt = new Point(3500, 700, -3500);
+        Point vidFocusPnt = new Point(-100, 0, -100);
+
+        cameraBuilder
+                .setRayTracer(new VoxelRayTracer(scene))
+                .setFocusPoint(new Point(-1000, 1700, 4000), new Point(-100, -120, -100))
+                .setVpDistance(800)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "voxel tracer 2", 1920, 1080))
+                .build()
+                //.enableAntiAliasing(3, 9)
+                .enableMultiThreading(4)
+                .rotate(0)
+                .renderImage()
+                .writeToImage();
+//                .generateVideo(125, 79, "diamonds scene vid 4 HD", 1280, 720,
+//                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
+    }
+
+    /**
+     * Scene builder
+     */
+    private Geometries buildScene(){
         //big diamond
         Point a1 = new Point(100, 100, 100);
         Point top = new Point(0, 200, 0);
@@ -119,8 +175,12 @@ public class DiamondsScene {
                 new Polygon(cc3, cc4, cc5, cc6).setMaterial(cubeMat).setEmission(cubeColor),
                 new Polygon(cc1, cc4, cc5, cc8).setMaterial(cubeMat).setEmission(cubeColor));
 
-        scene.geometries.add(
-                new Plane(new Point(1, -151, 1), Vector.UP).setMaterial(planeMat),
+        double planeRadius = 2000;
+
+        return new Geometries(
+                //new Plane(new Point(1, -151, 1), new Point(0, -151, 1), new Point(1, -151, 0)).setMaterial(planeMat),
+                new Polygon(new Point(-planeRadius, -151, -planeRadius), new Point(-planeRadius, -151, planeRadius),
+                        new Point(planeRadius, -151, planeRadius), new Point(planeRadius, -151, -planeRadius)).setMaterial(planeMat),
                 //.setEmission(new Color(59, 50, 39)),
                 //big cube
                 new Polygon(b1, b2, b3, b4).setMaterial(bigCubeMat).setEmission(cubeColor),  // Top face
@@ -182,49 +242,6 @@ public class DiamondsScene {
                 new Triangle(d4, d6, d5).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
                 new Triangle(d5, d6, d2).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor)
         );
-        scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0d));
-
-        Color spotColor1 = new Color(86, 135, 204);
-        Color spotColor2 = new Color(77, 20, 33);
-        Color spotColor3 = new Color(79, 57, 30);
-        Color spotColor4 = new Color(59, 35, 21);
-        Color pointColor1 = new Color(28, 97, 64);
-        Color pointColor2 = new Color(36, 31, 61);
-        scene.setLights(
-                new PointLight(pointColor1, new Point(-150, 0, -150))
-                        .setKl(4E-5).setKq(2E-7),
-//                new PointLight(pointColor1, new Point(-50, 130, -50))
-//                        .setKl(4E-5).setKq(2E-7),
-//                new PointLight(pointColor2, new Point(-250,-70,-330))
-//                        .setKl(4E-5).setKq(2E-7),
-                new SpotLight(spotColor1, new Point(-400, 80, 200), new Point(-100, 0, -100))
-                        .setKl(4E-5).setKq(2E-7),
-//                new SpotLight(spotColor2, new Point(-874.41164, 300.63026, -400.30782), Point.ZERO)
-//                        .setKl(4E-5).setKq(2E-7),
-//                new SpotLight(spotColor3, new Point(-800, 300, 900), new Point(-200, -10, 0))
-//                        .setKl(4E-5).setKq(2E-7),
-                new SpotLight(spotColor4, new Point(-1300, 300, -1300), new Point(0, 0, 0))
-                        .setKl(4E-5).setKq(2E-7)
-        );
-
-        Point vidStartingPnt = new Point(3500, 0, 0);
-        Point vidEndingPnt = new Point(0, 1400, -3500);
-        Point vidInterpolationPnt = new Point(3500, 700, -3500);
-        Point vidFocusPnt = new Point(-100, 0, -100);
-
-        cameraBuilder
-                .setRayTracer(new SimpleRayTracer(scene))
-                .setFocusPoint(new Point(-1000, 1700, 4000), new Point(-100, -120, -100))
-                .setVpDistance(800)
-                .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("diamonds scene/bonusImage6 with aa - grid 1 X4", 1920, 1080))
-                .build()
-                .enableAntiAliasing(1, 4)
-                .rotate(0)
-                .renderImage()
-                .writeToImage();
-//                .generateVideo(125, 79, "diamonds scene vid 4 HD", 1280, 720,
-//                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
     }
 
     /**

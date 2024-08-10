@@ -9,10 +9,6 @@ import scene.Scene;
 
 import java.util.List;
 import java.util.MissingResourceException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static primitives.Util.compare;
 import static primitives.Util.isZero;
@@ -25,6 +21,21 @@ import static xml.XmlParser.*;
  */
 public class Camera implements Cloneable {
 
+
+    /**
+     * Options for different print configuration for image rendering progress
+     */
+    public enum ProgressPrintMode {
+        NONE,
+        PROGRESS_ONLY,
+        PROGRESS_AND_TIME,
+        VIDEO_GENERATION;
+
+    }
+    /**
+     * Progress print mode of the camera
+     */
+    private ProgressPrintMode printMode = ProgressPrintMode.PROGRESS_AND_TIME;
     /**
      * The camera's position in the 3D space
      */
@@ -74,6 +85,61 @@ public class Camera implements Cloneable {
      * (the cells count in the grid will be: gridSize^2)
      */
     private int gridSize = 1;
+
+    /**
+     * The threads count for the next image-render. if this value is higher than 1,
+     * parallelization will be used for the rendering
+     */
+    private int threadsCount = 0;
+
+    /**
+     * Executor for the rendering in parallelization
+     */
+    private RenderExecutor renderExecutor;
+
+    /**
+     * Determines if multithreading is enabled
+     */
+    private boolean multiThreadingEnabled = false;
+
+    /**
+     * The horizontal pixels count of the camera's image writer
+     */
+    private int nX;
+
+    /**
+     * The vertical pixels count of the camera's image writer
+     */
+    private int nY;
+
+    /**
+     * The completed pixels of the current image render. only relevant once a render is on its way
+     */
+    private double completedPixelsCount = 0;
+
+    /**
+     * The total amount of pixels to render for the current image render.
+     * only relevant once a render is on its way
+     */
+    private int totalPixelsCount = 0;
+
+    /**
+     * The current percentage progress of the current image render.
+     * only relevant once a render is on its way
+     */
+    private int percentageProgress = 0;
+
+    /**
+     * The timestamp of the last update in milliseconds.
+     * This value is initialized to 0 and is updated whenever the progress is printed.
+     */
+    private long lastUpdateTime = 0;
+
+    /**
+     * The total elapsed time in milliseconds since the start.
+     * This value accumulates the time between successive updates.
+     */
+    private long elapsedTime = 0;
 
     /**
      * Empty constructor
@@ -194,50 +260,139 @@ public class Camera implements Cloneable {
 
         Ray mainRay = new Ray(position, pIJ.subtract(position).normalize());
         return antiAliasingRayCasts == 1 ? List.of(mainRay) : mainRay.generateBeam(
-                gridSize, Double.min(rY, rX), position.distance(pIJ), antiAliasingRayCasts);
+                gridSize, Double.min(rY, rX), position.distance(pIJ), antiAliasingRayCasts, vTo);
+    }
+
+    public Camera enableMultiThreading(int threadsCount){
+        if(threadsCount <= 0)
+            throw new IllegalArgumentException("Threads count must be 1 or higher");
+        this.threadsCount = threadsCount;
+        return this;
     }
 
     /**
-     * Renders the image based on the camera's scene and position.
+     * Renders the image based on the camera's scene and position. with the default
+     * recursion depth of the ray tracer used for the rendering.
      * after executing this method, the image will be rendered inside the image-writer
      * and the image file can be constructed
      *
      * @return the camera itself
      */
-    public Camera renderImage() {
-        int nY = imageWriter.getNy();
-        int nX = imageWriter.getNx();
-        int totalPixels = nY * nX;
-        AtomicInteger completedPixels = new AtomicInteger(0);
-        AtomicInteger lastPrintedProgress = new AtomicInteger(-1);
+    public Camera renderImage(){
+        return renderImage(-1);
+    }
 
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+    /**
+     * Called when a pixel is finished
+     */
+    private void onPixelDone() {
+        //if multi threading is on, submit the next pixel to the render executor
+        if(multiThreadingEnabled){
+            RenderExecutor.Pixel pixel = renderExecutor.nextPixel();
+            if (pixel != null) {
+                renderExecutor.submit(() ->
+                        castRay(nX, nY, pixel.col(), pixel.row())
+                );
+            }
+        }
+        ++completedPixelsCount;
+        printProgress();
+    }
 
-        // Submit tasks for each pixel
-        for (int i = 0; i < nY; ++i) {
-            for (int j = 0; j < nX; ++j) {
-                final int y = i;
-                final int x = j;
-                executor.submit(() -> {
-                    castRay(nX, nY, x, y);
-                    int completed = completedPixels.incrementAndGet();
-                    int progress = (int) ((completed / (double) totalPixels) * 100);
-                    if (lastPrintedProgress.getAndSet(progress) != progress) {
-                        System.out.println("Progress: " + progress + "%");
+    /**
+     * Prints rendering progress according to the camera's progress print mode
+     */
+    private synchronized void printProgress() {
+        int progress = (int) ((completedPixelsCount / (double) totalPixelsCount) * 100);
+        switch (printMode) {
+            case NONE:
+                break;
+            case PROGRESS_ONLY:
+                //only print if there is actual progress change
+                if (progress > this.percentageProgress) {
+                    this.percentageProgress = progress;
+                    System.out.println("Progress: " + progress + "%");
+                }
+                break;
+            case PROGRESS_AND_TIME:
+                // Only print if there is actual progress change
+                if (progress > this.percentageProgress) {
+                    this.percentageProgress = progress;
+
+                    long currentTime = System.currentTimeMillis();
+                    if (lastUpdateTime != 0) {
+                        long timeBetweenCalls = currentTime - lastUpdateTime;
+                        elapsedTime += timeBetweenCalls;
+                        double estimatedTotalTime = (elapsedTime / (double) completedPixelsCount) * totalPixelsCount;
+                        long estimatedRemainingTime = (long) (estimatedTotalTime - elapsedTime);
+
+                        System.out.println("Progress: " + progress + "%, Estimated time remaining: "
+                                + formatTime(estimatedRemainingTime));
                     }
-                });
+
+                    lastUpdateTime = currentTime;
+                }
+                break;
+            case VIDEO_GENERATION:
+                // Handle VIDEO_GENERATION case if needed
+                break;
+        }
+    }
+
+    private String formatTime(long timeInMillis) {
+        long seconds = (timeInMillis / 1000) % 60;
+        long minutes = (timeInMillis / (1000 * 60)) % 60;
+        long hours = (timeInMillis / (1000 * 60 * 60)) % 24;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    /**
+     * Renders the image based on the camera's scene and position. with the given
+     * recursion depth (higher recursion depth = better quality and worse performance).
+     * after executing this method, the image will be rendered inside the image-writer
+     * and the image file can be constructed
+     * @param recursionDepth the maximum recursion depth for calculating reflection and refraction
+     *                       lighting during the rendering phase. highly affects performance.
+     * @return the camera itself
+     */
+    public Camera renderImage(int recursionDepth) {
+        if(recursionDepth != -1)
+            rayTracer.setMaxRecursionDepth(recursionDepth);
+
+        nY = imageWriter.getNy();
+        nX = imageWriter.getNx();
+        totalPixelsCount = nX * nY;
+        completedPixelsCount = 0;
+
+        multiThreadingEnabled = threadsCount > 1;
+
+        //using the executor if multithreading is enabled
+        if(multiThreadingEnabled){
+            renderExecutor = new RenderExecutor(threadsCount, nX, nY);
+            renderExecutor.setPixelCompleteListener(this::onPixelDone);
+
+            int activeThreads = threadsCount;
+            while (activeThreads-- > 0) { //initiate the first pixels
+                RenderExecutor.Pixel pixel = renderExecutor.nextPixel();
+                if (pixel != null) {
+                    renderExecutor.submit(() ->
+                            castRay(nX, nY, pixel.col(), pixel.row())
+                    );
+                }
+            }
+            renderExecutor.start();
+        }else { //no multithreading
+            for (int i = 0; i < nY; ++i) {
+                for (int j = 0; j < nX; ++j) {
+                    final int y = i;
+                    final int x = j;
+                    castRay(nX, nY, x, y);
+                }
             }
         }
 
-        // Shut down the executor and wait for all tasks to complete
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
+        rayTracer.resetMaxRecursionDepth();
         return this;
     }
 
@@ -255,6 +410,7 @@ public class Camera implements Cloneable {
             imageWriter.writePixel(column, row, rayTracer.traceBeam(beam));
         else
             imageWriter.writePixel(column, row, rayTracer.traceRay(beam.getFirst()));
+        onPixelDone();
     }
 
     /**
@@ -302,9 +458,12 @@ public class Camera implements Cloneable {
      *                      'quadraticInterpolate' method description in the point class for a more detailed explanation)
      * @param interpolation the destination point, where the camera should reach at the last frame
      * @param rotation      rotation of the camera throughout all the frames (in degrees). leave 0 for no rotation
+     * @param recursionDepth the recursion depth for lighting calculation for each frame of the video. leave 0 for the
+     *                       default recursion depth of the tracer.
      */
     public void generateVideo(int frames, int startFrom, String name, int nX, int nY, Point focusPoint, Point origin,
-                              Point destination, Point interpolation, double rotation) {
+                              Point destination, Point interpolation, double rotation, int recursionDepth) {
+        printMode = ProgressPrintMode.VIDEO_GENERATION;
         for (int i = startFrom; i < frames; ++i) {
             double positionOnRoute = (double) i / (double) frames;
             String frameName = name + i;
@@ -312,8 +471,33 @@ public class Camera implements Cloneable {
             Point position = Point.quadraticInterpolate(origin, interpolation, destination, positionOnRoute);
             setFocusPoint(position, focusPoint);
             rotate(rotation);
-            renderImage();
+            if(printMode == ProgressPrintMode.VIDEO_GENERATION)
+                System.out.println("Working on frame " + i + " ...");
+
+            if(recursionDepth >= 1)
+                renderImage(recursionDepth);
+            else
+                renderImage();
             writeToImage();
+
+            if(printMode == ProgressPrintMode.VIDEO_GENERATION){
+                int progress = (int) ((i / (double) frames) * 100);
+
+                // Calculate time estimates
+                long currentTime = System.currentTimeMillis();
+                long timeBetweenCalls = currentTime - lastUpdateTime;
+                elapsedTime += timeBetweenCalls;
+
+                double estimatedTotalTime = (elapsedTime / (double) (i - startFrom + 1)) * (frames - startFrom);
+                long estimatedRemainingTime = (long) (estimatedTotalTime - elapsedTime);
+
+                System.out.println("Completed frame " + i + " out of " + frames
+                        + " | Progress: " + progress + "%"
+                        + " | Time taken for last frame: " + formatTime(timeBetweenCalls)
+                        + " | Estimated time remaining: " + formatTime(estimatedRemainingTime));
+
+                lastUpdateTime = currentTime;
+            }
         }
     }
 
@@ -341,6 +525,16 @@ public class Camera implements Cloneable {
         this.vUp = up.crossProduct(vTo).normalize();
         this.vUp = this.vTo.crossProduct(this.vUp).normalize();
         this.vRight = this.vTo.crossProduct(this.vUp).normalize();
+    }
+
+    /**
+     * Set the console print mode of the camera upon rendering progress.
+     * default is: PROGRESS_AND_TIME
+     * @param printMode the print mode for the next render of the camera
+     */
+    public Camera setProgressPrintMode(ProgressPrintMode printMode){
+        this.printMode = printMode;
+        return this;
     }
 
     /**

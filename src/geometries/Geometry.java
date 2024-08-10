@@ -69,4 +69,6 @@ public abstract class Geometry extends Intersectable {
      * @return normalized vector that is perpendicular (orthogonal) to the given point
      */
     public abstract Vector getNormal(Point point);
+
+
 }

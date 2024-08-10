@@ -16,10 +16,7 @@ import static primitives.Util.alignZero;
  */
 public class SimpleRayTracer extends RayTracerBase {
 
-    /**
-     * Static constant for the maximum recursive iterations for each pixel in the ray tracing process
-     */
-    private static final int MAX_CALC_COLOR_LEVEL = 10;
+    public static int counter = 0; //TODO for debugging. to be removed
     /**
      * Static constant for the lowest distinguishable color intensity
      */
@@ -67,7 +64,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * @return the point's color
      */
     private Color calcColor(GeoPoint geoPoint, Vector rayDir) {
-        return calcColor(geoPoint, rayDir, MAX_CALC_COLOR_LEVEL, STARTING_K)
+        return calcColor(geoPoint, rayDir, maxRecursionLevel, STARTING_K)
                 .add(scene.ambientLight.getIntensity());
     }
 
@@ -98,24 +95,41 @@ public class SimpleRayTracer extends RayTracerBase {
     private Color calcGlobalEffects(GeoPoint gp, Vector rayDir, int iterationsLeft, Double3 k) {
         Color color = Color.BLACK;
         Material gpMat = gp.geometry.getMaterial();
-        Double3 kkx = gpMat.kR.product(k);
-        if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
-            //generating a beam of rays in the general reflection direction and adding its average color
-            Ray reflectedRay = constructReflectedRay(gp, rayDir);
-            List<Ray> beam = reflectedRay.generateBeam(GRID_SIZE, gpMat.reflectionBlackboardDiameter,
-                    gpMat.SUPER_SAMPLING_BLACKBOARD_DISTANCE, gpMat.reflectionBlurCasts);
-            color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kR));
-        }
+        //adding reflection
+        Ray reflectedRay = constructReflectedRay(gp, rayDir);
+        color = color.add(calcGlobalEffect(gpMat.kR, reflectedRay, gpMat.SUPER_SAMPLING_BLACKBOARD_DISTANCE,
+                gpMat.reflectionBlackboardDiameter, gpMat.reflectionBlurCasts, k, iterationsLeft));
+        //adding transparency
+        Ray refractedRay = constructRefractedRay(gp, rayDir);
+        color = color.add(calcGlobalEffect(gpMat.kT, refractedRay, gpMat.SUPER_SAMPLING_BLACKBOARD_DISTANCE,
+                gpMat.transparencyBlackboardDiameter, gpMat.transparencyBlurCasts, k, iterationsLeft));
 
-        kkx = gpMat.kT.product(k);
-        if (!kkx.lowerThan(MIN_CALC_COLOR_K)) {
-            //generating a beam of rays in the general refraction direction and adding its average color
-            Ray refractedRay = constructRefractedRay(gp, rayDir);
-            List<Ray> beam = refractedRay.generateBeam(GRID_SIZE, gpMat.transparencyBlackboardDiameter,
-                    gpMat.SUPER_SAMPLING_BLACKBOARD_DISTANCE, gpMat.transparencyBlurCasts);
-            color = color.add(calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(gpMat.kT));
-        }
         return color;
+    }
+
+    /**
+     * Calculate a global effect based on the given parameters (can be either reflection / refraction).
+     * with the use of super-sampling.
+     * @param materialEffectFactor the effect-strength of the material (e.g: if we calculate reflection,
+     *                             it should be the material's kR factor)
+     * @param ray                  the main ray of the effect (reflection / refraction ray)
+     * @param blackBoardDistance the distance of the blackboard from the ray's head point. for super sampling
+     * @param blackboardDiameter the diameter of the blackboard. for super sampling
+     * @param minRayCasts the minimum amount of the ray casts for the super-sampling algorithm
+     * @param k the current color intensity factor, will not perform calculations (return black-color)
+     *          if it gets insignificantly low
+     * @param iterationsLeft the amount of iterations left for the current thread
+     * @return the calculated color intensity of the effect
+     */
+    private Color calcGlobalEffect(Double3 materialEffectFactor, Ray ray, double blackBoardDistance,
+                                   double blackboardDiameter, int minRayCasts, Double3 k, int iterationsLeft){
+        Double3 kkx = materialEffectFactor.product(k);
+        if (!kkx.higherThan(MIN_CALC_COLOR_K))
+            return Color.BLACK;
+        //generating a beam of rays in the general refraction/reflection direction and returning its average color
+        List<Ray> beam = ray.generateBeam(GRID_SIZE, blackboardDiameter,
+                blackBoardDistance, minRayCasts);
+        return calcAverageBeamColor(beam, iterationsLeft - 1, kkx).scale(materialEffectFactor);
     }
 
     /**
@@ -171,9 +185,30 @@ public class SimpleRayTracer extends RayTracerBase {
      * @return the closest intersection point from the given ray-head to objects in the scene,
      * null if the ray intersects nothing
      */
-    private GeoPoint findClosestIntersection(Ray ray) {
+    protected GeoPoint findClosestIntersection(Ray ray) {
         var intersections = scene.geometries.findGeoIntersections(ray);
         return ray.findClosestGeoPoint(intersections);
+    }
+
+    /**
+     * Utility method that gives all the geo-intersection points for the given ray
+     * @param ray a ray to be traced in the scene
+     * @return all the intersection points of the given ray with the scene
+     */
+    protected List<GeoPoint> findGeoIntersections(Ray ray) {
+        return scene.geometries.findGeoIntersections(ray);
+    }
+
+    /**
+     * Utility method that gives all the geo-intersection points for the given ray
+     * within the given distance from the head
+     * @param ray a ray to be traced in the scene
+     * @param maxDistance the maximum distance from the ray's starting point in which
+     *                    to look for intersections
+     * @return all the intersection points of the given ray within the given range
+     */
+    protected List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+        return scene.geometries.findGeoIntersections(ray, maxDistance);
     }
 
     /**
@@ -256,7 +291,7 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector pointToLightVector = l.scale(-1);
         Ray shadingRay = new Ray(gp.point, pointToLightVector, n);
 
-        var intersections = scene.geometries.findGeoIntersections(shadingRay, light.getDistance(gp.point));
+        var intersections = findGeoIntersections(shadingRay, light.getDistance(gp.point));
         if (intersections == null)
             return true;
 
@@ -282,10 +317,10 @@ public class SimpleRayTracer extends RayTracerBase {
         Ray shadingRay = new Ray(gp.point, pointToLightVector, n);
 
         Double3 ktr = Double3.ONE;
-        var intersections = scene.geometries.findGeoIntersections(shadingRay, light.getDistance(gp.point));
+        var intersections = findGeoIntersections(shadingRay, light.getDistance(gp.point));
         if (intersections == null)
             return ktr;
-
+        counter += intersections.size();
         for (GeoPoint intersection : intersections) {
             //summing the transparency factor of all the objects in the way
             ktr = ktr.product(intersection.geometry.getMaterial().kT);

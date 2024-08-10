@@ -5,6 +5,7 @@ import primitives.Ray;
 import primitives.Vector;
 
 import java.util.List;
+import java.util.Objects;
 
 import static primitives.Util.alignZero;
 
@@ -86,6 +87,16 @@ public class Sphere extends RadialGeometry {
     }
 
     @Override
+    public Point getMinCoordinates() {
+        return center.subtract(radius);
+    }
+
+    @Override
+    public Point getMaxCoordinates() {
+        return center.subtract(-radius);
+    }
+
+    @Override
     public Intersectable moveCloneTo(Point position) {
         Sphere cloned = (Sphere) this.getClone();
         if (position.equals(pivot))
@@ -99,5 +110,21 @@ public class Sphere extends RadialGeometry {
     @Override
     public Intersectable cloneAndRotate(Vector rotationAxis, double degrees) {
         return this.getClone();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        // Compare relevant fields in Geometry
+        // Example:
+        Sphere other = (Sphere) obj;
+        return this.radius == other.radius && this.center.equals(other.center);
+    }
+
+    @Override
+    public int hashCode() {
+        // Generate hash code based on relevant fields
+        return Objects.hash(radius, center);
     }
 }
