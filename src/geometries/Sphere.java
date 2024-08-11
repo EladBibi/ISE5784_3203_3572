@@ -1,5 +1,6 @@
 package geometries;
 
+import primitives.BoundingBox;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -94,6 +95,11 @@ public class Sphere extends RadialGeometry {
     @Override
     public Point getMaxCoordinates() {
         return center.subtract(-radius);
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(this, getMinCoordinates(), getMaxCoordinates());
     }
 
     @Override

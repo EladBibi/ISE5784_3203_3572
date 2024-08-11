@@ -80,11 +80,12 @@ public class Point {
     /**
      * Performs unconventional scalar subtraction.
      * subtracts the given scalar from each of the point's x,y,z coordinates
+     *
      * @param d the subtraction scalar factor
      * @return the following point: (x - d, y - d, z - d)
      */
-    public final Point subtract(double d){
-        return new Point(getX() - d, getY() - d, getZ() -d);
+    public final Point subtract(double d) {
+        return new Point(getX() - d, getY() - d, getZ() - d);
     }
 
     /**

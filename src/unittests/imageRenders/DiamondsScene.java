@@ -93,8 +93,10 @@ public class DiamondsScene {
 
     /**
      * Scene builder
+     *
+     * @return collection of geometries that form the scene
      */
-    private Geometries buildScene(){
+    private Geometries buildScene() {
         //big diamond
         Point a1 = new Point(100, 100, 100);
         Point top = new Point(0, 200, 0);

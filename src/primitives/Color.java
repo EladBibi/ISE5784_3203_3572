@@ -43,25 +43,28 @@ public class Color {
 
     /**
      * Getter for the red value of this rgb color
+     *
      * @return the red value of this color
      */
-    public double getRed(){
+    public double getRed() {
         return rgb.d1;
     }
 
     /**
      * Getter for the green value of this rgb color
+     *
      * @return the green value of this color
      */
-    public double getGreen(){
+    public double getGreen() {
         return rgb.d2;
     }
 
     /**
      * Getter for the blue value of this rgb color
+     *
      * @return the blue value of this color
      */
-    public double getBlue(){
+    public double getBlue() {
         return rgb.d3;
     }
 

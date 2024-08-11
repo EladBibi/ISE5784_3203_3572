@@ -16,7 +16,7 @@ public abstract class RayTracerBase {
     /**
      * The default value for the maximum recursive iterations for each pixel in the ray tracing process
      */
-    protected final static int DEFAULT_MAX_RECURSION_DEPTH = 8;
+    protected final static int DEFAULT_MAX_RECURSION_DEPTH = 10;
     /**
      * Maximum recursive iterations number for the current image render
      */
@@ -38,16 +38,17 @@ public abstract class RayTracerBase {
 
     /**
      * Set the maximum recursion depth of the tracer
+     *
      * @param n the required maximum recursion depth value
      */
-    protected void setMaxRecursionDepth(int n){
+    protected void setMaxRecursionDepth(int n) {
         maxRecursionLevel = n;
     }
 
     /**
      * Reset the maximum recursion depth value of the tracer to the default value
      */
-    protected void resetMaxRecursionDepth(){
+    protected void resetMaxRecursionDepth() {
         maxRecursionLevel = DEFAULT_MAX_RECURSION_DEPTH;
     }
 

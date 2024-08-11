@@ -162,7 +162,7 @@ public class Double3 {
      * @return true if all the numbers are higher than the appropriate numbers in
      * other triad, false otherwise
      */
-    public boolean higherThan(Double3 other){
+    public boolean higherThan(Double3 other) {
         return !this.lowerThan(other) && !this.equals(other);
     }
 }

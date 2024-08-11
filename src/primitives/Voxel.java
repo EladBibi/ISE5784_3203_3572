@@ -1,8 +1,7 @@
 package primitives;
 
-import geometries.Geometries;
 import geometries.Geometry;
-import geometries.Intersectable.*;
+import geometries.Intersectable.GeoPoint;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,21 +18,22 @@ public class Voxel {
     /**
      * Constructor that initializes the geometries collection of the voxel
      */
-    public Voxel(){
+    public Voxel() {
         geometries = new LinkedList<>();
     }
 
     /**
      * Trace the given ray through the geometries of this voxel and give all the found intersections
+     *
      * @param ray         a ray for the tracin
      * @param maxDistance the maximum distance from the ray's head point we should look for intersections
      * @return a collection of the found intersection point between the ray and this voxel's geometries
      */
-    public List<GeoPoint> findGeoIntersections(Ray ray, Double maxDistance){
+    public List<GeoPoint> findGeoIntersections(Ray ray, Double maxDistance) {
         List<GeoPoint> intersections = new LinkedList<>();
-        for(Geometry geometry : geometries){
+        for (Geometry geometry : geometries) {
             List<GeoPoint> geoPoints = geometry.findGeoIntersections(ray, maxDistance);
-            if(geoPoints != null)
+            if (geoPoints != null)
                 intersections.addAll(geoPoints);
         }
         return intersections.isEmpty() ? null : intersections;

@@ -1,5 +1,6 @@
 package geometries;
 
+import primitives.BoundingBox;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -135,12 +136,12 @@ public class Polygon extends Geometry {
         double x = Double.MAX_VALUE;
         double y = Double.MAX_VALUE;
         double z = Double.MAX_VALUE;
-        for (Point point : vertices){
+        for (Point point : vertices) {
             x = point.getX() < x ? point.getX() : x;
             y = point.getY() < y ? point.getY() : y;
             z = point.getZ() < z ? point.getZ() : z;
         }
-        return new Point(x,y,z);
+        return new Point(x, y, z);
     }
 
     @Override
@@ -148,12 +149,17 @@ public class Polygon extends Geometry {
         double x = Double.MIN_VALUE;
         double y = Double.MIN_VALUE;
         double z = Double.MIN_VALUE;
-        for (Point point : vertices){
+        for (Point point : vertices) {
             x = point.getX() > x ? point.getX() : x;
             y = point.getY() > y ? point.getY() : y;
             z = point.getZ() > z ? point.getZ() : z;
         }
-        return new Point(x,y,z);
+        return new Point(x, y, z);
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(this, getMinCoordinates(), getMaxCoordinates());
     }
 
     @Override

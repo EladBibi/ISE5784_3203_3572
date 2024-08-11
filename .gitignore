@@ -3,7 +3,6 @@ doc/
 images/
 videos/
 calibration/
-unittests/imageRenders/LandscapeScene
 
 # Compiled class file
 *.class
@@ -32,3 +31,4 @@ replay_pid*
 
 Questions.txt
 /temp/
+/src/unittests/imageRenders/LandscapeScene.java

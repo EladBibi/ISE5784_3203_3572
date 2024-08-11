@@ -1,9 +1,6 @@
 package geometries;
 
-import primitives.Point;
-import primitives.Ray;
-import primitives.Util;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +15,11 @@ import static primitives.Util.isZero;
  */
 public class Plane extends Geometry {
 
-    private final double DISTANCE = 99999;
+    /**
+     * Used for creating a bounding box for the plane. since the plane stretches up to infinity,
+     * we will create a bounding box with this diameter that will contain a portion of the plane.
+     */
+    private static final double BOUNDING_BOX_DIAMETER = 5000;
 
     /**
      * A point on the plane
@@ -27,7 +28,7 @@ public class Plane extends Geometry {
     /**
      * A normal vector to the plane
      */
-    private Vector normal;
+    private final Vector normal;
 
     /**
      * Constructor that initializes the plane from the three given unique points
@@ -105,12 +106,17 @@ public class Plane extends Geometry {
 
     @Override
     public Point getMinCoordinates() {
-        return q.subtract(DISTANCE);
+        return q.subtract(BOUNDING_BOX_DIAMETER);
     }
 
     @Override
     public Point getMaxCoordinates() {
-        return q.subtract(-DISTANCE);
+        return q.subtract(-BOUNDING_BOX_DIAMETER);
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(this, getMinCoordinates(), getMaxCoordinates());
     }
 
     @Override

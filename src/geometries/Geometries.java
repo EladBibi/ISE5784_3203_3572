@@ -101,12 +101,13 @@ public class Geometries extends Intersectable {
     /**
      * Calculates the amount of individual geometry objects contained within
      * this geometries container object
+     *
      * @return the amount of individual geometry objects contained within this object
      */
-    public int getGeometriesCount(){
+    public int getGeometriesCount() {
         int counter = 0;
-        for (Intersectable geometry : geometries){
-            if(geometry instanceof Geometries)
+        for (Intersectable geometry : geometries) {
+            if (geometry instanceof Geometries)
                 counter += ((Geometries) geometry).getGeometriesCount();
             else
                 ++counter;
@@ -116,18 +117,17 @@ public class Geometries extends Intersectable {
 
     /**
      * Calculates the bounding boxes of all the geometry objects contained within this object
+     *
      * @return a collection of all the bounding boxes of all the geometry objects that are
      * inside this object (one box for each geometry object)
      */
-    public List<BoundingBox> getAllBoundingBoxes(){
+    public List<BoundingBox> getAllBoundingBoxes() {
         List<BoundingBox> boxes = new LinkedList<>();
-        for (Intersectable geometry : geometries){
-            if(geometry instanceof Geometries)
+        for (Intersectable geometry : geometries) {
+            if (geometry instanceof Geometries)
                 boxes.addAll(((Geometries) geometry).getAllBoundingBoxes());
             else {
-                BoundingBox boundingBox = new BoundingBox((Geometry) geometry,
-                        geometry.getMinCoordinates(), geometry.getMaxCoordinates());
-                boxes.add(boundingBox);
+                boxes.add(((Geometry) geometry).getBoundingBox());
             }
         }
         return boxes;
@@ -138,13 +138,13 @@ public class Geometries extends Intersectable {
         double x = Double.MAX_VALUE;
         double y = Double.MAX_VALUE;
         double z = Double.MAX_VALUE;
-        for (Intersectable geometry : geometries){
+        for (Intersectable geometry : geometries) {
             Point geoMin = geometry.getMinCoordinates();
             x = geoMin.getX() < x ? geoMin.getX() : x;
             y = geoMin.getY() < y ? geoMin.getY() : y;
             z = geoMin.getZ() < z ? geoMin.getZ() : z;
         }
-        return new Point(x,y,z);
+        return new Point(x, y, z);
     }
 
     @Override
@@ -152,13 +152,13 @@ public class Geometries extends Intersectable {
         double x = Double.MIN_VALUE;
         double y = Double.MIN_VALUE;
         double z = Double.MIN_VALUE;
-        for (Intersectable geometry : geometries){
+        for (Intersectable geometry : geometries) {
             Point geoMax = geometry.getMaxCoordinates();
             x = geoMax.getX() > x ? geoMax.getX() : x;
             y = geoMax.getY() > y ? geoMax.getY() : y;
             z = geoMax.getZ() > z ? geoMax.getZ() : z;
         }
-        return new Point(x,y,z);
+        return new Point(x, y, z);
     }
 
     @Override

@@ -26,12 +26,24 @@ public class Camera implements Cloneable {
      * Options for different print configuration for image rendering progress
      */
     public enum ProgressPrintMode {
+        /**
+         * No progress prints
+         */
         NONE,
+        /**
+         * For each pixel-completion, print overall progress
+         */
         PROGRESS_ONLY,
+        /**
+         * For each pixel-completion, print overall progress and estimated remaining time
+         */
         PROGRESS_AND_TIME,
+        /**
+         * Will automatically be used when generating a video. otherwise, irrelevant
+         */
         VIDEO_GENERATION;
-
     }
+
     /**
      * Progress print mode of the camera
      */
@@ -93,9 +105,9 @@ public class Camera implements Cloneable {
     private int threadsCount = 0;
 
     /**
-     * Executor for the rendering in parallelization
+     * Executor for the rendering of pixels in parallelization
      */
-    private RenderExecutor renderExecutor;
+    private PixelExecutor pixelExecutor;
 
     /**
      * Determines if multithreading is enabled
@@ -263,8 +275,15 @@ public class Camera implements Cloneable {
                 gridSize, Double.min(rY, rX), position.distance(pIJ), antiAliasingRayCasts, vTo);
     }
 
-    public Camera enableMultiThreading(int threadsCount){
-        if(threadsCount <= 0)
+    /**
+     * Enable multithreading for the camera. significantly boosts performance.
+     * due to memory bottleneck, there is usually no performance-gain in using more than 5 threads.
+     *
+     * @param threadsCount the amount of threads the camera is allowed to use
+     * @return the camera object itself
+     */
+    public Camera enableMultiThreading(int threadsCount) {
+        if (threadsCount <= 0)
             throw new IllegalArgumentException("Threads count must be 1 or higher");
         this.threadsCount = threadsCount;
         return this;
@@ -278,19 +297,19 @@ public class Camera implements Cloneable {
      *
      * @return the camera itself
      */
-    public Camera renderImage(){
+    public Camera renderImage() {
         return renderImage(-1);
     }
 
     /**
-     * Called when a pixel is finished
+     * Called when a pixel is finished rendering
      */
     private void onPixelDone() {
         //if multi threading is on, submit the next pixel to the render executor
-        if(multiThreadingEnabled){
-            RenderExecutor.Pixel pixel = renderExecutor.nextPixel();
+        if (multiThreadingEnabled) {
+            PixelExecutor.Pixel pixel = pixelExecutor.nextPixel();
             if (pixel != null) {
-                renderExecutor.submit(() ->
+                pixelExecutor.submit(() ->
                         castRay(nX, nY, pixel.col(), pixel.row())
                 );
             }
@@ -315,7 +334,7 @@ public class Camera implements Cloneable {
                 }
                 break;
             case PROGRESS_AND_TIME:
-                // Only print if there is actual progress change
+                //only print if there is actual progress change
                 if (progress > this.percentageProgress) {
                     this.percentageProgress = progress;
 
@@ -334,11 +353,16 @@ public class Camera implements Cloneable {
                 }
                 break;
             case VIDEO_GENERATION:
-                // Handle VIDEO_GENERATION case if needed
                 break;
         }
     }
 
+    /**
+     * Gives a proper timestamp string from the time given in milliseconds
+     *
+     * @param timeInMillis time in milliseconds
+     * @return a proper timestamp string in the format: hh:mm:ss
+     */
     private String formatTime(long timeInMillis) {
         long seconds = (timeInMillis / 1000) % 60;
         long minutes = (timeInMillis / (1000 * 60)) % 60;
@@ -352,12 +376,13 @@ public class Camera implements Cloneable {
      * recursion depth (higher recursion depth = better quality and worse performance).
      * after executing this method, the image will be rendered inside the image-writer
      * and the image file can be constructed
+     *
      * @param recursionDepth the maximum recursion depth for calculating reflection and refraction
      *                       lighting during the rendering phase. highly affects performance.
      * @return the camera itself
      */
     public Camera renderImage(int recursionDepth) {
-        if(recursionDepth != -1)
+        if (recursionDepth != -1)
             rayTracer.setMaxRecursionDepth(recursionDepth);
 
         nY = imageWriter.getNy();
@@ -368,21 +393,21 @@ public class Camera implements Cloneable {
         multiThreadingEnabled = threadsCount > 1;
 
         //using the executor if multithreading is enabled
-        if(multiThreadingEnabled){
-            renderExecutor = new RenderExecutor(threadsCount, nX, nY);
-            renderExecutor.setPixelCompleteListener(this::onPixelDone);
+        if (multiThreadingEnabled) {
+            pixelExecutor = new PixelExecutor(threadsCount, nX, nY);
+            pixelExecutor.setPixelCompleteListener(this::onPixelDone);
 
             int activeThreads = threadsCount;
             while (activeThreads-- > 0) { //initiate the first pixels
-                RenderExecutor.Pixel pixel = renderExecutor.nextPixel();
+                PixelExecutor.Pixel pixel = pixelExecutor.nextPixel();
                 if (pixel != null) {
-                    renderExecutor.submit(() ->
+                    pixelExecutor.submit(() ->
                             castRay(nX, nY, pixel.col(), pixel.row())
                     );
                 }
             }
-            renderExecutor.start();
-        }else { //no multithreading
+            pixelExecutor.render();
+        } else { //no multithreading
             for (int i = 0; i < nY; ++i) {
                 for (int j = 0; j < nX; ++j) {
                     final int y = i;
@@ -445,19 +470,19 @@ public class Camera implements Cloneable {
     /**
      * Generate multiple frames along a given bezier-curve which can than be combined into a video
      *
-     * @param frames        the total amount of frames that will be generated for this video
-     * @param startFrom     the frame to start from, relevant if we already generated some frames in the past.
-     *                      since the camera positioning is recalculated every single frame independently, as long as the rest
-     *                      of the input parameters are the same, we can continue to generate frames from where we stopped
-     * @param name          the name of the frames, each frame-image will be named with a running index-number: "name + (frame-number)"
-     * @param nX            horizontal resolution (pixel count)
-     * @param nY            vertical resolution (pixel count)
-     * @param focusPoint    the point which the camera will focus at throughout all the frames
-     * @param origin        the origin point, where the camera will start from at the first frame
-     * @param destination   interpolation point for forming a bezier-curve on which the camera will move (see the
-     *                      'quadraticInterpolate' method description in the point class for a more detailed explanation)
-     * @param interpolation the destination point, where the camera should reach at the last frame
-     * @param rotation      rotation of the camera throughout all the frames (in degrees). leave 0 for no rotation
+     * @param frames         the total amount of frames that will be generated for this video
+     * @param startFrom      the frame to start from, relevant if we already generated some frames in the past.
+     *                       since the camera positioning is recalculated every single frame independently, as long as the rest
+     *                       of the input parameters are the same, we can continue to generate frames from where we stopped
+     * @param name           the name of the frames, each frame-image will be named with a running index-number: "name + (frame-number)"
+     * @param nX             horizontal resolution (pixel count)
+     * @param nY             vertical resolution (pixel count)
+     * @param focusPoint     the point which the camera will focus at throughout all the frames
+     * @param origin         the origin point, where the camera will start from at the first frame
+     * @param destination    interpolation point for forming a bezier-curve on which the camera will move (see the
+     *                       'quadraticInterpolate' method description in the point class for a more detailed explanation)
+     * @param interpolation  the destination point, where the camera should reach at the last frame
+     * @param rotation       rotation of the camera throughout all the frames (in degrees). leave 0 for no rotation
      * @param recursionDepth the recursion depth for lighting calculation for each frame of the video. leave 0 for the
      *                       default recursion depth of the tracer.
      */
@@ -471,16 +496,16 @@ public class Camera implements Cloneable {
             Point position = Point.quadraticInterpolate(origin, interpolation, destination, positionOnRoute);
             setFocusPoint(position, focusPoint);
             rotate(rotation);
-            if(printMode == ProgressPrintMode.VIDEO_GENERATION)
+            if (printMode == ProgressPrintMode.VIDEO_GENERATION)
                 System.out.println("Working on frame " + i + " ...");
 
-            if(recursionDepth >= 1)
+            if (recursionDepth >= 1)
                 renderImage(recursionDepth);
             else
                 renderImage();
             writeToImage();
 
-            if(printMode == ProgressPrintMode.VIDEO_GENERATION){
+            if (printMode == ProgressPrintMode.VIDEO_GENERATION) {
                 int progress = (int) ((i / (double) frames) * 100);
 
                 // Calculate time estimates
@@ -530,9 +555,11 @@ public class Camera implements Cloneable {
     /**
      * Set the console print mode of the camera upon rendering progress.
      * default is: PROGRESS_AND_TIME
+     *
      * @param printMode the print mode for the next render of the camera
+     * @return the camera object itself
      */
-    public Camera setProgressPrintMode(ProgressPrintMode printMode){
+    public Camera setProgressPrintMode(ProgressPrintMode printMode) {
         this.printMode = printMode;
         return this;
     }

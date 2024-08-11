@@ -1,5 +1,6 @@
 package geometries;
 
+import primitives.BoundingBox;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -55,6 +56,11 @@ public class Tube extends RadialGeometry {
 
     @Override
     public Point getMaxCoordinates() {
+        return null;
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
         return null;
     }
 

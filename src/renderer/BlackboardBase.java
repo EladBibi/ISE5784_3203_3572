@@ -14,23 +14,23 @@ public abstract class BlackboardBase {
     /**
      * The diameter of the 2D blackboard (the size of each side)
      */
-    protected double diameter;
+    protected final double diameter;
 
     /**
      * The center point of the blackboard
      */
-    protected Point center;
+    protected final Point center;
 
     /**
      * The vector representing the up direction of the blackboard
      */
-    protected Vector up;
+    protected final Vector up;
 
     /**
      * The vector representing the right direction of the blackboard.
      * together with the up vector, we can represent a 2D blackboard
      */
-    protected Vector right;
+    protected final Vector right;
 
     /**
      * Constructor that initializes a blackboard with diameter, center point and 2D direction vectors

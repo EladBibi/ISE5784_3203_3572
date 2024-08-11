@@ -16,7 +16,6 @@ import static primitives.Util.alignZero;
  */
 public class SimpleRayTracer extends RayTracerBase {
 
-    public static int counter = 0; //TODO for debugging. to be removed
     /**
      * Static constant for the lowest distinguishable color intensity
      */
@@ -110,19 +109,20 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Calculate a global effect based on the given parameters (can be either reflection / refraction).
      * with the use of super-sampling.
+     *
      * @param materialEffectFactor the effect-strength of the material (e.g: if we calculate reflection,
      *                             it should be the material's kR factor)
      * @param ray                  the main ray of the effect (reflection / refraction ray)
-     * @param blackBoardDistance the distance of the blackboard from the ray's head point. for super sampling
-     * @param blackboardDiameter the diameter of the blackboard. for super sampling
-     * @param minRayCasts the minimum amount of the ray casts for the super-sampling algorithm
-     * @param k the current color intensity factor, will not perform calculations (return black-color)
-     *          if it gets insignificantly low
-     * @param iterationsLeft the amount of iterations left for the current thread
+     * @param blackBoardDistance   the distance of the blackboard from the ray's head point. for super sampling
+     * @param blackboardDiameter   the diameter of the blackboard. for super sampling
+     * @param minRayCasts          the minimum amount of the ray casts for the super-sampling algorithm
+     * @param k                    the current color intensity factor, will not perform calculations (return black-color)
+     *                             if it gets insignificantly low
+     * @param iterationsLeft       the amount of iterations left for the current thread
      * @return the calculated color intensity of the effect
      */
     private Color calcGlobalEffect(Double3 materialEffectFactor, Ray ray, double blackBoardDistance,
-                                   double blackboardDiameter, int minRayCasts, Double3 k, int iterationsLeft){
+                                   double blackboardDiameter, int minRayCasts, Double3 k, int iterationsLeft) {
         Double3 kkx = materialEffectFactor.product(k);
         if (!kkx.higherThan(MIN_CALC_COLOR_K))
             return Color.BLACK;
@@ -192,6 +192,7 @@ public class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Utility method that gives all the geo-intersection points for the given ray
+     *
      * @param ray a ray to be traced in the scene
      * @return all the intersection points of the given ray with the scene
      */
@@ -202,7 +203,8 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * Utility method that gives all the geo-intersection points for the given ray
      * within the given distance from the head
-     * @param ray a ray to be traced in the scene
+     *
+     * @param ray         a ray to be traced in the scene
      * @param maxDistance the maximum distance from the ray's starting point in which
      *                    to look for intersections
      * @return all the intersection points of the given ray within the given range
@@ -320,7 +322,6 @@ public class SimpleRayTracer extends RayTracerBase {
         var intersections = findGeoIntersections(shadingRay, light.getDistance(gp.point));
         if (intersections == null)
             return ktr;
-        counter += intersections.size();
         for (GeoPoint intersection : intersections) {
             //summing the transparency factor of all the objects in the way
             ktr = ktr.product(intersection.geometry.getMaterial().kT);

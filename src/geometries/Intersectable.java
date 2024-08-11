@@ -1,6 +1,5 @@
 package geometries;
 
-import primitives.Double3;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -41,13 +40,6 @@ public abstract class Intersectable extends Movable implements Cloneable {
             this.point = point;
         }
 
-//        @Override
-//        public boolean equals(Object obj) {//TODO clean up
-//            if (this == obj) return true;
-//            return (obj instanceof GeoPoint other)
-//                    && this.point.equals(other.point)
-//                    && this.geometry == other.geometry;
-//        }
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true; // Check if both references are identical
@@ -129,12 +121,14 @@ public abstract class Intersectable extends Movable implements Cloneable {
 
     /**
      * Calculates the minimum (lowest) x,y,z coordinates of this geometry object
+     *
      * @return the minimum (lowest) x,y,z coordinates of this geometry object
      */
     public abstract Point getMinCoordinates();
 
     /**
      * Calculates the maximum (highest) x,y,z coordinates of this geometry object
+     *
      * @return the maximum (highest) x,y,z coordinates of this geometry object
      */
     public abstract Point getMaxCoordinates();

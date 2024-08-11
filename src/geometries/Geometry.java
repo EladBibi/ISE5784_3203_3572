@@ -1,9 +1,6 @@
 package geometries;
 
-import primitives.Color;
-import primitives.Material;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
 
 /**
  * Interface that represents a geometry object in a three-dimensional space
@@ -70,5 +67,10 @@ public abstract class Geometry extends Intersectable {
      */
     public abstract Vector getNormal(Point point);
 
-
+    /**
+     * Get the bounding box that contains this geometry object
+     *
+     * @return the bounding box that contains this geometry object
+     */
+    public abstract BoundingBox getBoundingBox();
 }

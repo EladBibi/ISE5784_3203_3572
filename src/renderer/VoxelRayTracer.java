@@ -5,10 +5,12 @@ import geometries.Geometry;
 import geometries.Intersectable.GeoPoint;
 import geometries.Polygon;
 import primitives.*;
-import primitives.Vector;
 import scene.Scene;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Voxel-based ray tracer. performs ray tracing using the technique of ray marching through a voxel-grid.
@@ -18,12 +20,12 @@ public class VoxelRayTracer extends SimpleRayTracer {
     /**
      * The maximum cubic dimensions allowed for the scene's bounding box
      */
-    private final double MAX_DIAMETER = 9000;
+    private static final double MAX_SCENE_DIAMETER = 9000;
     /**
      * The ratio between voxels to geometries in the scene.
      * determines how many voxels should be created for each geometry (in average). default is one
      */
-    private final double voxelToGeometryRatio = 1d;
+    private static final double VOXEL_TO_GEOMETRY_RATIO = 3d;
 
     /**
      * The three-dimensional voxels grid
@@ -100,9 +102,10 @@ public class VoxelRayTracer extends SimpleRayTracer {
      */
     private void divideScene() {
         //setting the bounding box of the scene
-        sceneBoxMin = scene.geometries.getMinCoordinates();//todo limit scene's box size
+        sceneBoxMin = scene.geometries.getMinCoordinates();
         sceneBoxMax = scene.geometries.getMaxCoordinates();
-
+        //ensuring the scene's bounding box is not too large
+        ensureSceneSizeLimit();
         //caching fields for later uses
         sceneBoxMinX = sceneBoxMin.getX();
         sceneBoxMinY = sceneBoxMin.getY();
@@ -116,8 +119,8 @@ public class VoxelRayTracer extends SimpleRayTracer {
 
         int totalGeometries = scene.geometries.getGeometriesCount();
 
-        //calculating the total voxels in the voxels grid
-        double totalVoxels = totalGeometries * voxelToGeometryRatio;
+        //calculating the total voxels to be in the voxels grid
+        double totalVoxels = totalGeometries * VOXEL_TO_GEOMETRY_RATIO;
 
         //calculating the amount of voxels for each axis dimension,
         // which is root 3 of the totalVoxels
@@ -130,9 +133,9 @@ public class VoxelRayTracer extends SimpleRayTracer {
         voxels = new Voxel[numVoxelsX][numVoxelsY][numVoxelsZ];
 
         System.out.println("Voxel grid was created with size " + (dimensionVoxelCount)
-                + ". total voxels: " + (dimensionVoxelCount) + "^3 = " + (int)Math.pow(dimensionVoxelCount, 3));
+                + ". total voxels: " + (dimensionVoxelCount) + "^3 = " + (int) Math.pow(dimensionVoxelCount, 3));
 
-        //dimensions of each voxel-box
+        //size in each dimension of each voxel-box
         voxelSizeX = (sceneBoxMax.getX() - sceneBoxMin.getX()) / numVoxelsX;
         voxelSizeY = (sceneBoxMax.getY() - sceneBoxMin.getY()) / numVoxelsY;
         voxelSizeZ = (sceneBoxMax.getZ() - sceneBoxMin.getZ()) / numVoxelsZ;
@@ -143,9 +146,9 @@ public class VoxelRayTracer extends SimpleRayTracer {
 
         //iterating through all the geometries in the scene and sorting them into their voxels
         List<BoundingBox> boundingBoxes = scene.geometries.getAllBoundingBoxes();
-        for (BoundingBox bBox : boundingBoxes) {
-            Point geoMin = bBox.getMinCoords();
-            Point geoMax = bBox.getMaxCoords();
+        for (BoundingBox boundingBox : boundingBoxes) {
+            Point geoMin = boundingBox.getMinCoords();
+            Point geoMax = boundingBox.getMaxCoords();
 
             //the voxel indexes of the current geometry
             int minIndexX = (int) Math.floor((geoMin.getX() - sceneBoxMin.getX()) / voxelSizeX);
@@ -156,11 +159,11 @@ public class VoxelRayTracer extends SimpleRayTracer {
             int maxIndexZ = (int) Math.ceil((geoMax.getZ() - sceneBoxMin.getZ()) / voxelSizeZ);
 
             //adding the current geometry to the proper voxels
-            Geometry geometry = bBox.getGeometry();
+            Geometry geometry = boundingBox.getGeometry();
             for (int x = minIndexX; x < maxIndexX && x < numVoxelsX && x >= 0; ++x) {
                 for (int y = minIndexY; y < maxIndexY && y < numVoxelsY && y >= 0; ++y) {
                     for (int z = minIndexZ; z < maxIndexZ && z < numVoxelsZ && z >= 0; ++z) {
-                        //instantiating a voxel
+                        //instantiating a voxel if it's the first time
                         if (voxels[x][y][z] == null) {
                             voxels[x][y][z] = new Voxel();
                             ++occupiedVoxelsCount;
@@ -175,6 +178,29 @@ public class VoxelRayTracer extends SimpleRayTracer {
 
         System.out.println("Distributed " + totalGeometries + " objects into " + occupiedVoxelsCount + " voxels\n"
                 + "Average objects in each voxel: " + (double) objectsInVoxelsCount / occupiedVoxelsCount);
+    }
+
+    /**
+     * Ensures that the scene's bounding box is within the specified max diameter on each dimension.
+     * should be called after the initialization of the scene's min and max coordinate point, and before
+     * the division of the scene into voxels. if the scene's bounding box is larger than the max diameter value
+     * of the tracer, the method will cut the needed portion from the bounding box while keeping it centered
+     * around the same center point
+     */
+    private void ensureSceneSizeLimit() {
+        //size of each dimension
+        double sizeX = (sceneBoxMax.getX() - sceneBoxMin.getX());
+        double sizeY = (sceneBoxMax.getY() - sceneBoxMin.getY());
+        double sizeZ = (sceneBoxMax.getZ() - sceneBoxMin.getZ());
+        //center point of the scene
+        Point center = new Point(sceneBoxMin.getX() + sizeX / 2d, sceneBoxMin.getY() + sizeY / 2d, sceneBoxMin.getZ() + sizeZ / 2d);
+        //ensure sizes are within the limit
+        sizeX = Math.min(sizeX, MAX_SCENE_DIAMETER);
+        sizeY = Math.min(sizeY, MAX_SCENE_DIAMETER);
+        sizeZ = Math.min(sizeZ, MAX_SCENE_DIAMETER);
+        //recalculate the scene's bounding box
+        sceneBoxMin = new Point(center.getX() - sizeX / 2, center.getY() - sizeY / 2, center.getZ() - sizeZ / 2);
+        sceneBoxMax = new Point(center.getX() + sizeX / 2, center.getY() + sizeY / 2, center.getZ() + sizeZ / 2);
     }
 
     @Override
@@ -241,7 +267,7 @@ public class VoxelRayTracer extends SimpleRayTracer {
             startingVoxelPoint = ray.getPoint(d + 0.1);
         }
 
-        //calculate the indexes first voxel
+        //calculate the indexes of the first voxel
         Point currentVoxelIndex = getVoxelIndex(startingVoxelPoint);
         int voxelX = (int) currentVoxelIndex.getX();
         int voxelY = (int) currentVoxelIndex.getY();
@@ -253,10 +279,9 @@ public class VoxelRayTracer extends SimpleRayTracer {
         double tDeltaZ = stepZ != 0 ? Math.abs(voxelSizeZ * invDir.getZ()) : Double.POSITIVE_INFINITY;
 
         //tMax is the jumping interval for the ray's traversal in the grid
-        double tMaxX = getTMax(head.getX(), dir.getX(), sceneBoxMin.getX(), voxelSizeX, voxelX, stepX);
-        double tMaxY = getTMax(head.getY(), dir.getY(), sceneBoxMin.getY(), voxelSizeY, voxelY, stepY);
-        double tMaxZ = getTMax(head.getZ(), dir.getZ(), sceneBoxMin.getZ(), voxelSizeZ, voxelZ, stepZ);
-        double tMaxLimit = maxDistance;
+        double tMaxX = getTMax(head.getX(), dir.getX(), sceneBoxMinX, voxelSizeX, voxelX, stepX);
+        double tMaxY = getTMax(head.getY(), dir.getY(), sceneBoxMinY, voxelSizeY, voxelY, stepY);
+        double tMaxZ = getTMax(head.getZ(), dir.getZ(), sceneBoxMinZ, voxelSizeZ, voxelZ, stepZ);
 
         Set<GeoPoint> uniqueIntersections = new HashSet<>();
         //traversing the ray through the voxel grid
@@ -264,8 +289,8 @@ public class VoxelRayTracer extends SimpleRayTracer {
                 voxelY >= 0 && voxelY < voxels[0].length &&
                 voxelZ >= 0 && voxelZ < voxels[0][0].length) {
 
-            // Check if the ray has traveled beyond the maxDistance
-            if (tMaxX > tMaxLimit && tMaxY > tMaxLimit && tMaxZ > tMaxLimit) {
+            //checking if the ray has traveled beyond the maxDistance
+            if (tMaxX > maxDistance && tMaxY > maxDistance && tMaxZ > maxDistance) {
                 break;
             }
 
@@ -345,15 +370,15 @@ public class VoxelRayTracer extends SimpleRayTracer {
     }
 
     /**
-     * Get a voxel-indexes inside the voxels-grid of the voxel that contains the given point.
+     * Get voxel indexes of the voxel that contains the given point inside the 3-dimensional voxels-grid.
      *
      * @param point represents a point inside the voxels-grid
      * @return a point representing the x,y,z indexes of the voxel which contains the given point
      */
     private Point getVoxelIndex(Point point) {
-        int xIndex = (int) Math.floor((point.getX() - sceneBoxMin.getX()) / voxelSizeX);
-        int yIndex = (int) Math.floor((point.getY() - sceneBoxMin.getY()) / voxelSizeY);
-        int zIndex = (int) Math.floor((point.getZ() - sceneBoxMin.getZ()) / voxelSizeZ);
+        int xIndex = (int) Math.floor((point.getX() - sceneBoxMinX) / voxelSizeX);
+        int yIndex = (int) Math.floor((point.getY() - sceneBoxMinY) / voxelSizeY);
+        int zIndex = (int) Math.floor((point.getZ() - sceneBoxMinZ) / voxelSizeZ);
         return new Point(xIndex, yIndex, zIndex);
     }
 

@@ -1,7 +1,9 @@
 package imageRenders;
 
 import geometries.*;
-import lighting.*;
+import lighting.DirectionalLight;
+import lighting.PointLight;
+import lighting.SpotLight;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
@@ -13,11 +15,6 @@ import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
 import renderer.VoxelRayTracer;
 import scene.Scene;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Image renders for the 'mini-project stage 1'
@@ -67,27 +64,22 @@ public class ChessScene {
     /**
      * Position of the moon through the window
      */
-    private final Point moonPosition = new Point(3100, -1100, 5000);
+    private final Point moonPosition = new Point(-500, 100, 1200);
     /**
      * Radius of the moon (moon size)
      */
-    private double moonRadius = 130d;
+    private final double moonRadius = 10;
 
     /**
      * Generate a video
      */
     @Test
     @Disabled
-    public void video() {
+    public void videoGeneration() {
         scene.setGeometries(buildScene());
         scene.setLights(
-//                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
-//                new SpotLight(new Color(38, 36, 97), new Point(100, 100, -200), new Point(450, 0, 450))
-                //new DirectionalLight(new Color(105, 82, 42), new Vector(-0.7,-0.2, 1))
                 new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001)
-//                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
-//                        .setKq(0.0000001)
         );
         cameraBuilder
                 .setRayTracer(new VoxelRayTracer(scene))
@@ -97,8 +89,8 @@ public class ChessScene {
                 .setImageWriter(new ImageWriter(directoryName + "video 1/frame ", 800, 450))
                 .build()
                 .enableMultiThreading(5)
-                .generateVideo(100,83, directoryName + "video 1/frame ", 1280, 720,new Point(425, 65, 450), new Point(-900, 1450, -2200),
-                        new Point(-1900, 250, -700),new Point(-2000, 750, -2200),0,6);
+                .generateVideo(100, 83, directoryName + "video 1/frame ", 1280, 720, new Point(425, 65, 450), new Point(-900, 1450, -2200),
+                        new Point(-1900, 250, -700), new Point(-2000, 750, -2200), 0, 6);
     }
 
     /**
@@ -197,53 +189,118 @@ public class ChessScene {
      */
     @Test
     @Disabled
-    public void simpleRender(){
+    public void simpleRender() {
         scene.setGeometries(buildScene());
         scene.setLights(
-//                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
-                //new SpotLight(new Color(55, 97, 117), new Point(-200, 80, -200), new Point(450, 0, 450)),
-                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8,-0.3, 1))
-//                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
-//                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
-//                        .setKq(0.0000001)
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
         );
         cameraBuilder
                 .setRayTracer(new SimpleRayTracer(scene))
                 .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "simple tracer - no effects", 1280, 720))
+                .setImageWriter(new ImageWriter(directoryName + "simple tracer, multithreading - no effects", 1280, 720))
                 .build()
                 .enableMultiThreading(5)
-                .renderImage(10)
+                .renderImage(7)
                 .writeToImage();
     }
+
     /**
      * Test Render of the scene with different setting presets
      */
     @Test
     @Disabled
-    public void voxelRender(){
+    public void voxelRender() {
         scene.setGeometries(buildScene());
         scene.setLights(
-//                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
-                //new SpotLight(new Color(55, 97, 117), new Point(-200, 80, -200), new Point(450, 0, 450)),
-                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8,-0.3, 1))
-//                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
-//                new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
-//                        .setKq(0.0000001)
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
         );
         cameraBuilder
                 .setRayTracer(new VoxelRayTracer(scene))
                 .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
                 .setVpDistance(600)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "voxel tracer - no effects", 1280, 720))
+                .setImageWriter(new ImageWriter(directoryName + "voxel tracer, multithreading - no effects", 1280, 720))
                 .build()
                 .enableMultiThreading(5)
-                .renderImage(10)
+                .renderImage(7)
+                .writeToImage();
+    }
+
+    /**
+     * Test Render of the scene with different setting presets
+     */
+    @Test
+    @Disabled
+    public void voxelRenderWithEffects() {
+        boardMat.setReflectionBlur(1.6, 81);
+
+        scene.setGeometries(buildScene());
+        scene.setLights(
+                new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
+        );
+        cameraBuilder
+                .setRayTracer(new VoxelRayTracer(scene))
+                .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
+                .setVpDistance(600)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "voxel tracer, multithreading - aa 9, reflectiveness 81", 1280, 720))
+                .build()
+                .enableAntiAliasing(3, 9)
+                .enableMultiThreading(5)
+                .renderImage(7)
+                .writeToImage();
+    }
+
+    /**
+     * Test Render of the scene with different setting presets
+     */
+    @Test
+    @Disabled
+    public void simpleRenderWithEffects() {
+        //boardMat.setReflectionBlur(1.6, 81);
+
+        scene.setGeometries(buildScene());
+        scene.setLights(
+                new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
+        );
+        cameraBuilder
+                .setRayTracer(new SimpleRayTracer(scene))
+                .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
+                .setVpDistance(600)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "simple tracer, multithreading - aa 9", 1280, 720))
+                .build()
+                .enableAntiAliasing(3, 9)
+                .enableMultiThreading(5)
+                .renderImage(7)
+                .writeToImage();
+    }
+
+    /**
+     * Test Render of the scene with different setting presets
+     */
+    @Test
+    @Disabled
+    public void noAccelerations() {
+        scene.setGeometries(buildScene());
+        scene.setLights(
+                new SpotLight(new Color(85, 120, 75), new Point(0, 250, 0), new Point(200, 15, 200)),
+                new DirectionalLight(new Color(79, 139, 168), new Vector(0.8, -0.3, 1))
+        );
+        cameraBuilder
+                .setRayTracer(new SimpleRayTracer(scene))
+                .setFocusPoint(new Point(-900, 1700, -2200), new Point(400, 60, 420))
+                .setVpDistance(600)
+                .setVpSize(135, 240)
+                .setImageWriter(new ImageWriter(directoryName + "no accelerations - no effects", 1280, 720))
+                .build()
+                .renderImage(7)
                 .writeToImage();
     }
 
@@ -316,7 +373,7 @@ public class ChessScene {
     /**
      * Builder method of the wall and window
      *
-     * @param material     the material of the wall
+     * @param material the material of the wall
      * @return geometries container with a wall, window in the wall, a moon in the
      * distance(through the window)
      */
