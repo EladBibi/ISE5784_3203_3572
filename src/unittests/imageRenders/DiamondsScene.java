@@ -1,7 +1,6 @@
 package imageRenders;
 
 import geometries.Geometries;
-import geometries.Plane;
 import geometries.Polygon;
 import geometries.Triangle;
 import lighting.AmbientLight;
@@ -12,10 +11,8 @@ import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Material;
 import primitives.Point;
-import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
-import renderer.SimpleRayTracer;
 import renderer.VoxelRayTracer;
 import scene.Scene;
 
@@ -48,32 +45,17 @@ public class DiamondsScene {
         scene.geometries.add(buildScene());
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0d));
         Color spotColor1 = new Color(86, 135, 204);
-        Color spotColor2 = new Color(77, 20, 33);
-        Color spotColor3 = new Color(79, 57, 30);
         Color spotColor4 = new Color(59, 35, 21);
         Color pointColor1 = new Color(28, 97, 64);
-        Color pointColor2 = new Color(36, 31, 61);
         scene.setLights(
                 new PointLight(pointColor1, new Point(-150, 0, -150))
                         .setKl(4E-5).setKq(2E-7),
-//                new PointLight(pointColor1, new Point(-50, 130, -50))
-//                        .setKl(4E-5).setKq(2E-7),
-//                new PointLight(pointColor2, new Point(-250,-70,-330))
-//                        .setKl(4E-5).setKq(2E-7),
                 new SpotLight(spotColor1, new Point(-400, 80, 200), new Point(-100, 0, -100))
                         .setKl(4E-5).setKq(2E-7),
-//                new SpotLight(spotColor2, new Point(-874.41164, 300.63026, -400.30782), Point.ZERO)
-//                        .setKl(4E-5).setKq(2E-7),
-//                new SpotLight(spotColor3, new Point(-800, 300, 900), new Point(-200, -10, 0))
-//                        .setKl(4E-5).setKq(2E-7),
                 new SpotLight(spotColor4, new Point(-1300, 300, -1300), new Point(0, 0, 0))
                         .setKl(4E-5).setKq(2E-7)
         );
 
-        Point vidStartingPnt = new Point(3500, 0, 0);
-        Point vidEndingPnt = new Point(0, 1400, -3500);
-        Point vidInterpolationPnt = new Point(3500, 700, -3500);
-        Point vidFocusPnt = new Point(-100, 0, -100);
 
         cameraBuilder
                 .setRayTracer(new VoxelRayTracer(scene))
@@ -82,13 +64,10 @@ public class DiamondsScene {
                 .setVpSize(135, 240)
                 .setImageWriter(new ImageWriter(directoryName + "voxel tracer 2", 1920, 1080))
                 .build()
-                //.enableAntiAliasing(3, 9)
                 .enableMultiThreading(4)
                 .rotate(0)
                 .renderImage()
                 .writeToImage();
-//                .generateVideo(125, 79, "diamonds scene vid 4 HD", 1280, 720,
-//                        vidFocusPnt, vidStartingPnt, vidEndingPnt, vidInterpolationPnt, 0);
     }
 
     /**
@@ -244,52 +223,5 @@ public class DiamondsScene {
                 new Triangle(d4, d6, d5).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor),
                 new Triangle(d5, d6, d2).setMaterial(cubeDiamondMat).setEmission(diamondCubeColor)
         );
-    }
-
-    /**
-     * For random tests
-     */
-    @Test
-    @Disabled
-    public void test() {
-        final Scene scene = new Scene("Test Scene");
-
-        Material planeMat = new Material().setKd(0.9d).setKs(0.1d).setShininess(300).setKr(0.7d)
-                .setReflectionBlur(14, 27);
-        Material sphereMat = new Material().setKd(0.3d).setKs(0.7d).setShininess(300).setKt(0.5d).setKr(200d)
-                .setReflectionBlur(20, 9);
-        Color planeColor = Color.BLACK;
-        Color sphereColor = new Color(9, 64, 50);
-        Color secSphereColor = new Color(15, 12, 44);
-
-        scene.geometries.add(
-                new Geometries(),
-                new Triangle(new Point(200, 700, 200), new Point(-200, 700, -200), new Point(-200, 700, 200))
-                        .setMaterial(sphereMat).setEmission(sphereColor),
-                new Plane(new Point(1, 0, 1), Vector.UP).setMaterial(planeMat).setEmission(planeColor)
-                //new Sphere(new Point(0, 200, 0), 180).setMaterial(sphereMat).setEmission(sphereColor)
-//                new Sphere(new Point(0, 100, 0), 50).setEmission(secSphereColor)
-        );
-
-        Color spotColor1 = new Color(166, 152, 48);
-        Color pointColor1 = new Color(46, 94, 41);
-        scene.setLights(
-//                new SpotLight(spotColor1, new Point(0, 500, 0), Point.ZERO)
-//                        .setKl(0.00001).setKq(0.0000002)
-//                new PointLight(spotColor1, new Point(400, 100, 400))
-//                            .setKl(0.000001).setKq(0.0000002)
-
-        );
-
-        cameraBuilder
-                .setRayTracer(new SimpleRayTracer(scene))
-                .setFocusPoint(new Point(800, 300, 0), Point.ZERO)
-                .setVpDistance(100)
-                .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter("test emission 2", 800, 450))
-                .build()
-                .enableAntiAliasing(3, 27)
-                .renderImage()
-                .writeToImage();
     }
 }

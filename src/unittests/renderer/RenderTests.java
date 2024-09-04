@@ -3,7 +3,6 @@ package renderer;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Double3;
@@ -87,21 +86,6 @@ public class RenderTests {
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(WHITE))
-                .writeToImage();
-    }
-
-    /**
-     * Test for XML based scene - for bonus
-     */
-    @Test
-    @Disabled
-    public void basicRenderXml() {
-        String sceneName = "scene1";
-        camera
-                .extractPresetFromFile(sceneName, "xml test image 1")
-                .build()
-                .renderImage()
-                .printGrid(100, new Color(YELLOW))
                 .writeToImage();
     }
 }

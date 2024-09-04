@@ -5,14 +5,12 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import scene.Scene;
 
 import java.util.List;
 import java.util.MissingResourceException;
 
 import static primitives.Util.compare;
 import static primitives.Util.isZero;
-import static xml.XmlParser.*;
 
 /**
  * Camera class that contains positioning in the plane and view plane size
@@ -39,9 +37,9 @@ public class Camera implements Cloneable {
          */
         PROGRESS_AND_TIME,
         /**
-         * Will automatically be used when generating a video. otherwise, irrelevant
+         * Prints only progress in intervals of 25%
          */
-        VIDEO_GENERATION;
+        PROGRESS_ONLY_SHORT
     }
 
     /**
@@ -322,7 +320,8 @@ public class Camera implements Cloneable {
      * Prints rendering progress according to the camera's progress print mode
      */
     private synchronized void printProgress() {
-        int progress = (int) ((completedPixelsCount / (double) totalPixelsCount) * 100);
+        double dProgress = ((completedPixelsCount / (double) totalPixelsCount) * 100);
+        int progress = (int) dProgress;
         switch (printMode) {
             case NONE:
                 break;
@@ -352,7 +351,9 @@ public class Camera implements Cloneable {
                     lastUpdateTime = currentTime;
                 }
                 break;
-            case VIDEO_GENERATION:
+            case PROGRESS_ONLY_SHORT:
+                if (dProgress == 25.0 || dProgress == 50.0 || dProgress == 75.0 || dProgress == 99.0)
+                    System.out.println("Progress: " + progress + "%");
                 break;
         }
     }
@@ -488,42 +489,46 @@ public class Camera implements Cloneable {
      */
     public void generateVideo(int frames, int startFrom, String name, int nX, int nY, Point focusPoint, Point origin,
                               Point destination, Point interpolation, double rotation, int recursionDepth) {
-        printMode = ProgressPrintMode.VIDEO_GENERATION;
+        printMode = ProgressPrintMode.PROGRESS_ONLY_SHORT;
+        lastUpdateTime = System.currentTimeMillis();
         for (int i = startFrom; i < frames; ++i) {
+            //where we are along the curve, percentage wise
             double positionOnRoute = (double) i / (double) frames;
             String frameName = name + i;
             imageWriter = new ImageWriter(frameName, nX, nY);
+            //calculating the position of the camera along the curve for the current frame using quadratic interpolation
             Point position = Point.quadraticInterpolate(origin, interpolation, destination, positionOnRoute);
+            //setting the new position for the camera
             setFocusPoint(position, focusPoint);
             rotate(rotation);
-            if (printMode == ProgressPrintMode.VIDEO_GENERATION)
-                System.out.println("Working on frame " + i + " ...");
 
-            if (recursionDepth >= 1)
+            System.out.println("Working on frame " + i + " ...");
+
+            if (recursionDepth >= 1) //rendering with user-defined recursion depth
                 renderImage(recursionDepth);
-            else
+            else //rendering with the ray tracer's default recursion depth
                 renderImage();
+
             writeToImage();
 
-            if (printMode == ProgressPrintMode.VIDEO_GENERATION) {
-                int progress = (int) ((i / (double) frames) * 100);
+            //handling progress print
+            int progress = (int) ((i / (double) frames) * 100);
+            long currentTime = System.currentTimeMillis();
+            long timeBetweenCalls = currentTime - lastUpdateTime;
+            elapsedTime += timeBetweenCalls;
 
-                // Calculate time estimates
-                long currentTime = System.currentTimeMillis();
-                long timeBetweenCalls = currentTime - lastUpdateTime;
-                elapsedTime += timeBetweenCalls;
+            double estimatedTotalTime = (elapsedTime / (double) (i - startFrom + 1)) * (frames - startFrom);
+            long estimatedRemainingTime = (long) (estimatedTotalTime - elapsedTime);
 
-                double estimatedTotalTime = (elapsedTime / (double) (i - startFrom + 1)) * (frames - startFrom);
-                long estimatedRemainingTime = (long) (estimatedTotalTime - elapsedTime);
+            System.out.println("Completed frame " + i + " out of " + frames
+                    + " | Progress: " + progress + "%"
+                    + " | Time taken for last frame: " + formatTime(timeBetweenCalls)
+                    + " | Estimated time remaining: " + formatTime(estimatedRemainingTime));
 
-                System.out.println("Completed frame " + i + " out of " + frames
-                        + " | Progress: " + progress + "%"
-                        + " | Time taken for last frame: " + formatTime(timeBetweenCalls)
-                        + " | Estimated time remaining: " + formatTime(estimatedRemainingTime));
-
-                lastUpdateTime = currentTime;
-            }
+            lastUpdateTime = currentTime;
         }
+
+        printMode = ProgressPrintMode.PROGRESS_AND_TIME;
     }
 
     /**
@@ -634,19 +639,6 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Loading the camera position in the scene from xml file from the given scene name
-         *
-         * @param sceneName the name of the scene listed in the scene file
-         * @return the builder object used in the construction
-         * @throws IllegalArgumentException if the given scene name does not exist
-         * @throws RuntimeException         if there was an error loading or parsing the scenes file
-         */
-        public Builder setLocationFromFile(String sceneName) {
-            camera.position = extractCameraPosition(sceneName);
-            return this;
-        }
-
-        /**
          * Setter for the camera's direction in the space
          *
          * @param vTo the forward vector towards the view-plane
@@ -724,20 +716,6 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Loading an Image writer from xml file
-         *
-         * @param sceneName the name of the scene listed in the scene file
-         * @param imageName the name for the image
-         * @return the builder object used in the construction
-         * @throws IllegalArgumentException if the given scene name does not exist
-         * @throws RuntimeException         if there was an error loading or parsing the scenes file
-         */
-        public Builder setImageWriterFromFile(String sceneName, String imageName) {
-            camera.imageWriter = extractImageWriter(sceneName, imageName);
-            return this;
-        }
-
-        /**
          * Setter for the camera's Ray-tracer
          *
          * @param rayTracer a ray tracer for the camera
@@ -746,35 +724,6 @@ public class Camera implements Cloneable {
         public Builder setRayTracer(RayTracerBase rayTracer) {
             camera.rayTracer = rayTracer;
             return this;
-        }
-
-        /**
-         * Loading a ray tracer from an xml file. all data related to the scene will be loaded from the file
-         *
-         * @param sceneName the name of the scene listed in the scene file
-         * @return the builder object used in the construction
-         * @throws IllegalArgumentException if the given scene name does not exist
-         * @throws RuntimeException         if there was an error loading or parsing the scenes file
-         */
-        public Builder setRayTracerFromFile(String sceneName) {
-            Scene scene = extractPreset(sceneName);
-            if (scene == null)
-                throw new IllegalArgumentException("A scene with name: " + sceneName + " does not exist");
-            camera.rayTracer = new SimpleRayTracer(scene);
-            return this;
-        }
-
-        /**
-         * Extracting a pre-made setting preset of the camera
-         *
-         * @param presetName the name of the preset in the file (will also be the scene name)
-         * @param imageName  name for the image
-         * @return the builder object used in the construction
-         */
-        public Builder extractPresetFromFile(String presetName, String imageName) {
-            return setImageWriterFromFile(presetName, imageName)
-                    .setLocationFromFile(presetName)
-                    .setRayTracerFromFile(presetName);
         }
 
         /**

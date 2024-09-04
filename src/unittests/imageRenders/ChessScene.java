@@ -71,26 +71,29 @@ public class ChessScene {
     private final double moonRadius = 10;
 
     /**
-     * Generate a video
+     * Rendering frames for a video
      */
     @Test
     @Disabled
     public void videoGeneration() {
         scene.setGeometries(buildScene());
         scene.setLights(
-                new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
-                new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001)
+                new SpotLight(new Color(86, 51, 66), new Point(0, 500, 1000), new Point(-425, 0, 450)),
+                new SpotLight(new Color(60, 57, 72), new Point(-650, 200, -750), new Point(550, 70, 550)),
+                new PointLight(new Color(52, 110, 103), new Point(-800, 200, -20)).setKl(0.00000001)
         );
         cameraBuilder
                 .setRayTracer(new VoxelRayTracer(scene))
                 .setFocusPoint(new Point(-900, 1050, -2200), new Point(425, 65, 450))
                 .setVpDistance(800)
                 .setVpSize(135, 240)
-                .setImageWriter(new ImageWriter(directoryName + "video 1/frame ", 800, 450))
+                .setImageWriter(new ImageWriter(directoryName + "video 2/frame ", 800, 450))
                 .build()
                 .enableMultiThreading(5)
-                .generateVideo(100, 83, directoryName + "video 1/frame ", 1280, 720, new Point(425, 65, 450), new Point(-900, 1450, -2200),
-                        new Point(-1900, 250, -700), new Point(-2000, 750, -2200), 0, 6);
+                .enableAntiAliasing(1, 4)
+                .generateVideo(100, 41, directoryName + "video 2 with aa 4 cont/frame ", 1920, 1080,
+                        new Point(425, 65, 450), new Point(-2805.12, 1265.12, 61.2799999999998),
+                        new Point(0, 600, 2400), new Point(-1205, 450, 2200), 0, 7);
     }
 
     /**
@@ -103,8 +106,6 @@ public class ChessScene {
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
-//                new SpotLight(new Color(38, 36, 97), new Point(100, 100, -200), new Point(450, 0, 450))
-                //new DirectionalLight(new Color(105, 82, 42), new Vector(-0.7,-0.2, 1))
                 new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
                 new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
                         .setKq(0.0000001)
@@ -131,8 +132,6 @@ public class ChessScene {
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
-//                new SpotLight(new Color(38, 36, 97), new Point(100, 100, -200), new Point(450, 0, 450))
-                //new DirectionalLight(new Color(105, 82, 42), new Vector(-0.7,-0.2, 1))
                 new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
                 new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
                         .setKq(0.0000001)
@@ -165,8 +164,6 @@ public class ChessScene {
         scene.setLights(
 //                81, 171, 161    70, 122, 148
                 new SpotLight(new Color(70, 47, 82), new Point(-650, 200, -750), new Point(550, 70, 550)),
-//                new SpotLight(new Color(38, 36, 97), new Point(100, 100, -200), new Point(450, 0, 450))
-                //new DirectionalLight(new Color(105, 82, 42), new Vector(-0.7,-0.2, 1))
                 new PointLight(new Color(62, 130, 123), new Point(-800, 200, -20)).setKl(0.00000001),
                 new SpotLight(new Color(59, 24, 40), new Point(0, 600, 0), new Point(450, 0, 450))
                         .setKq(0.0000001)
@@ -315,7 +312,7 @@ public class ChessScene {
         Color blackColor = new Color(41, 34, 0);
 
         Polygon surface = new Polygon(new Point(-1200, -20, 1100), new Point(1800, -20, 1100),
-                new Point(1800, -20, -1100), new Point(-1200, -20, -1100));
+                new Point(1800, -20, -900), new Point(-1200, -20, -900));
 
         Intersectable blackPawn = buildPawn().setEmission(blackColor).setMaterial(chessPieceMat);
         Intersectable blackKing = buildKing().setEmission(blackColor).setMaterial(chessPieceMat);
@@ -381,13 +378,13 @@ public class ChessScene {
         double windowLedgeLength = 80;
         Point p1 = new Point(-1200, -500, 0);
         Point p2 = new Point(0, -500, 0);
-        Point p3 = new Point(0, 2000, 0);
-        Point p4 = new Point(-1200, 2000, 0);
+        Point p3 = new Point(0, 1000, 0);
+        Point p4 = new Point(-1200, 1000, 0);
 
         Point p5 = new Point(1800, -500, 0);
         Point p6 = new Point(900, -500, 0);
-        Point p7 = new Point(900, 2000, 0);
-        Point p8 = new Point(1800, 2000, 0);
+        Point p7 = new Point(900, 1000, 0);
+        Point p8 = new Point(1800, 1000, 0);
 
         Point p9 = new Point(900, -500, 0);
         Point p10 = new Point(0, -500, 0);
@@ -396,8 +393,8 @@ public class ChessScene {
 
         Point p13 = new Point(900, 950, 0);
         Point p14 = new Point(0, 950, 0);
-        Point p15 = new Point(0, 2000, 0);
-        Point p16 = new Point(900, 2000, 0);
+        Point p15 = new Point(0, 1000, 0);
+        Point p16 = new Point(900, 1000, 0);
 
         Point o1 = new Point(0, 950, windowLedgeLength);
         Point o2 = new Point(900, 950, windowLedgeLength);

@@ -122,14 +122,15 @@ public class Point {
     }
 
     /**
-     * Performs Quadratic Interpolate using bezier-curves with the given points.
+     * Performs Quadratic Interpolation using bezier-curves with the given points.
      * the method accepts origin and destination points, as well as an interpolation point
      * as well as normalized double (with range 0 to 1) to represent where we are along the curve.
-     * the given point will be positioned on the curve created by the origin, destination and interpolation points.
-     * if the given normalized double equals to 1, we are at the beginning of the curve, which is the origin point
-     * if the given normalized double equals to 0, we are at the end of the curve, which is the destination point
-     * for each value in between, the given point will be along the curve respective to the curve's length and
-     * the given percentage as double
+     * the returned point will be positioned along the curve created by the origin, destination and interpolation points.
+     * if the given normalized double t equals to 0, we are at the beginning of the curve, which is the origin point.
+     * if the given normalized double t equals to 1, we are at the end of the curve, which is the destination point.
+     * for each value in between, the returned point will be in the given t % of the route along the curve,
+     * respective to the curve's length, of course. if you have no clue what quadratic interpolation is, watching visual
+     * demonstrations on YouTube can greatly help you understand and use this feature.
      *
      * @param originPoint        the origin point, where the curve starts from
      * @param interpolationPoint the interpolation point, will be used for creating the bezier-curve between the origin and destination
